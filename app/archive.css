@@ -198,84 +198,103 @@
   font-size: 9px;
 }
 .groupProgress {
-  padding: 12px;
-  border-radius: 9px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0 18px;
+  padding: 15px 16px 13px 18px;
+  overflow: hidden;
+  border-radius: 12px;
   background: #f7f8f9;
 }
+.groupProgress:before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: #abc0d8;
+}
 .groupProgress > span {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  gap: 5px;
   color: #6f8fb9;
-  font-size: 9px;
+  font-size: 11px;
+  font-weight: 780;
 }
 .groupProgress small {
-  color: #777772;
-  font:
-    9px "Courier New",
-    monospace;
-  font-weight: 700;
+  color: #999994;
+  font-size: 8px;
+  font-weight: 650;
 }
-.groupProgress > i {
-  height: 3px;
-  display: block;
-  overflow: hidden;
-  margin-top: 9px;
-  border-radius: 3px;
-  background: #e5e8eb;
+.progressNumber {
+  color: #6f8fb9;
+  font-size: 25px;
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
-.groupProgress > i b {
-  height: 100%;
-  display: block;
-  background: #abc0d8;
+.progressNumber i {
+  margin-left: 2px;
+  color: #9b9b96;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 650;
+  letter-spacing: 0;
 }
 .groupProgress.done > span {
   color: #6f8fb9;
 }
-.groupProgress.done > i b {
+.groupProgress.done:before {
   background: #abc0d8;
 }
+.groupProgress.done .progressNumber { color: #6f8fb9; }
 .groupProgress.paused > span {
   color: #c97887;
 }
-.groupProgress.paused > i b {
+.groupProgress.paused:before {
   background: #dca8b2;
 }
+.groupProgress.paused .progressNumber { color: #c97887; }
 .groupProgress.paused {
   background: #fbf6f7;
 }
 .groupProgress.basket > span {
   color: #858580;
 }
-.groupProgress.basket > i b {
+.groupProgress.basket:before {
   background: #bdbdb8;
 }
+.groupProgress.basket .progressNumber { color: #858580; }
 .groupProgress.basket {
   background: #f7f7f5;
 }
 .groupProgress.reading > span {
   color: #c59b24;
 }
-.groupProgress.reading > i b {
+.groupProgress.reading:before {
   background: #d9bc66;
 }
+.groupProgress.reading .progressNumber { color: #c59b24; }
 .groupProgress.reading {
   background: #fbf9f2;
 }
 .groupProgress.before > span {
   color: #6f9d7e;
 }
-.groupProgress.before > i b {
+.groupProgress.before:before {
   background: #9fc2aa;
 }
+.groupProgress.before .progressNumber { color: #6f9d7e; }
 .groupProgress.before {
   background: #f5f9f6;
 }
 .groupProgress > p {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
-  margin: 10px 0 0;
-  padding-top: 9px;
+  margin: 13px 0 0;
+  padding-top: 10px;
   border-top: 1px solid #e6e9ec;
   color: #9a9a95;
   font-size: 8px;
