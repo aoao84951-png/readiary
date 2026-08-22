@@ -804,8 +804,8 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
   );
 }
 
-function StatSection({ title, subtitle, items, max }: { title: string; subtitle: string; items: { name: string; works: number; volumes: number; paid: number }[]; max: number }) {
-  return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statRows">{items.map(item => <div className="statRow" key={item.name}><div><b>{item.name}</b><small>{item.volumes}권 · {item.works}작품</small></div><strong>{item.paid.toLocaleString()}원</strong><i><b style={{ width: `${Math.max(3, item.paid / max * 100)}%` }} /></i></div>)}</div></section>;
+function StatSection({ title, subtitle, items }: { title: string; subtitle: string; items: { name: string; works: number; volumes: number; paid: number }[] }) {
+  return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statCards">{items.map((item, index) => <article className="statCard" key={item.name}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><strong>{item.paid.toLocaleString()}원</strong><small>{item.volumes}권 · {item.works}작품</small></article>)}</div></section>;
 }
 
 function StatsView({ books }: { books: Book[] }) {
@@ -851,10 +851,10 @@ function StatsView({ books }: { books: Book[] }) {
         <div><small>평균 평점</small><b>★ {averageRating ? averageRating.toFixed(1) : "–"}</b></div>
         <div><small>평균 작품 지출</small><b>{won(books.length ? Math.round(paid / books.length) : 0)}</b></div>
       </div>
-      <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} max={Math.max(...genres.map(item => item.paid), 1)} />
-      <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} max={Math.max(...platforms.map(item => item.paid), 1)} />
+      <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} />
+      <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} />
       <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <div key={item.name}><small>{item.name}</small><b>{item.works}</b><i>작품</i></div>)}</div></section>
-      {months.length > 0 && <StatSection title="PURCHASE LOG" subtitle="월별 구매 지출" items={months} max={Math.max(...months.map(item => item.paid), 1)} />}
+      {months.length > 0 && <StatSection title="PURCHASE LOG" subtitle="월별 구매 지출" items={months} />}
     </section>
   );
 }
