@@ -810,8 +810,8 @@ export default function FeedPage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
@@ -850,9 +850,9 @@ export default function FeedPage() {
     const q = query.trim().toLowerCase();
     return books.filter((book) => {
       const textMatch = !q || `${book.title} ${book.author}`.toLowerCase().includes(q);
-      return textMatch && (!statusFilter || book.status === statusFilter) && (!categoryFilter || book.category === categoryFilter);
+      return textMatch && (!statusFilters.length || statusFilters.includes(book.status)) && (!categoryFilters.length || categoryFilters.includes(book.category));
     });
-  }, [books, query, statusFilter, categoryFilter]);
+  }, [books, query, statusFilters, categoryFilters]);
   useEffect(() => {
     if (view === "feed" && pending)
       requestAnimationFrame(() =>
@@ -987,7 +987,7 @@ export default function FeedPage() {
           <span>기록</span>
         </button>
         <button
-          className={`filterToggle ${filterOpen || statusFilter || categoryFilter ? "on" : ""}`}
+          className={`filterToggle ${filterOpen || statusFilters.length || categoryFilters.length ? "on" : ""}`}
           onClick={() => {
             setFilterOpen((v) => !v);
             setSearchOpen(false);
@@ -995,7 +995,7 @@ export default function FeedPage() {
           aria-label="상태 및 장르 필터"
         >
           <SlidersHorizontal size={14} />
-          {(statusFilter || categoryFilter) && <i aria-hidden="true" />}
+          {(statusFilters.length > 0 || categoryFilters.length > 0) && <i aria-hidden="true" />}
         </button>
         <button
           className={`refresh ${loading ? "loading" : ""}`}
@@ -1020,29 +1020,29 @@ export default function FeedPage() {
             <header className="filterHead">
               <div><b>FILTER</b><small>기록 골라보기</small></div>
               <span>
-                {(statusFilter || categoryFilter) && <button onClick={() => { setStatusFilter(""); setCategoryFilter(""); }}>초기화</button>}
+                {(statusFilters.length > 0 || categoryFilters.length > 0) && <button onClick={() => { setStatusFilters([]); setCategoryFilters([]); }}>초기화</button>}
                 <button className="filterClose" onClick={() => setFilterOpen(false)} aria-label="필터 닫기"><X size={14} /></button>
               </span>
             </header>
             <div className="filterGroup">
               <b>상태</b>
               <div className="filterOptions">
-                {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={statusFilter === value ? "on" : ""} key={value || "all"} onClick={() => setStatusFilter(value)}><i />{value || "전체"}</button>)}
+                {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={value ? statusFilters.includes(value) ? "on" : "" : statusFilters.length === 0 ? "on" : ""} key={value || "all"} onClick={() => value ? setStatusFilters(current => current.includes(value) ? current.filter(item => item !== value) : [...current, value]) : setStatusFilters([])}><i />{value || "전체"}</button>)}
               </div>
             </div>
             <div className="filterGroup">
               <b>장르</b>
               <div className="filterOptions">
-                {["", "BL", "로맨스", "로맨스판타지", "문학", "기타"].map(value => <button className={categoryFilter === value ? "on" : ""} key={value || "all"} onClick={() => setCategoryFilter(value)}><i />{value || "전체"}</button>)}
+                {["", "BL", "로맨스", "로맨스판타지", "문학", "기타"].map(value => <button className={value ? categoryFilters.includes(value) ? "on" : "" : categoryFilters.length === 0 ? "on" : ""} key={value || "all"} onClick={() => value ? setCategoryFilters(current => current.includes(value) ? current.filter(item => item !== value) : [...current, value]) : setCategoryFilters([])}><i />{value || "전체"}</button>)}
               </div>
             </div>
           </aside>
         </>
       )}
-      {(statusFilter || categoryFilter) && (
+      {(statusFilters.length > 0 || categoryFilters.length > 0) && (
         <div className="activeFilters" aria-label="적용 중인 필터">
-          {statusFilter && <button onClick={() => setStatusFilter("")}>{statusFilter}<X size={10} /></button>}
-          {categoryFilter && <button onClick={() => setCategoryFilter("")}>{categoryFilter}<X size={10} /></button>}
+          {statusFilters.map(value => <button key={value} onClick={() => setStatusFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
+          {categoryFilters.map(value => <button key={value} onClick={() => setCategoryFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
         </div>
       )}
       {view === "records" && <ModalRecordArchive books={visible} />}
