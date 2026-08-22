@@ -503,6 +503,229 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
+function ModalRecordArchive({ books }: { books: Book[] }) {
+  const [selected, setSelected] = useState<{
+    book: Book;
+    index: number;
+  } | null>(null);
+  useEffect(() => {
+    if (!selected) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(null);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [selected]);
+  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <div className="recordRow">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+  const statusClass = (status: string) =>
+    status === "완독"
+      ? "done"
+      : status === "하차"
+        ? "paused"
+        : status === "읽는 중"
+          ? "reading"
+          : status === "읽기 전"
+            ? "before"
+            : "basket";
+  return (
+    <section className="archiveList modalArchive">
+      <header className="archiveHead">
+        <span>MY BOOK RECORDS</span>
+        <b>{String(books.length).padStart(2, "0")}</b>
+      </header>
+      {books.map((book, index) => {
+        const progress = Math.min(
+          100,
+          Math.round((book.read_count / book.total_count) * 100),
+        );
+        return (
+          <button
+            className="archiveListButton"
+            key={book.id}
+            onClick={() => setSelected({ book, index })}
+          >
+            <span className="archiveCover">
+              {book.cover_url ? (
+                <img src={book.cover_url} alt="" />
+              ) : (
+                <span>▦</span>
+              )}
+            </span>
+            <span className="archiveIdentity">
+              <b>{book.title}</b>
+              <small>
+                {book.author || "저자 미상"} · {book.category}
+              </small>
+            </span>
+            <span className={`archiveStatus ${statusClass(book.status)}`}>
+              {book.status}
+              <small>{progress}%</small>
+            </span>
+          </button>
+        );
+      })}
+      {selected &&
+        (() => {
+          const { book, index } = selected;
+          const progress = Math.min(
+            100,
+            Math.round((book.read_count / book.total_count) * 100),
+          );
+          const discount = book.list_price
+            ? Math.max(
+                0,
+                Math.round((1 - book.paid_price / book.list_price) * 100),
+              )
+            : 0;
+          return (
+            <div
+              className="recordModalShade"
+              onMouseDown={() => setSelected(null)}
+            >
+              <section
+                className="recordModal"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${book.title} 상세 기록`}
+                onMouseDown={(event) => event.stopPropagation()}
+              >
+                <header className="recordModalHead">
+                  <span className="modalBookCover">
+                    {book.cover_url ? (
+                      <img src={book.cover_url} alt="" />
+                    ) : (
+                      <span>▦</span>
+                    )}
+                  </span>
+                  <span>
+                    <small>RECORD {String(index + 1).padStart(2, "0")}</small>
+                    <b>{book.title}</b>
+                    <em>
+                      {book.author || "저자 미상"} · {book.category}
+                    </em>
+                  </span>
+                  <button
+                    onClick={() => setSelected(null)}
+                    aria-label="상세 기록 닫기"
+                  >
+                    <X size={17} />
+                  </button>
+                </header>
+                <div className="recordModalBody">
+                  <div className="recordHighlights">
+                    <div>
+                      <Rating rating={book.rating} />
+                      <small>평점</small>
+                    </div>
+                    <div>
+                      <b>
+                        {book.read_count} / {book.total_count}권
+                      </b>
+                      <small>독서량</small>
+                    </div>
+                    <div>
+                      <b>{progress}%</b>
+                      <small>진행률</small>
+                    </div>
+                  </div>
+                  <section className="recordGroup">
+                    <h3>BOOK</h3>
+                    <dl>
+                      <Row label="저자" value={book.author || "–"} />
+                      <Row label="총 권수" value={`${book.total_count}권`} />
+                      <Row label="카테고리" value={book.category} />
+                      <Row
+                        label="커버 이미지"
+                        value={book.cover_url ? "등록됨" : "–"}
+                      />
+                    </dl>
+                  </section>
+                  <section className="recordGroup readingGroup">
+                    <h3>READING</h3>
+                    <div
+                      className={`groupProgress ${statusClass(book.status)}`}
+                    >
+                      <span>
+                        <b>{book.status}</b>
+                        <small>{progress}%</small>
+                      </span>
+                      <i>
+                        <b style={{ width: `${progress}%` }} />
+                      </i>
+                      <p>
+                        <span>완독 / 하차일</span>
+                        <b>{book.finished_date || "–"}</b>
+                      </p>
+                    </div>
+                    <dl>
+                      <Row
+                        label="평점"
+                        value={<Rating rating={book.rating} />}
+                      />
+                      <Row
+                        label="독서량"
+                        value={`${book.read_count} / ${book.total_count}권`}
+                      />
+                    </dl>
+                  </section>
+                  <section className="recordGroup purchaseGroup">
+                    <h3>PURCHASE</h3>
+                    <div className="priceLine">
+                      <span>
+                        <small>총 판매가</small>
+                        <s>{book.list_price.toLocaleString()}원</s>
+                      </span>
+                      <b>{book.paid_price.toLocaleString()}원</b>
+                      <em>{discount}% OFF</em>
+                    </div>
+                    <dl>
+                      <Row label="구매일" value={book.purchase_date || "–"} />
+                      <Row label="플랫폼" value={book.platform || "–"} />
+                      <Row
+                        label="총 판매가"
+                        value={`${book.list_price.toLocaleString()}원`}
+                      />
+                      <Row
+                        label="총 실구매가"
+                        value={`${book.paid_price.toLocaleString()}원`}
+                      />
+                      <Row label="할인율" value={`${discount}%`} />
+                      <Row
+                        label="구매방법"
+                        value={book.purchase_method || "–"}
+                      />
+                    </dl>
+                  </section>
+                  <section className="recordGroup notesGroup">
+                    <h3>NOTES</h3>
+                    <div className="archiveNotes">
+                      <Notes notes={book.liked_notes} kind="liked" />
+                      <Notes notes={book.disliked_notes} kind="disliked" />
+                      {!book.liked_notes.length &&
+                        !book.disliked_notes.length && (
+                          <p className="emptyNotes">기록된 감상이 없습니다.</p>
+                        )}
+                    </div>
+                  </section>
+                </div>
+              </section>
+            </div>
+          );
+        })()}
+    </section>
+  );
+}
+
 export default function FeedPage() {
   const [books, setBooks] = useState<Book[]>(demo);
   const [view, setView] = useState<ViewMode>("grid");
@@ -689,7 +912,7 @@ export default function FeedPage() {
           )}
         </div>
       )}
-      {view === "records" && <GroupedRecordArchive books={visible} />}
+      {view === "records" && <ModalRecordArchive books={visible} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
       ) : view === "grid" ? (
