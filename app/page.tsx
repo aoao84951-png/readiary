@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
+  BarChart3,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -26,7 +27,7 @@ type SearchBook = {
   category: string;
   platform: string;
 };
-type ViewMode = "grid" | "feed" | "calendar" | "records";
+type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 const demo: Book[] = [
   {
     id: "sample-1",
@@ -803,6 +804,61 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
   );
 }
 
+function StatSection({ title, subtitle, items, max }: { title: string; subtitle: string; items: { name: string; works: number; volumes: number; paid: number }[]; max: number }) {
+  return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statRows">{items.map(item => <div className="statRow" key={item.name}><div><b>{item.name}</b><small>{item.volumes}권 · {item.works}작품</small></div><strong>{item.paid.toLocaleString()}원</strong><i><b style={{ width: `${Math.max(3, item.paid / max * 100)}%` }} /></i></div>)}</div></section>;
+}
+
+function StatsView({ books }: { books: Book[] }) {
+  const won = (value: number) => `${value.toLocaleString()}원`;
+  const totalVolumes = books.reduce((sum, book) => sum + (book.total_count || 0), 0);
+  const readVolumes = books.reduce((sum, book) => sum + (book.read_count || 0), 0);
+  const paid = books.reduce((sum, book) => sum + (book.paid_price || 0), 0);
+  const list = books.reduce((sum, book) => sum + (book.list_price || 0), 0);
+  const rated = books.filter(book => typeof book.rating === "number" && book.rating > 0);
+  const averageRating = rated.length ? rated.reduce((sum, book) => sum + (book.rating || 0), 0) / rated.length : 0;
+  const group = (key: "category" | "platform" | "status") => Object.values(books.reduce<Record<string, { name: string; works: number; volumes: number; paid: number }>>((all, book) => {
+    const name = book[key] || "미분류";
+    all[name] ||= { name, works: 0, volumes: 0, paid: 0 };
+    all[name].works += 1;
+    all[name].volumes += book.total_count || 0;
+    all[name].paid += book.paid_price || 0;
+    return all;
+  }, {})).sort((a, b) => b.paid - a.paid || b.volumes - a.volumes);
+  const genres = group("category");
+  const platforms = group("platform");
+  const statuses = group("status");
+  const months = Object.values(books.reduce<Record<string, { name: string; works: number; volumes: number; paid: number }>>((all, book) => {
+    const name = book.purchase_date?.slice(0, 7);
+    if (!name) return all;
+    all[name] ||= { name, works: 0, volumes: 0, paid: 0 };
+    all[name].works += 1;
+    all[name].volumes += book.total_count || 0;
+    all[name].paid += book.paid_price || 0;
+    return all;
+  }, {})).sort((a, b) => b.name.localeCompare(a.name));
+  if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
+  return (
+    <section className="statsPage">
+      <header className="statsIntro"><span>READING REPORT</span><h1>나의 독서 통계</h1><p>지금까지 기록한 모든 책을 바탕으로 정리했어요.</p></header>
+      <div className="statsSummary">
+        <div><small>기록한 작품</small><strong>{books.length}<i>작품</i></strong></div>
+        <div><small>소장 권수</small><strong>{totalVolumes}<i>권</i></strong></div>
+        <div><small>총 실구매액</small><strong>{won(paid)}</strong></div>
+        <div><small>절약한 금액</small><strong>{won(Math.max(0, list - paid))}</strong></div>
+      </div>
+      <div className="readingSnapshot">
+        <div><small>읽은 권수</small><b>{readVolumes} / {totalVolumes}권</b></div>
+        <div><small>평균 평점</small><b>★ {averageRating ? averageRating.toFixed(1) : "–"}</b></div>
+        <div><small>평균 작품 지출</small><b>{won(books.length ? Math.round(paid / books.length) : 0)}</b></div>
+      </div>
+      <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} max={Math.max(...genres.map(item => item.paid), 1)} />
+      <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} max={Math.max(...platforms.map(item => item.paid), 1)} />
+      <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <div key={item.name}><small>{item.name}</small><b>{item.works}</b><i>작품</i></div>)}</div></section>
+      {months.length > 0 && <StatSection title="PURCHASE LOG" subtitle="월별 구매 지출" items={months} max={Math.max(...months.map(item => item.paid), 1)} />}
+    </section>
+  );
+}
+
 export default function FeedPage() {
   const [books, setBooks] = useState<Book[]>(demo);
   const [view, setView] = useState<ViewMode>("grid");
@@ -987,6 +1043,13 @@ export default function FeedPage() {
           <span>기록</span>
         </button>
         <button
+          className={view === "stats" ? "active" : ""}
+          onClick={() => setView("stats")}
+        >
+          <BarChart3 size={18} />
+          <span>통계</span>
+        </button>
+        <button
           className={`filterToggle ${filterOpen || statusFilters.length || categoryFilters.length ? "on" : ""}`}
           onClick={() => {
             setFilterOpen((v) => !v);
@@ -1039,16 +1102,17 @@ export default function FeedPage() {
           </aside>
         </>
       )}
-      {(statusFilters.length > 0 || categoryFilters.length > 0) && (
+      {view !== "stats" && (statusFilters.length > 0 || categoryFilters.length > 0) && (
         <div className="activeFilters" aria-label="적용 중인 필터">
           {statusFilters.map(value => <button key={value} onClick={() => setStatusFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
           {categoryFilters.map(value => <button key={value} onClick={() => setCategoryFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
         </div>
       )}
       {view === "records" && <ModalRecordArchive books={visible} />}
+      {view === "stats" && <StatsView books={books} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
-      ) : view === "records" ? null
+      ) : view === "records" || view === "stats" ? null
       : view === "calendar" ? (
         <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
       ) : view === "grid" ? (
