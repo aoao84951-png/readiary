@@ -839,7 +839,13 @@ function StatsView({ books }: { books: Book[] }) {
   if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
   return (
     <section className="statsPage">
-      <header className="statsIntro"><span>READING REPORT</span><h1>나의 독서 통계</h1><p>지금까지 기록한 모든 책을 바탕으로 정리했어요.</p></header>
+      <header className="statsIntro">
+        <div className="statsCopy"><span>READING REPORT</span><h1>나의 독서 통계</h1><p>지금까지 기록한 모든 책을 바탕으로 정리했어요.</p><i>♡ &nbsp; books, notes &amp; little memories</i></div>
+        <div className="statsCovers" aria-hidden="true">
+          {books.filter(book => book.cover_url).slice(0, 4).map((book, index) => <img key={book.id} src={book.cover_url} alt="" style={{ right: 18 + index * 34, transform: `rotate(${(index - 1.5) * 5}deg)` }} />)}
+          <b>MY<br />SHELF</b>
+        </div>
+      </header>
       <div className="statsSummary">
         <div><small>기록한 작품</small><strong>{books.length}<i>작품</i></strong></div>
         <div><small>소장 권수</small><strong>{totalVolumes}<i>권</i></strong></div>
