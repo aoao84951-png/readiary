@@ -809,6 +809,7 @@ function StatSection({ title, subtitle, items }: { title: string; subtitle: stri
 }
 
 function StatsView({ books }: { books: Book[] }) {
+  const [purchaseYear, setPurchaseYear] = useState("");
   const won = (value: number) => `${value.toLocaleString()}원`;
   const totalVolumes = books.reduce((sum, book) => sum + (book.total_count || 0), 0);
   const readVolumes = books.reduce((sum, book) => sum + (book.read_count || 0), 0);
@@ -836,6 +837,8 @@ function StatsView({ books }: { books: Book[] }) {
     all[name].paid += book.paid_price || 0;
     return all;
   }, {})).sort((a, b) => b.name.localeCompare(a.name));
+  const purchaseYears = [...new Set(months.map(item => item.name.slice(0, 4)))];
+  const activePurchaseYear = purchaseYears.includes(purchaseYear) ? purchaseYear : purchaseYears[0];
   if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
   return (
     <section className="statsPage">
@@ -857,10 +860,16 @@ function StatsView({ books }: { books: Book[] }) {
         <div><small>평균 평점</small><b>★ {averageRating ? averageRating.toFixed(1) : "–"}</b></div>
         <div><small>평균 작품 지출</small><b>{won(books.length ? Math.round(paid / books.length) : 0)}</b></div>
       </div>
-      <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} />
-      <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} />
+      <div className="statsSplit">
+        <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} />
+        <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} />
+      </div>
       <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <div key={item.name}><small>{item.name}</small><b>{item.works}</b><i>작품</i></div>)}</div></section>
-      {months.length > 0 && <StatSection title="PURCHASE LOG" subtitle="월별 구매 지출" items={months} />}
+      {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><div className="yearTabs">{purchaseYears.map(year => <button className={activePurchaseYear === year ? "on" : ""} key={year} onClick={() => setPurchaseYear(year)}>{year}</button>)}</div></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
+        const month = String(index + 1).padStart(2, "0");
+        const item = months.find(value => value.name === `${activePurchaseYear}-${month}`);
+        return <div className={item ? "hasPurchase" : ""} key={month}><span>{month}</span><strong>{item ? won(item.paid) : "–"}</strong><small>{item ? `${item.volumes}권 · ${item.works}작품` : "기록 없음"}</small></div>;
+      })}</div></section>}
     </section>
   );
 }
