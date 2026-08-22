@@ -3,6 +3,40 @@
   align-items: center;
   color: inherit;
 }
+.classicRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #ffbd32;
+}
+.classicRating b {
+  color: #5d5d58;
+  font-size: 11px;
+  font-weight: 800;
+}
+.classicRating b.empty {
+  font-size: 9px;
+  font-weight: 600;
+}
+.classicRating small {
+  margin-left: -2px;
+  color: #aaa9a4;
+  font-size: 8px;
+  font-weight: 650;
+}
+.gridRating .classicRating {
+  gap: 3px;
+}
+.gridRating .classicRating svg {
+  width: 14px;
+  height: 14px;
+}
+.gridRating .classicRating b {
+  font-size: 9px;
+}
+.gridRating .classicRating small {
+  font-size: 7px;
+}
 .starScale {
   display: inline-flex;
   align-items: center;

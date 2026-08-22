@@ -7,6 +7,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Star,
   X,
 } from "lucide-react";
 import type { BookRecord } from "@/lib/books";
@@ -147,6 +148,27 @@ function Rating({ rating }: { rating: number | null }) {
       aria-label={rating == null ? "평점 없음" : `평점 ${value}점`}
     >
       <StarScale value={value} />
+    </span>
+  );
+}
+
+function ClassicRating({ rating }: { rating: number | null }) {
+  const value =
+    typeof rating === "number" ? Math.max(0, Math.min(5, rating)) : null;
+  return (
+    <span
+      className="classicRating"
+      aria-label={value == null ? "평점 없음" : `평점 ${value}점`}
+    >
+      <Star
+        size={17}
+        strokeWidth={1.7}
+        fill={value == null ? "none" : "currentColor"}
+      />
+      <b className={value == null ? "empty" : ""}>
+        {value == null ? "–" : value}
+      </b>
+      <small>/ 5</small>
     </span>
   );
 }
@@ -699,7 +721,7 @@ export default function FeedPage() {
                   <Cover book={book} />
                 </span>
                 <span className="gridRating">
-                  <Rating rating={book.rating} />
+                  <ClassicRating rating={book.rating} />
                 </span>
               </button>
             );
@@ -761,49 +783,12 @@ export default function FeedPage() {
                       #{book.status}
                     </span>
                   </div>
-                  <Rating rating={book.rating} />
-                </div>
-                <div className="readingMini">
-                  <span>
-                    {book.read_count} / {book.total_count}권
-                  </span>
-                  <i>
-                    <b
-                      style={{
-                        width: `${Math.min(100, (book.read_count / book.total_count) * 100)}%`,
-                      }}
-                    />
-                  </i>
+                  <ClassicRating rating={book.rating} />
                 </div>
                 <div className="caption">
                   <Notes notes={book.liked_notes} kind="liked" />
                   <Notes notes={book.disliked_notes} kind="disliked" />
                 </div>
-                <details className="recordDetails">
-                  <summary>기록 정보 보기</summary>
-                  <dl>
-                    <div>
-                      <dt>플랫폼</dt>
-                      <dd>{book.platform || "–"}</dd>
-                    </div>
-                    <div>
-                      <dt>구매일</dt>
-                      <dd>{book.purchase_date || "–"}</dd>
-                    </div>
-                    <div>
-                      <dt>완독/하차일</dt>
-                      <dd>{book.finished_date || "–"}</dd>
-                    </div>
-                    <div>
-                      <dt>실구매가</dt>
-                      <dd>{book.paid_price.toLocaleString()}원</dd>
-                    </div>
-                    <div>
-                      <dt>구매방법</dt>
-                      <dd>{book.purchase_method || "–"}</dd>
-                    </div>
-                  </dl>
-                </details>
               </div>
             </article>
           ))}
