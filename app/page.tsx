@@ -575,16 +575,20 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books }: { books: Book[] }) {
+function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
   } | null>(null);
   useEffect(() => {
+    if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
+  }, [openBook, books]);
+  const closeSelected = () => { setSelected(null); onClose?.(); };
+  useEffect(() => {
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelected(null);
+      if (event.key === "Escape") closeSelected();
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
@@ -611,11 +615,11 @@ function ModalRecordArchive({ books }: { books: Book[] }) {
             : "basket";
   return (
     <section className="archiveList modalArchive">
-      <header className="archiveHead">
+      {!hideList && <header className="archiveHead">
         <span>MY BOOK RECORDS</span>
         <b>{String(books.length).padStart(2, "0")}</b>
-      </header>
-      {books.map((book, index) => {
+      </header>}
+      {!hideList && books.map((book, index) => {
         const progress = Math.min(
           100,
           Math.round((book.read_count / book.total_count) * 100),
@@ -662,7 +666,7 @@ function ModalRecordArchive({ books }: { books: Book[] }) {
           return (
             <div
               className="recordModalShade"
-              onMouseDown={() => setSelected(null)}
+              onMouseDown={closeSelected}
             >
               <section
                 className="recordModal"
@@ -687,7 +691,7 @@ function ModalRecordArchive({ books }: { books: Book[] }) {
                     </em>
                   </span>
                   <button
-                    onClick={() => setSelected(null)}
+                    onClick={closeSelected}
                     aria-label="상세 기록 닫기"
                   >
                     <X size={17} />
@@ -804,6 +808,8 @@ export default function FeedPage() {
   const [pending, setPending] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
@@ -815,6 +821,7 @@ export default function FeedPage() {
   const [readingDate, setReadingDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [detailBook, setDetailBook] = useState<Book | null>(null);
   const scrollRef = useRef(0);
   async function load(show = false) {
     setLoading(true);
@@ -839,10 +846,11 @@ export default function FeedPage() {
   }, []);
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q
-      ? books.filter((b) => `${b.title} ${b.author}`.toLowerCase().includes(q))
-      : books;
-  }, [books, query]);
+    return books.filter((book) => {
+      const textMatch = !q || `${book.title} ${book.author}`.toLowerCase().includes(q);
+      return textMatch && (!statusFilter || book.status === statusFilter) && (!categoryFilter || book.category === categoryFilter);
+    });
+  }, [books, query, statusFilter, categoryFilter]);
   useEffect(() => {
     if (view === "feed" && pending)
       requestAnimationFrame(() =>
@@ -983,20 +991,19 @@ export default function FeedPage() {
       </nav>
       {notice && <div className="refreshNotice">{notice}</div>}
       {searchOpen && (
-        <div className="searchBar">
-          <Search size={14} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="책 제목 또는 저자 검색"
-            autoFocus
-          />
-          {query && (
-            <button onClick={() => setQuery("")}>
-              <X size={13} />
-            </button>
-          )}
-        </div>
+        <section className="filterPanel">
+          <div className="searchBar">
+            <Search size={14} />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="책 제목 또는 저자 검색" autoFocus />
+            {query && <button onClick={() => setQuery("")}><X size={13} /></button>}
+          </div>
+          <div className="filterLine"><b>STATUS</b><span>
+            {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={statusFilter === value ? "on" : ""} key={value || "all"} onClick={() => setStatusFilter(value)}>{value || "전체"}</button>)}
+          </span></div>
+          <div className="filterLine"><b>GENRE</b><span>
+            {["", "BL", "로맨스", "로맨스판타지", "문학", "기타"].map(value => <button className={categoryFilter === value ? "on" : ""} key={value || "all"} onClick={() => setCategoryFilter(value)}>{value || "전체"}</button>)}
+          </span></div>
+        </section>
       )}
       {view === "records" && <ModalRecordArchive books={visible} />}
       {loading && books.length === 0 ? (
@@ -1057,7 +1064,7 @@ export default function FeedPage() {
                   {String(index + 1).padStart(2, "0")}
                 </span>
               </header>
-              <div className="feedCover">
+              <button className="feedCover" onClick={() => setDetailBook(book)} aria-label={`${book.title} 상세 기록 열기`}>
                 {book.cover_url && (
                   <img className="coverBackdrop" src={book.cover_url} alt="" />
                 )}
@@ -1074,7 +1081,7 @@ export default function FeedPage() {
                     <Cover book={book} />
                   )}
                 </div>
-              </div>
+              </button>
               <div className="postBody">
                 <div className="summary">
                   <div className="metaActions">
@@ -1100,6 +1107,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} hideList />}
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
           <aside className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
