@@ -33,10 +33,11 @@ async function naverImageCover(title:string,author:string) {
     const res=await fetch(`https://search.naver.com/search.naver?where=image&sm=tab_jum&query=${encodeURIComponent(query)}`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'text/html',Referer:'https://search.naver.com/'}});
     const html=await res.text();
     const candidates=[...html.matchAll(/"originalUrl":"([^"]+)"/g)].map(match=>{try{return JSON.parse(`"${match[1]}"`) as string;}catch{return '';}}).filter(url=>/^https?:\/\//.test(url)&&!/(19over|noimg|adult|profile|icon|logo)/i.test(url));
-    return (candidates[0]||'')
+    const cover=(candidates[0]||'')
       .replace(/^http:\/\//,'https://')
       .replace('blogfiles.naver.net','blogfiles.pstatic.net')
       .replace('postfiles.naver.net','postfiles.pstatic.net');
+    return cover?`/api/image?url=${encodeURIComponent(cover)}`:'';
   } catch { return ''; }
 }
 async function naver(q:string):Promise<SearchBook[]> {
