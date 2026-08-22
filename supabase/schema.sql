@@ -10,7 +10,6 @@ create table if not exists public.books (
   purchase_date date,
   platform text not null default '',
   cover_url text not null default '',
-  purchase_year integer,
   finished_date date,
   rating numeric(2,1) check (rating between 0 and 5),
   read_count integer not null default 0 check (read_count >= 0),

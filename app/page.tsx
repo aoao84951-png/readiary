@@ -1,59 +1,1006 @@
-'use client';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Grid3X3, List, NotebookTabs, Plus, RefreshCw, Search, Star, X } from 'lucide-react';
-import type { BookRecord } from '@/lib/books';
+"use client";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Grid3X3,
+  List,
+  NotebookTabs,
+  Plus,
+  RefreshCw,
+  Search,
+  Star,
+  X,
+} from "lucide-react";
+import type { BookRecord } from "@/lib/books";
 
-type Book=BookRecord&{id:string};
-type SearchBook={title:string;author:string;cover:string;url:string;totalCount:number;category:string;platform:string};
-type ViewMode='grid'|'feed'|'records';
-const demo:Book[]=[
-{id:'sample-1',title:'빌어먹을 가이딩을 받을 바에야',author:'목해',cover_url:'https://img.ridicdn.net/cover/425387012/xxlarge?dpi=xxhdpi',category:'BL',status:'완독',rating:4,read_count:4,total_count:4,platform:'리디북스',purchase_date:'2026-04-15',purchase_year:2026,finished_date:'2026-04-15',list_price:13200,paid_price:11880,purchase_method:'위클리쿠폰(10%)',liked_notes:['수가 정병이 조금 있어서 죽고싶어하는데 그게 좀 맛있음','공 초반에 재수없긴한데 뒤로 갈수록 다정해짐','공수관계가 꽤 맛남'],disliked_notes:['가이딩이 시작하면 어느 순간처럼 흐물흐물해짐'],source_url:''},
-{id:'sample-2',title:'겨울 정원의 하와르',author:'문시현',cover_url:'https://image.aladin.co.kr/product/33688/92/cover500/k692939802_1.jpg',category:'로맨스판타지',status:'읽는 중',rating:4.5,read_count:3,total_count:6,platform:'리디북스',purchase_date:null,purchase_year:2026,finished_date:null,list_price:18000,paid_price:15000,purchase_method:'포인트 사용',liked_notes:['차분하게 쌓이는 관계와 겨울의 분위기'],disliked_notes:[],source_url:''},
-{id:'sample-3',title:'파과',author:'구병모',cover_url:'https://img.ridicdn.net/cover/734001567/xxlarge?dpi=xxhdpi',category:'문학',status:'완독',rating:5,read_count:1,total_count:1,platform:'리디북스',purchase_date:null,purchase_year:2025,finished_date:null,list_price:14000,paid_price:12600,purchase_method:'온라인 구매',liked_notes:['단단하고 서늘한 문장','조각이라는 인물이 오래 남는다'],disliked_notes:[],source_url:''}];
-const empty:BookRecord={title:'',author:'',total_count:1,category:'문학',status:'책바구니',purchase_date:null,platform:'',cover_url:'',purchase_year:new Date().getFullYear(),finished_date:null,rating:null,read_count:0,list_price:0,paid_price:0,purchase_method:'',liked_notes:[],disliked_notes:[],source_url:''};
+type Book = BookRecord & { id: string };
+type SearchBook = {
+  title: string;
+  author: string;
+  cover: string;
+  url: string;
+  totalCount: number;
+  category: string;
+  platform: string;
+};
+type ViewMode = "grid" | "feed" | "records";
+const demo: Book[] = [
+  {
+    id: "sample-1",
+    title: "빌어먹을 가이딩을 받을 바에야",
+    author: "목해",
+    cover_url: "https://img.ridicdn.net/cover/425387012/xxlarge?dpi=xxhdpi",
+    category: "BL",
+    status: "완독",
+    rating: 4,
+    read_count: 4,
+    total_count: 4,
+    platform: "리디북스",
+    purchase_date: "2026-04-15",
+    finished_date: "2026-04-15",
+    list_price: 13200,
+    paid_price: 11880,
+    purchase_method: "위클리쿠폰(10%)",
+    liked_notes: [
+      "수가 정병이 조금 있어서 죽고싶어하는데 그게 좀 맛있음",
+      "공 초반에 재수없긴한데 뒤로 갈수록 다정해짐",
+      "공수관계가 꽤 맛남",
+    ],
+    disliked_notes: ["가이딩이 시작하면 어느 순간처럼 흐물흐물해짐"],
+    source_url: "",
+  },
+  {
+    id: "sample-2",
+    title: "겨울 정원의 하와르",
+    author: "문시현",
+    cover_url:
+      "https://image.aladin.co.kr/product/33688/92/cover500/k692939802_1.jpg",
+    category: "로맨스판타지",
+    status: "읽는 중",
+    rating: 4.5,
+    read_count: 3,
+    total_count: 6,
+    platform: "리디북스",
+    purchase_date: null,
+    finished_date: null,
+    list_price: 18000,
+    paid_price: 15000,
+    purchase_method: "포인트 사용",
+    liked_notes: ["차분하게 쌓이는 관계와 겨울의 분위기"],
+    disliked_notes: [],
+    source_url: "",
+  },
+  {
+    id: "sample-3",
+    title: "파과",
+    author: "구병모",
+    cover_url: "https://img.ridicdn.net/cover/734001567/xxlarge?dpi=xxhdpi",
+    category: "문학",
+    status: "완독",
+    rating: 5,
+    read_count: 1,
+    total_count: 1,
+    platform: "리디북스",
+    purchase_date: null,
+    finished_date: null,
+    list_price: 14000,
+    paid_price: 12600,
+    purchase_method: "온라인 구매",
+    liked_notes: ["단단하고 서늘한 문장", "조각이라는 인물이 오래 남는다"],
+    disliked_notes: [],
+    source_url: "",
+  },
+];
+const empty: BookRecord = {
+  title: "",
+  author: "",
+  total_count: 1,
+  category: "문학",
+  status: "책바구니",
+  purchase_date: null,
+  platform: "",
+  cover_url: "",
+  finished_date: null,
+  rating: null,
+  read_count: 0,
+  list_price: 0,
+  paid_price: 0,
+  purchase_method: "",
+  liked_notes: [],
+  disliked_notes: [],
+  source_url: "",
+};
 
-function Rating({rating}:{rating:number|null}){const value=typeof rating==='number'?Math.max(0,Math.min(5,rating)):null;return <span className="feedRating" aria-label={value==null?'평점 없음':`평점 ${value}점`}><Star size={17} strokeWidth={1.7} fill={value==null?'none':'currentColor'}/><b className={value==null?'empty':''}>{value==null?'–':value}</b><small>/ 5</small></span>}
-function Notes({notes,kind}:{notes:string[];kind:'liked'|'disliked'}){if(!notes.length)return null;return <section className={`reviewNotes ${kind}`}><span className="reviewLabel">{kind==='liked'?'LOVE NOTES':'NOPE NOTES'} <small>{String(notes.length).padStart(2,'0')}</small></span>{notes.map((note,i)=><div className="reviewNote" key={i}><span className="noteHeart">{kind==='liked'?'♥':'♡'}</span><p>{note}</p></div>)}</section>}
-function Cover({book}:{book:Book}){return book.cover_url?<img src={book.cover_url} alt={`${book.title} 표지`}/>:<div className="noCover"><span>▦</span><b>NO COVER</b></div>}
-
-function RecordArchive({books}:{books:Book[]}){return <section className="archiveList"><header className="archiveHead"><span>MY BOOK RECORDS</span><b>{String(books.length).padStart(2,'0')}</b></header>{books.map((book,index)=>{const progress=Math.min(100,Math.round(book.read_count/book.total_count*100));const discount=book.list_price?Math.max(0,Math.round((1-book.paid_price/book.list_price)*100)):0;return <details className="archiveItem" key={book.id}><summary><span className="archiveCover">{book.cover_url?<img src={book.cover_url} alt=""/>:<span>▦</span>}</span><span className="archiveIdentity"><b>{book.title}</b><small>{book.author||'저자 미상'} · {book.category}</small><i><span style={{width:`${progress}%`}}/></i></span><span className="archiveStatus">{book.status}<small>{progress}%</small></span></summary><div className="archiveBody"><span className="archiveNumber">RECORD {String(index+1).padStart(2,'0')}</span><dl><div><dt>저자</dt><dd>{book.author||'–'}</dd></div><div><dt>총 권수</dt><dd>{book.total_count}권</dd></div><div><dt>카테고리</dt><dd>{book.category}</dd></div><div><dt>상태</dt><dd>{book.status}</dd></div><div><dt>구매일</dt><dd>{book.purchase_date||'–'}</dd></div><div><dt>플랫폼</dt><dd>{book.platform||'–'}</dd></div><div><dt>구매연도</dt><dd>{book.purchase_year||'–'}</dd></div><div><dt>완독 / 하차일</dt><dd>{book.finished_date||'–'}</dd></div><div><dt>평점</dt><dd><Rating rating={book.rating}/></dd></div><div><dt>독서량</dt><dd>{book.read_count} / {book.total_count}권</dd></div><div><dt>진행률</dt><dd>{progress}%</dd></div><div><dt>총 판매가</dt><dd>{book.list_price.toLocaleString()}원</dd></div><div><dt>총 실구매가</dt><dd>{book.paid_price.toLocaleString()}원</dd></div><div><dt>할인율</dt><dd>{discount}%</dd></div><div className="wide"><dt>구매방법</dt><dd>{book.purchase_method||'–'}</dd></div><div className="wide"><dt>커버 이미지</dt><dd>{book.cover_url?'등록됨':'–'}</dd></div></dl><div className="archiveNotes"><Notes notes={book.liked_notes} kind="liked"/><Notes notes={book.disliked_notes} kind="disliked"/></div></div></details>})}</section>}
-
-function GroupedRecordArchive({books}:{books:Book[]}) {
-  const Row=({label,value}:{label:string;value:React.ReactNode})=><div className="recordRow"><dt>{label}</dt><dd>{value}</dd></div>;
-  return <section className="archiveList">
-    <header className="archiveHead"><span>MY BOOK RECORDS</span><b>{String(books.length).padStart(2,'0')}</b></header>
-    {books.map((book,index)=>{const progress=Math.min(100,Math.round(book.read_count/book.total_count*100));const discount=book.list_price?Math.max(0,Math.round((1-book.paid_price/book.list_price)*100)):0;return <details className="archiveItem grouped" key={book.id}>
-      <summary><span className="archiveCover">{book.cover_url?<img src={book.cover_url} alt=""/>:<span>▦</span>}</span><span className="archiveIdentity"><b>{book.title}</b><small>{book.author||'저자 미상'} · {book.category}</small><i><span style={{width:`${progress}%`}}/></i></span><span className="archiveStatus">{book.status}<small>{progress}%</small></span></summary>
-      <div className="archiveBody"><span className="archiveNumber">RECORD {String(index+1).padStart(2,'0')}</span>
-        <div className="recordHighlights"><div><Rating rating={book.rating}/><small>평점</small></div><div><b>{book.read_count} / {book.total_count}권</b><small>독서량</small></div><div><b>{progress}%</b><small>진행률</small></div></div>
-        <section className="recordGroup"><h3>BOOK</h3><dl><Row label="저자" value={book.author||'–'}/><Row label="총 권수" value={`${book.total_count}권`}/><Row label="카테고리" value={book.category}/><Row label="커버 이미지" value={book.cover_url?'등록됨':'–'}/></dl></section>
-        <section className="recordGroup readingGroup"><h3>READING</h3><div className="groupProgress"><span><b>{book.status}</b><small>{progress}%</small></span><i><b style={{width:`${progress}%`}}/></i></div><dl><Row label="상태" value={book.status}/><Row label="평점" value={<Rating rating={book.rating}/>}/><Row label="독서량" value={`${book.read_count} / ${book.total_count}권`}/><Row label="진행률" value={`${progress}%`}/><Row label="완독 / 하차일" value={book.finished_date||'–'}/></dl></section>
-        <section className="recordGroup purchaseGroup"><h3>PURCHASE</h3><div className="priceLine"><span><small>총 판매가</small><s>{book.list_price.toLocaleString()}원</s></span><b>{book.paid_price.toLocaleString()}원</b><em>{discount}% OFF</em></div><dl><Row label="구매일" value={book.purchase_date||'–'}/><Row label="플랫폼" value={book.platform||'–'}/><Row label="구매연도" value={book.purchase_year||'–'}/><Row label="총 판매가" value={`${book.list_price.toLocaleString()}원`}/><Row label="총 실구매가" value={`${book.paid_price.toLocaleString()}원`}/><Row label="할인율" value={`${discount}%`}/><Row label="구매방법" value={book.purchase_method||'–'}/></dl></section>
-        <section className="recordGroup notesGroup"><h3>NOTES</h3><div className="archiveNotes"><Notes notes={book.liked_notes} kind="liked"/><Notes notes={book.disliked_notes} kind="disliked"/>{!book.liked_notes.length&&!book.disliked_notes.length&&<p className="emptyNotes">기록된 감상이 없습니다.</p>}</div></section>
-      </div>
-    </details>})}
-  </section>;
+function Rating({ rating }: { rating: number | null }) {
+  const value =
+    typeof rating === "number" ? Math.max(0, Math.min(5, rating)) : null;
+  return (
+    <span
+      className="feedRating"
+      aria-label={value == null ? "평점 없음" : `평점 ${value}점`}
+    >
+      <Star
+        size={17}
+        strokeWidth={1.7}
+        fill={value == null ? "none" : "currentColor"}
+      />
+      <b className={value == null ? "empty" : ""}>
+        {value == null ? "–" : value}
+      </b>
+      <small>/ 5</small>
+    </span>
+  );
+}
+function Notes({
+  notes,
+  kind,
+}: {
+  notes: string[];
+  kind: "liked" | "disliked";
+}) {
+  if (!notes.length) return null;
+  return (
+    <section className={`reviewNotes ${kind}`}>
+      <span className="reviewLabel">
+        {kind === "liked" ? "LOVE NOTES" : "NOPE NOTES"}{" "}
+        <small>{String(notes.length).padStart(2, "0")}</small>
+      </span>
+      {notes.map((note, i) => (
+        <div className="reviewNote" key={i}>
+          <span className="noteHeart">{kind === "liked" ? "♥" : "♡"}</span>
+          <p>{note}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+function Cover({ book }: { book: Book }) {
+  return book.cover_url ? (
+    <img src={book.cover_url} alt={`${book.title} 표지`} />
+  ) : (
+    <div className="noCover">
+      <span>▦</span>
+      <b>NO COVER</b>
+    </div>
+  );
 }
 
-export default function FeedPage(){
- const[books,setBooks]=useState<Book[]>(demo);const[view,setView]=useState<ViewMode>('grid');const[pending,setPending]=useState<string|null>(null);const[searchOpen,setSearchOpen]=useState(false);const[query,setQuery]=useState('');const[loading,setLoading]=useState(true);const[notice,setNotice]=useState('');const[adding,setAdding]=useState(false);const[step,setStep]=useState<'search'|'form'>('search');const[search,setSearch]=useState('');const[results,setResults]=useState<SearchBook[]>([]);const[searching,setSearching]=useState(false);const[form,setForm]=useState<BookRecord>(empty);const[saving,setSaving]=useState(false);const[message,setMessage]=useState('');const scrollRef=useRef(0);
- async function load(show=false){setLoading(true);try{const r=await fetch('/api/books',{cache:'no-store'});const data=await r.json();if(data.items?.length)setBooks(data.items);if(show){setNotice(data.configured?'최신 기록으로 업데이트했어요':'Supabase 연결 전 미리보기예요');setTimeout(()=>setNotice(''),2200)}}finally{setLoading(false)}}
- useEffect(()=>{load()},[]);
- const visible=useMemo(()=>{const q=query.trim().toLowerCase();return q?books.filter(b=>`${b.title} ${b.author}`.toLowerCase().includes(q)):books},[books,query]);
- useEffect(()=>{if(view==='feed'&&pending)requestAnimationFrame(()=>document.getElementById(pending)?.scrollIntoView({block:'start'}))},[view,pending]);
- function openPost(book:Book,index:number){scrollRef.current=window.scrollY;setPending(`post-${book.id||index}`);setView('feed')}
- function showGrid(){setView('grid');requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current))}
- function openAdd(){setAdding(true);setStep('search');setSearch('');setResults([]);setMessage('');setForm(empty)}
- async function findBooks(e:FormEvent){e.preventDefault();if(!search.trim())return;setSearching(true);setMessage('');try{const r=await fetch(`/api/search?q=${encodeURIComponent(search)}`);const data=await r.json();setResults(data.books||[]);if(!data.books?.length)setMessage('검색 결과가 없어요. 직접 입력할 수 있어요.')}catch{setMessage('검색에 실패했어요.')}finally{setSearching(false)}}
- function choose(book:SearchBook){setForm({...empty,title:book.title,author:book.author,total_count:book.totalCount||1,category:book.category,platform:book.platform,cover_url:book.cover,source_url:book.url});setStep('form')}
- const field=<K extends keyof BookRecord>(key:K,value:BookRecord[K])=>setForm(prev=>({...prev,[key]:value}));
- async function save(e:FormEvent){e.preventDefault();setSaving(true);setMessage('');try{const r=await fetch('/api/books',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const data=await r.json();if(!r.ok)throw new Error(data.error);setBooks(prev=>[data.item,...prev]);setAdding(false)}catch(error){setMessage(error instanceof Error?error.message:'저장하지 못했어요.')}finally{setSaving(false)}}
- const discount=form.list_price?Math.max(0,Math.round((1-form.paid_price/form.list_price)*100)):0;
- return <main className="feedPage">
-  <nav className="viewTabs" aria-label="독서 기록 보기 방식"><button className={`searchToggle ${searchOpen?'on':''}`} onClick={()=>setSearchOpen(v=>!v)} aria-label="내 기록 검색"><Search size={15}/></button><button className={`addToggle ${adding?'on':''}`} onClick={openAdd} aria-label="책 추가"><Plus size={16}/></button><button className={view==='grid'?'active':''} onClick={showGrid}><Grid3X3 size={18}/><span>모아보기</span></button><button className={view==='feed'?'active':''} onClick={()=>{scrollRef.current=window.scrollY;setPending(null);setView('feed')}}><List size={19}/><span>피드</span></button><button className={view==='records'?'active':''} onClick={()=>setView('records')}><NotebookTabs size={18}/><span>기록</span></button><button className={`refresh ${loading?'loading':''}`} onClick={()=>load(true)} disabled={loading}><RefreshCw size={14}/></button></nav>
-  {notice&&<div className="refreshNotice">{notice}</div>}
-  {searchOpen&&<div className="searchBar"><Search size={14}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="책 제목 또는 저자 검색" autoFocus/>{query&&<button onClick={()=>setQuery('')}><X size={13}/></button>}</div>}
-  {view==='records'&&<GroupedRecordArchive books={visible}/>} 
-  {loading&&books.length===0?<div className="state">피드를 불러오는 중...</div>:view==='grid'?<section className="bookGrid">{visible.map((book,index)=>{const last=visible.length-1;const start=Math.floor(last/3)*3;const corners=[index===0?'topLeft':'',index===Math.min(2,last)?'topRight':'',index===start?'bottomLeft':'',index===last?'bottomRight':''].filter(Boolean).join(' ');return <button className={`gridItem ${corners}`} key={book.id} onClick={()=>openPost(book,index)}><span className="gridCover"><Cover book={book}/></span><span className="gridRating"><Rating rating={book.rating}/></span></button>})}</section>:<section className="feedList">{visible.map((book,index)=><article id={`post-${book.id||index}`} className="post" key={book.id}><header className="postHead"><span className="identity"><span className="profileCover">{book.cover_url?<img src={book.cover_url} alt=""/>:<span>📖</span>}</span><b>{book.title}</b><small>{book.author||'저자 미상'}</small></span><span className="postNumber">{String(index+1).padStart(2,'0')}</span></header><div className="feedCover">{book.cover_url&&<img className="coverBackdrop" src={book.cover_url} alt=""/>}<span className="coverWash"/><div className="coverMain">{book.cover_url?<div className="frontCover" style={{backgroundImage:`url("${book.cover_url.replace(/"/g,'%22')}")`}}/>:<Cover book={book}/>}</div></div><div className="postBody"><div className="summary"><div className="metaActions"><span className={`genreText ${book.category==='BL'?'bl':book.category==='로맨스'?'romance':book.category==='로맨스판타지'?'rofan':'books'}`}>#{book.category}</span><span className={`statusText ${book.status==='완독'?'done':book.status==='읽는 중'?'reading':book.status==='하차'?'paused':'basket'}`}>#{book.status}</span></div><Rating rating={book.rating}/></div><div className="readingMini"><span>{book.read_count} / {book.total_count}권</span><i><b style={{width:`${Math.min(100,book.read_count/book.total_count*100)}%`}}/></i></div><div className="caption"><Notes notes={book.liked_notes} kind="liked"/><Notes notes={book.disliked_notes} kind="disliked"/></div><details className="recordDetails"><summary>기록 정보 보기</summary><dl><div><dt>플랫폼</dt><dd>{book.platform||'–'}</dd></div><div><dt>구매일</dt><dd>{book.purchase_date||'–'}</dd></div><div><dt>완독/하차일</dt><dd>{book.finished_date||'–'}</dd></div><div><dt>실구매가</dt><dd>{book.paid_price.toLocaleString()}원</dd></div><div><dt>구매방법</dt><dd>{book.purchase_method||'–'}</dd></div></dl></details></div></article>)}</section>}
-  {adding&&<div className="drawerShade" onMouseDown={()=>setAdding(false)}><aside className="addDrawer" onMouseDown={e=>e.stopPropagation()}><header><button onClick={()=>step==='form'?setStep('search'):setAdding(false)}>{step==='form'?'←':'×'}</button><b>{step==='search'?'책 추가':'독서 기록'}</b><span/></header>{step==='search'?<div className="drawerBody"><form className="addSearch" onSubmit={findBooks}><Search size={15}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="제목 또는 작가 검색" autoFocus/><button>{searching?'…':'검색'}</button></form><button className="manual" onClick={()=>setStep('form')}>검색 없이 직접 입력</button>{message&&<p className="formMessage">{message}</p>}<div className="results">{results.map((book,i)=><button key={`${book.url}-${i}`} onClick={()=>choose(book)}>{book.cover?<img src={book.cover} alt=""/>:<span className="miniNoCover">▦</span>}<span><b>{book.title}</b><small>{book.author||'저자 미상'} · {book.platform}</small></span><Plus size={14}/></button>)}</div>{!search&&!results.length&&<div className="emptySearch"><Search size={22}/><b>책을 검색해 바로 기록해보세요</b><p>리디북스 · 카카오페이지 · 네이버 시리즈</p></div>}</div>:<form className="recordForm" onSubmit={save}><div className="selectedBook">{form.cover_url?<img src={form.cover_url} alt=""/>:<span className="miniNoCover">▦</span>}<div><label>제목<input required value={form.title} onChange={e=>field('title',e.target.value)}/></label><label>저자<input value={form.author} onChange={e=>field('author',e.target.value)}/></label></div></div><div className="fields"><label>총 권수<input type="number" min="1" value={form.total_count} onChange={e=>field('total_count',+e.target.value)}/></label><label>카테고리<select value={form.category} onChange={e=>field('category',e.target.value)}><option>BL</option><option>로맨스</option><option>로맨스판타지</option><option>문학</option><option>기타</option></select></label><label>상태<select value={form.status} onChange={e=>field('status',e.target.value)}><option>책바구니</option><option>읽기 전</option><option>읽는 중</option><option>완독</option><option>하차</option></select></label><label>플랫폼<input value={form.platform} onChange={e=>field('platform',e.target.value)}/></label><label>구매일<input type="date" value={form.purchase_date||''} onChange={e=>field('purchase_date',e.target.value||null)}/></label><label>구매연도<input type="number" value={form.purchase_year||''} onChange={e=>field('purchase_year',+e.target.value||null)}/></label><label>완독 / 하차일<input type="date" value={form.finished_date||''} onChange={e=>field('finished_date',e.target.value||null)}/></label><label>평점<input type="number" min="0" max="5" step="0.5" value={form.rating??''} onChange={e=>field('rating',e.target.value===''?null:+e.target.value)}/></label><label>독서량<input type="number" min="0" value={form.read_count} onChange={e=>field('read_count',+e.target.value)}/></label><label>총 판매가<input type="number" min="0" value={form.list_price} onChange={e=>field('list_price',+e.target.value)}/></label><label>실구매가<input type="number" min="0" value={form.paid_price} onChange={e=>field('paid_price',+e.target.value)}/></label><label>할인율<span className="calculated">{discount}%</span></label><label className="full">구매방법<input value={form.purchase_method} onChange={e=>field('purchase_method',e.target.value)}/></label><label className="full">커버 이미지 URL<input value={form.cover_url} onChange={e=>field('cover_url',e.target.value)}/></label><label className="full">좋았던 점<textarea value={form.liked_notes.join('\n')} onChange={e=>field('liked_notes',e.target.value.split('\n').filter(Boolean))} placeholder="한 줄에 하나씩"/></label><label className="full">싫었던 점<textarea value={form.disliked_notes.join('\n')} onChange={e=>field('disliked_notes',e.target.value.split('\n').filter(Boolean))} placeholder="한 줄에 하나씩"/></label></div>{message&&<p className="formMessage">{message}</p>}<button className="save" disabled={saving}>{saving?'저장 중…':'기록 저장'}</button></form>}</aside></div>}
- </main>}
+function RecordArchive({ books }: { books: Book[] }) {
+  return (
+    <section className="archiveList">
+      <header className="archiveHead">
+        <span>MY BOOK RECORDS</span>
+        <b>{String(books.length).padStart(2, "0")}</b>
+      </header>
+      {books.map((book, index) => {
+        const progress = Math.min(
+          100,
+          Math.round((book.read_count / book.total_count) * 100),
+        );
+        const discount = book.list_price
+          ? Math.max(
+              0,
+              Math.round((1 - book.paid_price / book.list_price) * 100),
+            )
+          : 0;
+        return (
+          <details className="archiveItem" key={book.id}>
+            <summary>
+              <span className="archiveCover">
+                {book.cover_url ? (
+                  <img src={book.cover_url} alt="" />
+                ) : (
+                  <span>▦</span>
+                )}
+              </span>
+              <span className="archiveIdentity">
+                <b>{book.title}</b>
+                <small>
+                  {book.author || "저자 미상"} · {book.category}
+                </small>
+                <i>
+                  <span style={{ width: `${progress}%` }} />
+                </i>
+              </span>
+              <span className="archiveStatus">
+                {book.status}
+                <small>{progress}%</small>
+              </span>
+            </summary>
+            <div className="archiveBody">
+              <span className="archiveNumber">
+                RECORD {String(index + 1).padStart(2, "0")}
+              </span>
+              <dl>
+                <div>
+                  <dt>저자</dt>
+                  <dd>{book.author || "–"}</dd>
+                </div>
+                <div>
+                  <dt>총 권수</dt>
+                  <dd>{book.total_count}권</dd>
+                </div>
+                <div>
+                  <dt>카테고리</dt>
+                  <dd>{book.category}</dd>
+                </div>
+                <div>
+                  <dt>상태</dt>
+                  <dd>{book.status}</dd>
+                </div>
+                <div>
+                  <dt>구매일</dt>
+                  <dd>{book.purchase_date || "–"}</dd>
+                </div>
+                <div>
+                  <dt>플랫폼</dt>
+                  <dd>{book.platform || "–"}</dd>
+                </div>
+                <div>
+                  <dt>구매연도</dt>
+                  <dd>{book.purchase_year || "–"}</dd>
+                </div>
+                <div>
+                  <dt>완독 / 하차일</dt>
+                  <dd>{book.finished_date || "–"}</dd>
+                </div>
+                <div>
+                  <dt>평점</dt>
+                  <dd>
+                    <Rating rating={book.rating} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>독서량</dt>
+                  <dd>
+                    {book.read_count} / {book.total_count}권
+                  </dd>
+                </div>
+                <div>
+                  <dt>진행률</dt>
+                  <dd>{progress}%</dd>
+                </div>
+                <div>
+                  <dt>총 판매가</dt>
+                  <dd>{book.list_price.toLocaleString()}원</dd>
+                </div>
+                <div>
+                  <dt>총 실구매가</dt>
+                  <dd>{book.paid_price.toLocaleString()}원</dd>
+                </div>
+                <div>
+                  <dt>할인율</dt>
+                  <dd>{discount}%</dd>
+                </div>
+                <div className="wide">
+                  <dt>구매방법</dt>
+                  <dd>{book.purchase_method || "–"}</dd>
+                </div>
+                <div className="wide">
+                  <dt>커버 이미지</dt>
+                  <dd>{book.cover_url ? "등록됨" : "–"}</dd>
+                </div>
+              </dl>
+              <div className="archiveNotes">
+                <Notes notes={book.liked_notes} kind="liked" />
+                <Notes notes={book.disliked_notes} kind="disliked" />
+              </div>
+            </div>
+          </details>
+        );
+      })}
+    </section>
+  );
+}
+
+function GroupedRecordArchive({ books }: { books: Book[] }) {
+  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <div className="recordRow">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+  return (
+    <section className="archiveList">
+      <header className="archiveHead">
+        <span>MY BOOK RECORDS</span>
+        <b>{String(books.length).padStart(2, "0")}</b>
+      </header>
+      {books.map((book, index) => {
+        const progress = Math.min(
+          100,
+          Math.round((book.read_count / book.total_count) * 100),
+        );
+        const discount = book.list_price
+          ? Math.max(
+              0,
+              Math.round((1 - book.paid_price / book.list_price) * 100),
+            )
+          : 0;
+        return (
+          <details className="archiveItem grouped" key={book.id}>
+            <summary>
+              <span className="archiveCover">
+                {book.cover_url ? (
+                  <img src={book.cover_url} alt="" />
+                ) : (
+                  <span>▦</span>
+                )}
+              </span>
+              <span className="archiveIdentity">
+                <b>{book.title}</b>
+                <small>
+                  {book.author || "저자 미상"} · {book.category}
+                </small>
+                <i>
+                  <span style={{ width: `${progress}%` }} />
+                </i>
+              </span>
+              <span className="archiveStatus">
+                {book.status}
+                <small>{progress}%</small>
+              </span>
+            </summary>
+            <div className="archiveBody">
+              <span className="archiveNumber">
+                RECORD {String(index + 1).padStart(2, "0")}
+              </span>
+              <div className="recordHighlights">
+                <div>
+                  <Rating rating={book.rating} />
+                  <small>평점</small>
+                </div>
+                <div>
+                  <b>
+                    {book.read_count} / {book.total_count}권
+                  </b>
+                  <small>독서량</small>
+                </div>
+                <div>
+                  <b>{progress}%</b>
+                  <small>진행률</small>
+                </div>
+              </div>
+              <section className="recordGroup">
+                <h3>BOOK</h3>
+                <dl>
+                  <Row label="저자" value={book.author || "–"} />
+                  <Row label="총 권수" value={`${book.total_count}권`} />
+                  <Row label="카테고리" value={book.category} />
+                  <Row
+                    label="커버 이미지"
+                    value={book.cover_url ? "등록됨" : "–"}
+                  />
+                </dl>
+              </section>
+              <section className="recordGroup readingGroup">
+                <h3>READING</h3>
+                <div className="groupProgress">
+                  <span>
+                    <b>{book.status}</b>
+                    <small>{progress}%</small>
+                  </span>
+                  <i>
+                    <b style={{ width: `${progress}%` }} />
+                  </i>
+                  <p><span>완독 / 하차일</span><b>{book.finished_date || "–"}</b></p>
+                </div>
+                <dl>
+                  <Row label="평점" value={<Rating rating={book.rating} />} />
+                  <Row
+                    label="독서량"
+                    value={`${book.read_count} / ${book.total_count}권`}
+                  />
+                </dl>
+              </section>
+              <section className="recordGroup purchaseGroup">
+                <h3>PURCHASE</h3>
+                <div className="priceLine">
+                  <span>
+                    <small>총 판매가</small>
+                    <s>{book.list_price.toLocaleString()}원</s>
+                  </span>
+                  <b>{book.paid_price.toLocaleString()}원</b>
+                  <em>{discount}% OFF</em>
+                </div>
+                <dl>
+                  <Row label="구매일" value={book.purchase_date || "–"} />
+                  <Row label="플랫폼" value={book.platform || "–"} />
+                  <Row
+                    label="총 판매가"
+                    value={`${book.list_price.toLocaleString()}원`}
+                  />
+                  <Row
+                    label="총 실구매가"
+                    value={`${book.paid_price.toLocaleString()}원`}
+                  />
+                  <Row label="할인율" value={`${discount}%`} />
+                  <Row label="구매방법" value={book.purchase_method || "–"} />
+                </dl>
+              </section>
+              <section className="recordGroup notesGroup">
+                <h3>NOTES</h3>
+                <div className="archiveNotes">
+                  <Notes notes={book.liked_notes} kind="liked" />
+                  <Notes notes={book.disliked_notes} kind="disliked" />
+                  {!book.liked_notes.length && !book.disliked_notes.length && (
+                    <p className="emptyNotes">기록된 감상이 없습니다.</p>
+                  )}
+                </div>
+              </section>
+            </div>
+          </details>
+        );
+      })}
+    </section>
+  );
+}
+
+export default function FeedPage() {
+  const [books, setBooks] = useState<Book[]>(demo);
+  const [view, setView] = useState<ViewMode>("grid");
+  const [pending, setPending] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [step, setStep] = useState<"search" | "form">("search");
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<SearchBook[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [form, setForm] = useState<BookRecord>(empty);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const scrollRef = useRef(0);
+  async function load(show = false) {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/books", { cache: "no-store" });
+      const data = await r.json();
+      if (data.items?.length) setBooks(data.items);
+      if (show) {
+        setNotice(
+          data.configured
+            ? "최신 기록으로 업데이트했어요"
+            : "Supabase 연결 전 미리보기예요",
+        );
+        setTimeout(() => setNotice(""), 2200);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    load();
+  }, []);
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q
+      ? books.filter((b) => `${b.title} ${b.author}`.toLowerCase().includes(q))
+      : books;
+  }, [books, query]);
+  useEffect(() => {
+    if (view === "feed" && pending)
+      requestAnimationFrame(() =>
+        document.getElementById(pending)?.scrollIntoView({ block: "start" }),
+      );
+  }, [view, pending]);
+  function openPost(book: Book, index: number) {
+    scrollRef.current = window.scrollY;
+    setPending(`post-${book.id || index}`);
+    setView("feed");
+  }
+  function showGrid() {
+    setView("grid");
+    requestAnimationFrame(() => window.scrollTo(0, scrollRef.current));
+  }
+  function openAdd() {
+    setAdding(true);
+    setStep("search");
+    setSearch("");
+    setResults([]);
+    setMessage("");
+    setForm(empty);
+  }
+  async function findBooks(e: FormEvent) {
+    e.preventDefault();
+    if (!search.trim()) return;
+    setSearching(true);
+    setMessage("");
+    try {
+      const r = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
+      const data = await r.json();
+      setResults(data.books || []);
+      if (!data.books?.length)
+        setMessage("검색 결과가 없어요. 직접 입력할 수 있어요.");
+    } catch {
+      setMessage("검색에 실패했어요.");
+    } finally {
+      setSearching(false);
+    }
+  }
+  function choose(book: SearchBook) {
+    setForm({
+      ...empty,
+      title: book.title,
+      author: book.author,
+      total_count: book.totalCount || 1,
+      category: book.category,
+      platform: book.platform,
+      cover_url: book.cover,
+      source_url: book.url,
+    });
+    setStep("form");
+  }
+  const field = <K extends keyof BookRecord>(key: K, value: BookRecord[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      const r = await fetch("/api/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      setBooks((prev) => [data.item, ...prev]);
+      setAdding(false);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "저장하지 못했어요.");
+    } finally {
+      setSaving(false);
+    }
+  }
+  const discount = form.list_price
+    ? Math.max(0, Math.round((1 - form.paid_price / form.list_price) * 100))
+    : 0;
+  return (
+    <main className="feedPage">
+      <nav className="viewTabs" aria-label="독서 기록 보기 방식">
+        <button
+          className={`searchToggle ${searchOpen ? "on" : ""}`}
+          onClick={() => setSearchOpen((v) => !v)}
+          aria-label="내 기록 검색"
+        >
+          <Search size={15} />
+        </button>
+        <button
+          className={`addToggle ${adding ? "on" : ""}`}
+          onClick={openAdd}
+          aria-label="책 추가"
+        >
+          <Plus size={16} />
+        </button>
+        <button className={view === "grid" ? "active" : ""} onClick={showGrid}>
+          <Grid3X3 size={18} />
+          <span>모아보기</span>
+        </button>
+        <button
+          className={view === "feed" ? "active" : ""}
+          onClick={() => {
+            scrollRef.current = window.scrollY;
+            setPending(null);
+            setView("feed");
+          }}
+        >
+          <List size={19} />
+          <span>피드</span>
+        </button>
+        <button
+          className={view === "records" ? "active" : ""}
+          onClick={() => setView("records")}
+        >
+          <NotebookTabs size={18} />
+          <span>기록</span>
+        </button>
+        <button
+          className={`refresh ${loading ? "loading" : ""}`}
+          onClick={() => load(true)}
+          disabled={loading}
+        >
+          <RefreshCw size={14} />
+        </button>
+      </nav>
+      {notice && <div className="refreshNotice">{notice}</div>}
+      {searchOpen && (
+        <div className="searchBar">
+          <Search size={14} />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="책 제목 또는 저자 검색"
+            autoFocus
+          />
+          {query && (
+            <button onClick={() => setQuery("")}>
+              <X size={13} />
+            </button>
+          )}
+        </div>
+      )}
+      {view === "records" && <GroupedRecordArchive books={visible} />}
+      {loading && books.length === 0 ? (
+        <div className="state">피드를 불러오는 중...</div>
+      ) : view === "grid" ? (
+        <section className="bookGrid">
+          {visible.map((book, index) => {
+            const last = visible.length - 1;
+            const start = Math.floor(last / 3) * 3;
+            const corners = [
+              index === 0 ? "topLeft" : "",
+              index === Math.min(2, last) ? "topRight" : "",
+              index === start ? "bottomLeft" : "",
+              index === last ? "bottomRight" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+            return (
+              <button
+                className={`gridItem ${corners}`}
+                key={book.id}
+                onClick={() => openPost(book, index)}
+              >
+                <span className="gridCover">
+                  <Cover book={book} />
+                </span>
+                <span className="gridRating">
+                  <Rating rating={book.rating} />
+                </span>
+              </button>
+            );
+          })}
+        </section>
+      ) : (
+        <section className="feedList">
+          {visible.map((book, index) => (
+            <article
+              id={`post-${book.id || index}`}
+              className="post"
+              key={book.id}
+            >
+              <header className="postHead">
+                <span className="identity">
+                  <span className="profileCover">
+                    {book.cover_url ? (
+                      <img src={book.cover_url} alt="" />
+                    ) : (
+                      <span>📖</span>
+                    )}
+                  </span>
+                  <b>{book.title}</b>
+                  <small>{book.author || "저자 미상"}</small>
+                </span>
+                <span className="postNumber">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </header>
+              <div className="feedCover">
+                {book.cover_url && (
+                  <img className="coverBackdrop" src={book.cover_url} alt="" />
+                )}
+                <span className="coverWash" />
+                <div className="coverMain">
+                  {book.cover_url ? (
+                    <div
+                      className="frontCover"
+                      style={{
+                        backgroundImage: `url("${book.cover_url.replace(/"/g, "%22")}")`,
+                      }}
+                    />
+                  ) : (
+                    <Cover book={book} />
+                  )}
+                </div>
+              </div>
+              <div className="postBody">
+                <div className="summary">
+                  <div className="metaActions">
+                    <span
+                      className={`genreText ${book.category === "BL" ? "bl" : book.category === "로맨스" ? "romance" : book.category === "로맨스판타지" ? "rofan" : "books"}`}
+                    >
+                      #{book.category}
+                    </span>
+                    <span
+                      className={`statusText ${book.status === "완독" ? "done" : book.status === "읽는 중" ? "reading" : book.status === "하차" ? "paused" : "basket"}`}
+                    >
+                      #{book.status}
+                    </span>
+                  </div>
+                  <Rating rating={book.rating} />
+                </div>
+                <div className="readingMini">
+                  <span>
+                    {book.read_count} / {book.total_count}권
+                  </span>
+                  <i>
+                    <b
+                      style={{
+                        width: `${Math.min(100, (book.read_count / book.total_count) * 100)}%`,
+                      }}
+                    />
+                  </i>
+                </div>
+                <div className="caption">
+                  <Notes notes={book.liked_notes} kind="liked" />
+                  <Notes notes={book.disliked_notes} kind="disliked" />
+                </div>
+                <details className="recordDetails">
+                  <summary>기록 정보 보기</summary>
+                  <dl>
+                    <div>
+                      <dt>플랫폼</dt>
+                      <dd>{book.platform || "–"}</dd>
+                    </div>
+                    <div>
+                      <dt>구매일</dt>
+                      <dd>{book.purchase_date || "–"}</dd>
+                    </div>
+                    <div>
+                      <dt>완독/하차일</dt>
+                      <dd>{book.finished_date || "–"}</dd>
+                    </div>
+                    <div>
+                      <dt>실구매가</dt>
+                      <dd>{book.paid_price.toLocaleString()}원</dd>
+                    </div>
+                    <div>
+                      <dt>구매방법</dt>
+                      <dd>{book.purchase_method || "–"}</dd>
+                    </div>
+                  </dl>
+                </details>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
+      {adding && (
+        <div className="drawerShade" onMouseDown={() => setAdding(false)}>
+          <aside className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
+            <header>
+              <button
+                onClick={() =>
+                  step === "form" ? setStep("search") : setAdding(false)
+                }
+              >
+                {step === "form" ? "←" : "×"}
+              </button>
+              <b>{step === "search" ? "책 추가" : "독서 기록"}</b>
+              <span />
+            </header>
+            {step === "search" ? (
+              <div className="drawerBody">
+                <form className="addSearch" onSubmit={findBooks}>
+                  <Search size={15} />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="제목 또는 작가 검색"
+                    autoFocus
+                  />
+                  <button>{searching ? "…" : "검색"}</button>
+                </form>
+                <button className="manual" onClick={() => setStep("form")}>
+                  검색 없이 직접 입력
+                </button>
+                {message && <p className="formMessage">{message}</p>}
+                <div className="results">
+                  {results.map((book, i) => (
+                    <button
+                      key={`${book.url}-${i}`}
+                      onClick={() => choose(book)}
+                    >
+                      {book.cover ? (
+                        <img src={book.cover} alt="" />
+                      ) : (
+                        <span className="miniNoCover">▦</span>
+                      )}
+                      <span>
+                        <b>{book.title}</b>
+                        <small>
+                          {book.author || "저자 미상"} · {book.platform}
+                        </small>
+                      </span>
+                      <Plus size={14} />
+                    </button>
+                  ))}
+                </div>
+                {!search && !results.length && (
+                  <div className="emptySearch">
+                    <Search size={22} />
+                    <b>책을 검색해 바로 기록해보세요</b>
+                    <p>리디북스 · 카카오페이지 · 네이버 시리즈</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <form className="recordForm" onSubmit={save}>
+                <div className="selectedBook">
+                  {form.cover_url ? (
+                    <img src={form.cover_url} alt="" />
+                  ) : (
+                    <span className="miniNoCover">▦</span>
+                  )}
+                  <div>
+                    <label>
+                      제목
+                      <input
+                        required
+                        value={form.title}
+                        onChange={(e) => field("title", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      저자
+                      <input
+                        value={form.author}
+                        onChange={(e) => field("author", e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <div className="fields">
+                  <label>
+                    총 권수
+                    <input
+                      type="number"
+                      min="1"
+                      value={form.total_count}
+                      onChange={(e) => field("total_count", +e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    카테고리
+                    <select
+                      value={form.category}
+                      onChange={(e) => field("category", e.target.value)}
+                    >
+                      <option>BL</option>
+                      <option>로맨스</option>
+                      <option>로맨스판타지</option>
+                      <option>문학</option>
+                      <option>기타</option>
+                    </select>
+                  </label>
+                  <label>
+                    상태
+                    <select
+                      value={form.status}
+                      onChange={(e) => field("status", e.target.value)}
+                    >
+                      <option>책바구니</option>
+                      <option>읽기 전</option>
+                      <option>읽는 중</option>
+                      <option>완독</option>
+                      <option>하차</option>
+                    </select>
+                  </label>
+                  <label>
+                    플랫폼
+                    <input
+                      value={form.platform}
+                      onChange={(e) => field("platform", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    구매일
+                    <input
+                      type="date"
+                      value={form.purchase_date || ""}
+                      onChange={(e) =>
+                        field("purchase_date", e.target.value || null)
+                      }
+                    />
+                  </label>
+                  <label>
+                    완독 / 하차일
+                    <input
+                      type="date"
+                      value={form.finished_date || ""}
+                      onChange={(e) =>
+                        field("finished_date", e.target.value || null)
+                      }
+                    />
+                  </label>
+                  <label>
+                    평점
+                    <input
+                      type="number"
+                      min="0"
+                      max="5"
+                      step="0.5"
+                      value={form.rating ?? ""}
+                      onChange={(e) =>
+                        field(
+                          "rating",
+                          e.target.value === "" ? null : +e.target.value,
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    독서량
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.read_count}
+                      onChange={(e) => field("read_count", +e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    총 판매가
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.list_price}
+                      onChange={(e) => field("list_price", +e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    실구매가
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.paid_price}
+                      onChange={(e) => field("paid_price", +e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    할인율<span className="calculated">{discount}%</span>
+                  </label>
+                  <label className="full">
+                    구매방법
+                    <input
+                      value={form.purchase_method}
+                      onChange={(e) => field("purchase_method", e.target.value)}
+                    />
+                  </label>
+                  <label className="full">
+                    커버 이미지 URL
+                    <input
+                      value={form.cover_url}
+                      onChange={(e) => field("cover_url", e.target.value)}
+                    />
+                  </label>
+                  <label className="full">
+                    좋았던 점
+                    <textarea
+                      value={form.liked_notes.join("\n")}
+                      onChange={(e) =>
+                        field(
+                          "liked_notes",
+                          e.target.value.split("\n").filter(Boolean),
+                        )
+                      }
+                      placeholder="한 줄에 하나씩"
+                    />
+                  </label>
+                  <label className="full">
+                    싫었던 점
+                    <textarea
+                      value={form.disliked_notes.join("\n")}
+                      onChange={(e) =>
+                        field(
+                          "disliked_notes",
+                          e.target.value.split("\n").filter(Boolean),
+                        )
+                      }
+                      placeholder="한 줄에 하나씩"
+                    />
+                  </label>
+                </div>
+                {message && <p className="formMessage">{message}</p>}
+                <button className="save" disabled={saving}>
+                  {saving ? "저장 중…" : "기록 저장"}
+                </button>
+              </form>
+            )}
+          </aside>
+        </div>
+      )}
+    </main>
+  );
+}
