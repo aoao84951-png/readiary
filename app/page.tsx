@@ -230,7 +230,6 @@ function CalendarCover({ books, onOpen }: { books: Book[]; onOpen: (book: Book) 
 function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) => void }) {
   const now = new Date();
   const [cursor, setCursor] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
-  const [selected, setSelected] = useState(() => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`);
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
@@ -241,7 +240,6 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
     books.forEach((book) => (book.reading_dates || []).forEach((date) => map.set(date, [...(map.get(date) || []), book])));
     return map;
   }, [books]);
-  const selectedBooks = byDate.get(selected) || [];
   const cells = Array.from({ length: Math.ceil((firstDay + dayCount) / 7) * 7 }, (_, index) => {
     const day = index - firstDay + 1;
     return day > 0 && day <= dayCount ? day : null;
@@ -259,23 +257,13 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
           const key = day ? dateKey(day) : `empty-${index}`;
           const dayBooks = day ? byDate.get(key) || [] : [];
           return (
-            <div className={`calendarDay ${day && selected === key ? "selected" : ""} ${dayBooks.length ? "hasBooks" : ""}`} key={key}>
-              {day && <button className="dayNumber" onClick={() => setSelected(key)}>{day}</button>}
+            <div className={`calendarDay ${dayBooks.length ? "hasBooks" : ""}`} key={key}>
+              {day && <span className="dayNumber">{String(day).padStart(2, "0")}</span>}
               {dayBooks.length > 0 && <CalendarCover books={dayBooks} onOpen={onOpen} />}
             </div>
           );
         })}
       </div>
-      <section className="calendarSelection">
-        <header><span>READ ON</span><b>{selected.replaceAll("-", ".")}</b></header>
-        {selectedBooks.length ? selectedBooks.map(book => (
-          <button key={book.id} onClick={() => onOpen(book)}>
-            <span className="selectionCover"><Cover book={book} /></span>
-            <span><b>{book.title}</b><small>{book.author} · {book.status}</small></span>
-            <ClassicRating rating={book.rating} />
-          </button>
-        )) : <p>이날의 독서 기록이 아직 없어요.</p>}
-      </section>
     </section>
   );
 }
