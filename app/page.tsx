@@ -10,6 +10,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  SlidersHorizontal,
   Star,
   X,
 } from "lucide-react";
@@ -807,6 +808,7 @@ export default function FeedPage() {
   const [view, setView] = useState<ViewMode>("grid");
   const [pending, setPending] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -940,7 +942,10 @@ export default function FeedPage() {
       <nav className="viewTabs" aria-label="독서 기록 보기 방식">
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
-          onClick={() => setSearchOpen((v) => !v)}
+          onClick={() => {
+            setSearchOpen((v) => !v);
+            setFilterOpen(false);
+          }}
           aria-label="내 기록 검색"
         >
           <Search size={15} />
@@ -982,6 +987,17 @@ export default function FeedPage() {
           <span>기록</span>
         </button>
         <button
+          className={`filterToggle ${filterOpen || statusFilter || categoryFilter ? "on" : ""}`}
+          onClick={() => {
+            setFilterOpen((v) => !v);
+            setSearchOpen(false);
+          }}
+          aria-label="상태 및 장르 필터"
+        >
+          <SlidersHorizontal size={14} />
+          {(statusFilter || categoryFilter) && <i aria-hidden="true" />}
+        </button>
+        <button
           className={`refresh ${loading ? "loading" : ""}`}
           onClick={() => load(true)}
           disabled={loading}
@@ -991,12 +1007,14 @@ export default function FeedPage() {
       </nav>
       {notice && <div className="refreshNotice">{notice}</div>}
       {searchOpen && (
+        <div className="searchBar">
+          <Search size={14} />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="책 제목 또는 저자 검색" autoFocus />
+          {query && <button onClick={() => setQuery("")}><X size={13} /></button>}
+        </div>
+      )}
+      {filterOpen && (
         <section className="filterPanel">
-          <div className="searchBar">
-            <Search size={14} />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="책 제목 또는 저자 검색" autoFocus />
-            {query && <button onClick={() => setQuery("")}><X size={13} /></button>}
-          </div>
           <div className="filterLine"><b>STATUS</b><span>
             {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={statusFilter === value ? "on" : ""} key={value || "all"} onClick={() => setStatusFilter(value)}>{value || "전체"}</button>)}
           </span></div>
