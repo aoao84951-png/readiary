@@ -827,7 +827,8 @@ function StatsView({ books }: { books: Book[] }) {
   }, {})).sort((a, b) => b.paid - a.paid || b.volumes - a.volumes);
   const genres = group("category");
   const platforms = group("platform");
-  const statuses = group("status");
+  const recordedStatuses = group("status");
+  const statuses = ["책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(name => recordedStatuses.find(item => item.name === name) || { name, works: 0, volumes: 0, paid: 0 });
   const months = Object.values(books.reduce<Record<string, { name: string; works: number; volumes: number; paid: number }>>((all, book) => {
     const name = book.purchase_date?.slice(0, 7);
     if (!name) return all;
