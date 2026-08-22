@@ -94,6 +94,11 @@
     7px "Courier New",
     monospace;
 }
+.archiveStatus.done { color: #6f8fb9; }
+.archiveStatus.paused { color: #c97887; }
+.archiveStatus.basket { color: #858580; }
+.archiveStatus.reading { color: #c59b24; }
+.archiveStatus.before { color: #6f9d7e; }
 .archiveItem[open] > summary {
   background: #fafaf8;
 }
@@ -163,6 +168,11 @@
   margin: 0;
   border-top: 1px solid #ecece9;
 }
+.readingGroup dl,
+.purchaseGroup dl {
+  margin-top: 10px;
+  border-top: 0;
+}
 .recordRow {
   display: flex;
   justify-content: space-between;
@@ -205,10 +215,11 @@
   font-size: 9px;
 }
 .groupProgress small {
-  color: #aaa;
+  color: #777772;
   font:
-    7px "Courier New",
+    9px "Courier New",
     monospace;
+  font-weight: 700;
 }
 .groupProgress > i {
   height: 3px;
@@ -223,6 +234,20 @@
   display: block;
   background: #abc0d8;
 }
+.groupProgress.done > span { color: #6f8fb9; }
+.groupProgress.done > i b { background: #abc0d8; }
+.groupProgress.paused > span { color: #c97887; }
+.groupProgress.paused > i b { background: #dca8b2; }
+.groupProgress.paused { background: #fbf6f7; }
+.groupProgress.basket > span { color: #858580; }
+.groupProgress.basket > i b { background: #bdbdb8; }
+.groupProgress.basket { background: #f7f7f5; }
+.groupProgress.reading > span { color: #c59b24; }
+.groupProgress.reading > i b { background: #d9bc66; }
+.groupProgress.reading { background: #fbf9f2; }
+.groupProgress.before > span { color: #6f9d7e; }
+.groupProgress.before > i b { background: #9fc2aa; }
+.groupProgress.before { background: #f5f9f6; }
 .groupProgress > p {
   display: flex;
   justify-content: space-between;
@@ -262,13 +287,14 @@
 }
 .priceLine em {
   margin-left: auto;
-  padding: 3px 5px;
+  padding: 5px 7px;
   border-radius: 5px;
-  background: #f3e8e5;
-  color: #bf7f76;
+  background: #f1e2de;
+  color: #a8665e;
   font:
-    normal 7px "Courier New",
+    700 9px "Courier New",
     monospace;
+  letter-spacing: .03em;
 }
 .archiveNotes {
   display: grid;

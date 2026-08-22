@@ -201,7 +201,7 @@ function RecordArchive({ books }: { books: Book[] }) {
                   <span style={{ width: `${progress}%` }} />
                 </i>
               </span>
-              <span className="archiveStatus">
+          <span className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
                 {book.status}
                 <small>{progress}%</small>
               </span>
@@ -335,7 +335,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <span style={{ width: `${progress}%` }} />
                 </i>
               </span>
-              <span className="archiveStatus">
+              <span className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
                 {book.status}
                 <small>{progress}%</small>
               </span>
@@ -374,7 +374,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
               </section>
               <section className="recordGroup readingGroup">
                 <h3>READING</h3>
-                <div className="groupProgress">
+                <div className={`groupProgress ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
                   <span>
                     <b>{book.status}</b>
                     <small>{progress}%</small>
