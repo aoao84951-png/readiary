@@ -27,19 +27,6 @@ async function kakao(q:string):Promise<SearchBook[]> {
 }
 
 const cleanHtml=(value:string)=>value.replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
-async function naverImageCover(title:string,author:string) {
-  try {
-    const query=`${title} ${author} 네이버시리즈 표지`;
-    const res=await fetch(`https://search.naver.com/search.naver?where=image&sm=tab_jum&query=${encodeURIComponent(query)}`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'text/html',Referer:'https://search.naver.com/'}});
-    const html=await res.text();
-    const candidates=[...html.matchAll(/"originalUrl":"([^"]+)"/g)].map(match=>{try{return JSON.parse(`"${match[1]}"`) as string;}catch{return '';}}).filter(url=>/^https?:\/\//.test(url)&&!/(19over|noimg|adult|profile|icon|logo)/i.test(url));
-    const cover=(candidates[0]||'')
-      .replace(/^http:\/\//,'https://')
-      .replace('blogfiles.naver.net','blogfiles.pstatic.net')
-      .replace('postfiles.naver.net','postfiles.pstatic.net');
-    return cover?`/api/image?url=${encodeURIComponent(cover)}`:'';
-  } catch { return ''; }
-}
 async function naver(q:string):Promise<SearchBook[]> {
   try {
     const res=await fetch(`https://series.naver.com/search/search.series?t=all&fs=novel&q=${encodeURIComponent(q)}`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'text/html',Referer:'https://series.naver.com/'}});
@@ -60,7 +47,6 @@ export async function GET(req:NextRequest) {
     const match=results.find(candidate=>candidate.cover && candidate.platform!=='네이버시리즈' && normalize(candidate.title)===titleKey && (!authorKey || normalize(candidate.author).includes(authorKey)));
     if(match) item.cover=match.cover;
   }
-  await Promise.all(results.map(async item=>{if(!item.cover&&item.platform==='네이버시리즈')item.cover=await naverImageCover(item.title,item.author);}));
   const queryKey=normalize(q);const exactKey=(text:string)=>text.toLowerCase().replace(/\s+/g,' ').trim();const exactQuery=exactKey(q);const platformRank:Record<string,number>={'리디북스':0,'카카오페이지':1,'네이버시리즈':2};
   results.sort((a,b)=>{const relevance=(item:SearchBook)=>{const key=normalize(item.title);return exactKey(item.title)===exactQuery?0:key===queryKey?1:key.startsWith(queryKey)?2:key.includes(queryKey)?3:4;};return relevance(a)-relevance(b)||(platformRank[a.platform]??9)-(platformRank[b.platform]??9);});
   const seen=new Set<string>(); const books=results.filter(item=>{const key=`${item.title}-${item.platform}`;if(seen.has(key))return false;seen.add(key);return true;});
