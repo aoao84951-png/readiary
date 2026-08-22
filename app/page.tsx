@@ -1014,14 +1014,30 @@ export default function FeedPage() {
         </div>
       )}
       {filterOpen && (
-        <section className="filterPanel">
-          <div className="filterLine"><b>STATUS</b><span>
-            {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={statusFilter === value ? "on" : ""} key={value || "all"} onClick={() => setStatusFilter(value)}>{value || "전체"}</button>)}
-          </span></div>
-          <div className="filterLine"><b>GENRE</b><span>
-            {["", "BL", "로맨스", "로맨스판타지", "문학", "기타"].map(value => <button className={categoryFilter === value ? "on" : ""} key={value || "all"} onClick={() => setCategoryFilter(value)}>{value || "전체"}</button>)}
-          </span></div>
-        </section>
+        <>
+          <button className="filterBackdrop" onClick={() => setFilterOpen(false)} aria-label="필터 닫기" />
+          <aside className="filterPanel" role="dialog" aria-label="독서 기록 필터">
+            <header className="filterHead">
+              <div><b>FILTER</b><small>기록 골라보기</small></div>
+              <span>
+                {(statusFilter || categoryFilter) && <button onClick={() => { setStatusFilter(""); setCategoryFilter(""); }}>초기화</button>}
+                <button className="filterClose" onClick={() => setFilterOpen(false)} aria-label="필터 닫기"><X size={14} /></button>
+              </span>
+            </header>
+            <div className="filterGroup">
+              <b>상태</b>
+              <div className="filterOptions">
+                {["", "책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(value => <button className={statusFilter === value ? "on" : ""} key={value || "all"} onClick={() => setStatusFilter(value)}><i />{value || "전체"}</button>)}
+              </div>
+            </div>
+            <div className="filterGroup">
+              <b>장르</b>
+              <div className="filterOptions">
+                {["", "BL", "로맨스", "로맨스판타지", "문학", "기타"].map(value => <button className={categoryFilter === value ? "on" : ""} key={value || "all"} onClick={() => setCategoryFilter(value)}><i />{value || "전체"}</button>)}
+              </div>
+            </div>
+          </aside>
+        </>
       )}
       {view === "records" && <ModalRecordArchive books={visible} />}
       {loading && books.length === 0 ? (
