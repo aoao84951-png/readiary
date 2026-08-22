@@ -1,0 +1,80 @@
+.feedRating {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+.starScale {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5px;
+  color: #ffbd32;
+}
+.starUnit {
+  position: relative;
+  width: 0.92em;
+  height: 1em;
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+}
+.starEmpty,
+.starFill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  line-height: 1;
+}
+.starEmpty {
+  color: #e3e3df;
+}
+.starFill {
+  overflow: hidden;
+  color: #ffbd32;
+  white-space: nowrap;
+}
+.gridRating .starUnit {
+  font-size: 10px;
+}
+.recordHighlights .starUnit,
+.recordRow .starUnit {
+  font-size: 12px;
+}
+.ratingControl {
+  position: relative;
+  width: 138px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  border-bottom: 1px solid #e4e4e0;
+}
+.ratingControl .starScale {
+  gap: 4px;
+}
+.ratingControl .starUnit {
+  font-size: 22px;
+}
+.ratingControl input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.ratingControl:focus-within {
+  border-color: #aaa;
+}
+.ratingControl:focus-within .starEmpty {
+  color: #d6d6d0;
+}
+@media (max-width: 520px) {
+  .ratingControl {
+    width: 128px;
+  }
+  .ratingControl .starUnit {
+    font-size: 20px;
+  }
+}

@@ -7,7 +7,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Star,
   X,
 } from "lucide-react";
 import type { BookRecord } from "@/lib/books";
@@ -110,23 +109,67 @@ const empty: BookRecord = {
   source_url: "",
 };
 
+function StarScale({
+  value,
+  interactive = false,
+}: {
+  value: number;
+  interactive?: boolean;
+}) {
+  const safeValue = Math.max(0, Math.min(5, value));
+  return (
+    <span
+      className={`starScale ${interactive ? "interactive" : ""}`}
+      aria-hidden="true"
+    >
+      {[0, 1, 2, 3, 4].map((index) => {
+        const fill = Math.max(0, Math.min(1, safeValue - index)) * 100;
+        return (
+          <span className="starUnit" key={index}>
+            <span className="starEmpty">★</span>
+            <span className="starFill" style={{ width: `${fill}%` }}>
+              ★
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function Rating({ rating }: { rating: number | null }) {
   const value =
-    typeof rating === "number" ? Math.max(0, Math.min(5, rating)) : null;
+    typeof rating === "number" ? Math.max(0, Math.min(5, rating)) : 0;
   return (
     <span
       className="feedRating"
-      aria-label={value == null ? "평점 없음" : `평점 ${value}점`}
+      role="img"
+      aria-label={rating == null ? "평점 없음" : `평점 ${value}점`}
     >
-      <Star
-        size={17}
-        strokeWidth={1.7}
-        fill={value == null ? "none" : "currentColor"}
+      <StarScale value={value} />
+    </span>
+  );
+}
+
+function InteractiveRating({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <span className="ratingControl">
+      <StarScale value={value} interactive />
+      <input
+        type="range"
+        min="0"
+        max="5"
+        step="0.5"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        aria-label={`평점 ${value}점. 좌우로 움직여 조절`}
       />
-      <b className={value == null ? "empty" : ""}>
-        {value == null ? "–" : value}
-      </b>
-      <small>/ 5</small>
     </span>
   );
 }
@@ -201,7 +244,9 @@ function RecordArchive({ books }: { books: Book[] }) {
                   <span style={{ width: `${progress}%` }} />
                 </i>
               </span>
-          <span className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
+              <span
+                className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
+              >
                 {book.status}
                 <small>{progress}%</small>
               </span>
@@ -335,7 +380,9 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <span style={{ width: `${progress}%` }} />
                 </i>
               </span>
-              <span className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
+              <span
+                className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
+              >
                 {book.status}
                 <small>{progress}%</small>
               </span>
@@ -374,7 +421,9 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
               </section>
               <section className="recordGroup readingGroup">
                 <h3>READING</h3>
-                <div className={`groupProgress ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
+                <div
+                  className={`groupProgress ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
+                >
                   <span>
                     <b>{book.status}</b>
                     <small>{progress}%</small>
@@ -382,7 +431,10 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <i>
                     <b style={{ width: `${progress}%` }} />
                   </i>
-                  <p><span>완독 / 하차일</span><b>{book.finished_date || "–"}</b></p>
+                  <p>
+                    <span>완독 / 하차일</span>
+                    <b>{book.finished_date || "–"}</b>
+                  </p>
                 </div>
                 <dl>
                   <Row label="평점" value={<Rating rating={book.rating} />} />
@@ -907,18 +959,9 @@ export default function FeedPage() {
                   </label>
                   <label>
                     평점
-                    <input
-                      type="number"
-                      min="0"
-                      max="5"
-                      step="0.5"
-                      value={form.rating ?? ""}
-                      onChange={(e) =>
-                        field(
-                          "rating",
-                          e.target.value === "" ? null : +e.target.value,
-                        )
-                      }
+                    <InteractiveRating
+                      value={form.rating ?? 0}
+                      onChange={(value) => field("rating", value)}
                     />
                   </label>
                   <label>
