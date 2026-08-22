@@ -66,20 +66,6 @@
   color: #999;
   font-size: 8.5px;
 }
-.archiveIdentity > i {
-  width: 100%;
-  height: 2px;
-  display: block;
-  overflow: hidden;
-  margin-top: 9px;
-  border-radius: 2px;
-  background: #eee;
-}
-.archiveIdentity > i span {
-  height: 100%;
-  display: block;
-  background: #b7c6d8;
-}
 .archiveStatus {
   display: grid;
   justify-items: end;
@@ -94,19 +80,28 @@
     7px "Courier New",
     monospace;
 }
-.archiveStatus.done { color: #6f8fb9; }
-.archiveStatus.paused { color: #c97887; }
-.archiveStatus.basket { color: #858580; }
-.archiveStatus.reading { color: #c59b24; }
-.archiveStatus.before { color: #6f9d7e; }
-.archiveItem[open] > summary {
-  background: #fafaf8;
-}
-.archiveItem[open] .archiveStatus {
+.archiveStatus.done {
   color: #6f8fb9;
 }
+.archiveStatus.paused {
+  color: #c97887;
+}
+.archiveStatus.basket {
+  color: #858580;
+}
+.archiveStatus.reading {
+  color: #c59b24;
+}
+.archiveStatus.before {
+  color: #6f9d7e;
+}
+.archiveItem[open] > summary {
+  background: #fff;
+  padding-bottom: 13px;
+}
 .archiveBody {
-  padding: 15px 8px 26px 54px;
+  padding: 18px 10px 28px;
+  border-top: 1px solid #ecece9;
 }
 .archiveNumber {
   display: block;
@@ -234,20 +229,48 @@
   display: block;
   background: #abc0d8;
 }
-.groupProgress.done > span { color: #6f8fb9; }
-.groupProgress.done > i b { background: #abc0d8; }
-.groupProgress.paused > span { color: #c97887; }
-.groupProgress.paused > i b { background: #dca8b2; }
-.groupProgress.paused { background: #fbf6f7; }
-.groupProgress.basket > span { color: #858580; }
-.groupProgress.basket > i b { background: #bdbdb8; }
-.groupProgress.basket { background: #f7f7f5; }
-.groupProgress.reading > span { color: #c59b24; }
-.groupProgress.reading > i b { background: #d9bc66; }
-.groupProgress.reading { background: #fbf9f2; }
-.groupProgress.before > span { color: #6f9d7e; }
-.groupProgress.before > i b { background: #9fc2aa; }
-.groupProgress.before { background: #f5f9f6; }
+.groupProgress.done > span {
+  color: #6f8fb9;
+}
+.groupProgress.done > i b {
+  background: #abc0d8;
+}
+.groupProgress.paused > span {
+  color: #c97887;
+}
+.groupProgress.paused > i b {
+  background: #dca8b2;
+}
+.groupProgress.paused {
+  background: #fbf6f7;
+}
+.groupProgress.basket > span {
+  color: #858580;
+}
+.groupProgress.basket > i b {
+  background: #bdbdb8;
+}
+.groupProgress.basket {
+  background: #f7f7f5;
+}
+.groupProgress.reading > span {
+  color: #c59b24;
+}
+.groupProgress.reading > i b {
+  background: #d9bc66;
+}
+.groupProgress.reading {
+  background: #fbf9f2;
+}
+.groupProgress.before > span {
+  color: #6f9d7e;
+}
+.groupProgress.before > i b {
+  background: #9fc2aa;
+}
+.groupProgress.before {
+  background: #f5f9f6;
+}
 .groupProgress > p {
   display: flex;
   justify-content: space-between;
@@ -294,7 +317,7 @@
   font:
     700 9px "Courier New",
     monospace;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
 }
 .archiveNotes {
   display: grid;
@@ -316,7 +339,7 @@
     padding: 12px 8px 48px;
   }
   .archiveBody {
-    padding: 14px 2px 24px;
+    padding: 16px 2px 24px;
   }
   .recordGroup dl {
     grid-template-columns: 1fr;

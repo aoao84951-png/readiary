@@ -262,9 +262,6 @@ function RecordArchive({ books }: { books: Book[] }) {
                 <small>
                   {book.author || "저자 미상"} · {book.category}
                 </small>
-                <i>
-                  <span style={{ width: `${progress}%` }} />
-                </i>
               </span>
               <span
                 className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
@@ -398,9 +395,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 <small>
                   {book.author || "저자 미상"} · {book.category}
                 </small>
-                <i>
-                  <span style={{ width: `${progress}%` }} />
-                </i>
               </span>
               <span
                 className={`archiveStatus ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
