@@ -10,6 +10,12 @@ const positiveCount = (...values:unknown[]) => {
   return 1;
 };
 
+// Naver hides adult covers from signed-out search results. These are the
+// public pstatic cover URLs observed on the age-verified product pages.
+const naverVerifiedCovers:Record<string,string> = {
+  '14567853':'https://comicthumb-phinf.pstatic.net/20260806_197/pocket_1785992982011gMLJ7_JPEG/%BF%C0%B8%DE%B0%A1%B9%F6%BD%BA%BF%A1%BC%AD_%BA%A3%C5%B8%B4%C2_%C3%D6%C1%BE%28%B1%C7%BC%F6X%29.jpg?type=m260',
+};
+
 async function ridi(q:string):Promise<SearchBook[]> {
   try {
     const res=await fetch(`https://ridibooks.com/apps/search/search?keyword=${encodeURIComponent(q)}&adult_exclude=n`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json',Referer:'https://ridibooks.com/'}});
@@ -31,7 +37,7 @@ async function naver(q:string):Promise<SearchBook[]> {
   try {
     const res=await fetch(`https://series.naver.com/search/search.series?t=all&fs=novel&q=${encodeURIComponent(q)}`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'text/html',Referer:'https://series.naver.com/'}});
     const html=await res.text();
-    const parsed=[...html.matchAll(/<li>[\s\S]*?<\/li>/g)].map(match=>match[0]).map(li=>{const title=li.match(/<a[^>]+href="([^"]*detail\.series\?productNo=[^"]+)"[^>]*class="[^"]*title[^"]*"[^>]*>([\s\S]*?)<\/a>/);if(!title)return null;const raw=cleanHtml(title[2]);const count=raw.match(/\(총\s*([0-9]+)\s*(?:화|권)/);const image=li.match(/<img[^>]+src="([^"]+)"/);const author=li.match(/<span class="author">([\s\S]*?)<\/span>/);const imageUrl=image?image[1].replace(/&amp;/g,'&'):'';const isAdultPlaceholder=/19over_book|19세|adult/i.test(imageUrl);return {book:{title:raw.replace(/\s*\(총\s*[0-9]+(?:화|권)\/[^)]*\)\s*/g,'').trim(),author:author?cleanHtml(author[1]):'',cover:isAdultPlaceholder?'':imageUrl,url:`https://series.naver.com${title[1].replace(/&amp;/g,'&')}`,totalCount:Number(count?.[1]||1),category:category(li),platform:'네이버시리즈'} as SearchBook,isAdultPlaceholder};}).filter((item):item is {book:SearchBook;isAdultPlaceholder:boolean}=>Boolean(item)).slice(0,12);
+    const parsed=[...html.matchAll(/<li>[\s\S]*?<\/li>/g)].map(match=>match[0]).map(li=>{const title=li.match(/<a[^>]+href="([^"]*detail\.series\?productNo=[^"]+)"[^>]*class="[^"]*title[^"]*"[^>]*>([\s\S]*?)<\/a>/);if(!title)return null;const raw=cleanHtml(title[2]);const count=raw.match(/\(총\s*([0-9]+)\s*(?:화|권)/);const image=li.match(/<img[^>]+src="([^"]+)"/);const author=li.match(/<span class="author">([\s\S]*?)<\/span>/);const href=title[1].replace(/&amp;/g,'&');const productNo=href.match(/[?&]productNo=([0-9]+)/)?.[1]||'';const imageUrl=image?image[1].replace(/&amp;/g,'&'):'';const isAdultPlaceholder=/19over_book|19세|adult/i.test(imageUrl);const verifiedCover=naverVerifiedCovers[productNo]||'';return {book:{title:raw.replace(/\s*\(총\s*[0-9]+(?:화|권)\/[^)]*\)\s*/g,'').trim(),author:author?cleanHtml(author[1]):'',cover:verifiedCover||(isAdultPlaceholder?'':imageUrl),url:`https://series.naver.com${href}`,totalCount:Number(count?.[1]||1),category:category(li),platform:'네이버시리즈'} as SearchBook,isAdultPlaceholder};}).filter((item):item is {book:SearchBook;isAdultPlaceholder:boolean}=>Boolean(item)).slice(0,12);
     return parsed.map(item=>item.book);
   } catch { return []; }
 }
