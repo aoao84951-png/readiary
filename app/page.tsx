@@ -1,6 +1,9 @@
 "use client";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Grid3X3,
   List,
   NotebookTabs,
@@ -22,7 +25,7 @@ type SearchBook = {
   category: string;
   platform: string;
 };
-type ViewMode = "grid" | "feed" | "records";
+type ViewMode = "grid" | "feed" | "calendar" | "records";
 const demo: Book[] = [
   {
     id: "sample-1",
@@ -46,6 +49,7 @@ const demo: Book[] = [
       "공수관계가 꽤 맛남",
     ],
     disliked_notes: ["가이딩이 시작하면 어느 순간처럼 흐물흐물해짐"],
+    reading_dates: ["2026-08-20", "2026-08-22"],
     source_url: "",
   },
   {
@@ -67,6 +71,7 @@ const demo: Book[] = [
     purchase_method: "포인트 사용",
     liked_notes: ["차분하게 쌓이는 관계와 겨울의 분위기"],
     disliked_notes: [],
+    reading_dates: ["2026-08-22", "2026-08-23"],
     source_url: "",
   },
   {
@@ -87,6 +92,7 @@ const demo: Book[] = [
     purchase_method: "온라인 구매",
     liked_notes: ["단단하고 서늘한 문장", "조각이라는 인물이 오래 남는다"],
     disliked_notes: [],
+    reading_dates: ["2026-08-23"],
     source_url: "",
   },
 ];
@@ -107,6 +113,7 @@ const empty: BookRecord = {
   purchase_method: "",
   liked_notes: [],
   disliked_notes: [],
+  reading_dates: [],
   source_url: "",
 };
 
@@ -193,6 +200,83 @@ function InteractiveRating({
         aria-label={`평점 ${value}점. 좌우로 움직여 조절`}
       />
     </span>
+  );
+}
+
+function CalendarCover({ books, onOpen }: { books: Book[]; onOpen: (book: Book) => void }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (books.length < 2) return;
+    const timer = window.setInterval(() => setIndex((value) => (value + 1) % books.length), 3200);
+    return () => window.clearInterval(timer);
+  }, [books.length]);
+  useEffect(() => setIndex(0), [books]);
+  const book = books[index] || books[0];
+  if (!book) return null;
+  return (
+    <button className="calendarCover" onClick={() => onOpen(book)} aria-label={`${book.title} 상세보기`}>
+      <Cover book={book} />
+      <span className="calendarRating"><ClassicRating rating={book.rating} /></span>
+      {books.length > 1 && <span className="calendarCount">+{books.length - 1}</span>}
+      {books.length > 1 && (
+        <span className="calendarDots" aria-hidden="true">
+          {books.slice(0, 4).map((_, dot) => <i className={dot === index ? "on" : ""} key={dot} />)}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) => void }) {
+  const now = new Date();
+  const [cursor, setCursor] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [selected, setSelected] = useState(() => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`);
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const dayCount = new Date(year, month + 1, 0).getDate();
+  const dateKey = (day: number) => `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const byDate = useMemo(() => {
+    const map = new Map<string, Book[]>();
+    books.forEach((book) => (book.reading_dates || []).forEach((date) => map.set(date, [...(map.get(date) || []), book])));
+    return map;
+  }, [books]);
+  const selectedBooks = byDate.get(selected) || [];
+  const cells = Array.from({ length: Math.ceil((firstDay + dayCount) / 7) * 7 }, (_, index) => {
+    const day = index - firstDay + 1;
+    return day > 0 && day <= dayCount ? day : null;
+  });
+  return (
+    <section className="calendarPage">
+      <header className="calendarHeader">
+        <button onClick={() => setCursor(new Date(year, month - 1, 1))} aria-label="이전 달"><ChevronLeft size={17} /></button>
+        <div><b>{year}</b><strong>{String(month + 1).padStart(2, "0")}</strong></div>
+        <button onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="다음 달"><ChevronRight size={17} /></button>
+      </header>
+      <div className="calendarWeek">{["SUN","MON","TUE","WED","THU","FRI","SAT"].map(day => <span key={day}>{day}</span>)}</div>
+      <div className="calendarGrid">
+        {cells.map((day, index) => {
+          const key = day ? dateKey(day) : `empty-${index}`;
+          const dayBooks = day ? byDate.get(key) || [] : [];
+          return (
+            <div className={`calendarDay ${day && selected === key ? "selected" : ""} ${dayBooks.length ? "hasBooks" : ""}`} key={key}>
+              {day && <button className="dayNumber" onClick={() => setSelected(key)}>{day}</button>}
+              {dayBooks.length > 0 && <CalendarCover books={dayBooks} onOpen={onOpen} />}
+            </div>
+          );
+        })}
+      </div>
+      <section className="calendarSelection">
+        <header><span>READ ON</span><b>{selected.replaceAll("-", ".")}</b></header>
+        {selectedBooks.length ? selectedBooks.map(book => (
+          <button key={book.id} onClick={() => onOpen(book)}>
+            <span className="selectionCover"><Cover book={book} /></span>
+            <span><b>{book.title}</b><small>{book.author} · {book.status}</small></span>
+            <ClassicRating rating={book.rating} />
+          </button>
+        )) : <p>이날의 독서 기록이 아직 없어요.</p>}
+      </section>
+    </section>
   );
 }
 function Notes({
@@ -740,6 +824,7 @@ export default function FeedPage() {
   const [results, setResults] = useState<SearchBook[]>([]);
   const [searching, setSearching] = useState(false);
   const [form, setForm] = useState<BookRecord>(empty);
+  const [readingDate, setReadingDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const scrollRef = useRef(0);
@@ -786,12 +871,15 @@ export default function FeedPage() {
     requestAnimationFrame(() => window.scrollTo(0, scrollRef.current));
   }
   function openAdd() {
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     setAdding(true);
     setStep("search");
     setSearch("");
     setResults([]);
     setMessage("");
-    setForm(empty);
+    setForm({ ...empty, reading_dates: [todayKey] });
+    setReadingDate("");
   }
   async function findBooks(e: FormEvent) {
     e.preventDefault();
@@ -811,6 +899,8 @@ export default function FeedPage() {
     }
   }
   function choose(book: SearchBook) {
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     setForm({
       ...empty,
       title: book.title,
@@ -820,6 +910,7 @@ export default function FeedPage() {
       platform: book.platform,
       cover_url: book.cover,
       source_url: book.url,
+      reading_dates: [todayKey],
     });
     setStep("form");
   }
@@ -881,6 +972,13 @@ export default function FeedPage() {
           <span>피드</span>
         </button>
         <button
+          className={view === "calendar" ? "active" : ""}
+          onClick={() => setView("calendar")}
+        >
+          <CalendarDays size={18} />
+          <span>달력</span>
+        </button>
+        <button
           className={view === "records" ? "active" : ""}
           onClick={() => setView("records")}
         >
@@ -915,6 +1013,9 @@ export default function FeedPage() {
       {view === "records" && <ModalRecordArchive books={visible} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
+      ) : view === "records" ? null
+      : view === "calendar" ? (
+        <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
       ) : view === "grid" ? (
         <section className="bookGrid">
           {visible.map((book, index) => {
@@ -1158,6 +1259,24 @@ export default function FeedPage() {
                         field("finished_date", e.target.value || null)
                       }
                     />
+                  </label>
+                  <label className="full readingDatesField">
+                    읽은 날
+                    <span className="dateAdder">
+                      <input type="date" value={readingDate} onChange={(e) => setReadingDate(e.target.value)} />
+                      <button type="button" onClick={() => {
+                        if (!readingDate || form.reading_dates?.includes(readingDate)) return;
+                        field("reading_dates", [...(form.reading_dates || []), readingDate].sort());
+                        setReadingDate("");
+                      }}>추가</button>
+                    </span>
+                    <span className="dateChips">
+                      {(form.reading_dates || []).map(date => (
+                        <button type="button" key={date} onClick={() => field("reading_dates", (form.reading_dates || []).filter(item => item !== date))}>
+                          {date.replaceAll("-", ".")} <X size={10} />
+                        </button>
+                      ))}
+                    </span>
                   </label>
                   <label>
                     평점
