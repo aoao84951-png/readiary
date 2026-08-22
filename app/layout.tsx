@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './archive.css';
 
 export const metadata: Metadata = {
   title: '읽은 마음 — 나의 독서기록',
