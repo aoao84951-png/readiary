@@ -516,9 +516,8 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 >
                   <span>
                     <b>{book.status}</b>
-                    <small>{book.read_count} / {book.total_count}권</small>
+                    <small>{book.read_count}권 읽음</small>
                   </span>
-                  <strong className="progressNumber">{progress}<i>%</i></strong>
                   <p>
                     <span>완독 / 하차일</span>
                     <b>{book.finished_date || "–"}</b>
@@ -733,9 +732,8 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                     >
                       <span>
                         <b>{book.status}</b>
-                        <small>{book.read_count} / {book.total_count}권</small>
+                        <small>{book.read_count}권 읽음</small>
                       </span>
-                      <strong className="progressNumber">{progress}<i>%</i></strong>
                       <p>
                         <span>완독 / 하차일</span>
                         <b>{book.finished_date || "–"}</b>

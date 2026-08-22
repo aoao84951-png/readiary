@@ -303,6 +303,49 @@
   color: #6d6d68;
   font-size: 9px;
 }
+.groupProgress {
+  min-height: 88px;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  padding: 14px 16px;
+}
+.groupProgress:before {
+  content: none;
+}
+.groupProgress > span {
+  gap: 6px;
+}
+.groupProgress > span b {
+  font-size: 12px;
+}
+.groupProgress > p {
+  grid-column: 2;
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+.groupProgress > p span {
+  color: #aaa9a4;
+  font-size: 7.5px;
+}
+.groupProgress > p b {
+  font-size: 10px;
+}
+@media (max-width: 520px) {
+  .groupProgress {
+    min-height: 78px;
+    padding: 12px 13px;
+  }
+  .groupProgress > span b {
+    font-size: 11px;
+  }
+  .groupProgress > p b {
+    font-size: 9px;
+  }
+}
 .priceLine {
   display: flex;
   align-items: end;
