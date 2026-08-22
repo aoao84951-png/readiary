@@ -753,7 +753,7 @@ export default function FeedPage() {
         setNotice(
           data.configured
             ? "최신 기록으로 업데이트했어요"
-            : "Supabase 연결 전 미리보기예요",
+            : "Firebase 연결 전 미리보기예요",
         );
         setTimeout(() => setNotice(""), 2200);
       }
@@ -1208,6 +1208,7 @@ export default function FeedPage() {
                     <input
                       value={form.cover_url}
                       onChange={(e) => field("cover_url", e.target.value)}
+                      placeholder="네이버 공식 표지 주소를 넣으면 다음 검색부터 자동 적용돼요"
                     />
                   </label>
                   <label className="full">

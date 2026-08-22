@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getDocument } from '@/lib/firebase';
 
 type SearchBook = { title:string; author:string; cover:string; url:string; totalCount:number; category:string; platform:string };
 const category = (text:string) => /BL|비엘/i.test(text) ? 'BL' : /로맨스판타지|로판/i.test(text) ? '로맨스판타지' : /로맨스/i.test(text) ? '로맨스' : '문학';
@@ -53,6 +54,12 @@ export async function GET(req:NextRequest) {
     const match=results.find(candidate=>candidate.cover && candidate.platform!=='네이버시리즈' && normalize(candidate.title)===titleKey && (!authorKey || normalize(candidate.author).includes(authorKey)));
     if(match) item.cover=match.cover;
   }
+  await Promise.all(results.map(async item=>{
+    if(item.cover || item.platform!=='네이버시리즈') return;
+    const productNo=item.url.match(/[?&]productNo=([0-9]+)/)?.[1];
+    if(!productNo) return;
+    try { const saved=await getDocument('naver_covers',productNo); if(saved?.cover_url)item.cover=String(saved.cover_url); } catch {}
+  }));
   const queryKey=normalize(q);const exactKey=(text:string)=>text.toLowerCase().replace(/\s+/g,' ').trim();const exactQuery=exactKey(q);const platformRank:Record<string,number>={'리디북스':0,'카카오페이지':1,'네이버시리즈':2};
   results.sort((a,b)=>{const relevance=(item:SearchBook)=>{const key=normalize(item.title);return exactKey(item.title)===exactQuery?0:key===queryKey?1:key.startsWith(queryKey)?2:key.includes(queryKey)?3:4;};return relevance(a)-relevance(b)||(platformRank[a.platform]??9)-(platformRank[b.platform]??9);});
   const seen=new Set<string>(); const books=results.filter(item=>{const key=`${item.title}-${item.platform}`;if(seen.has(key))return false;seen.add(key);return true;});
