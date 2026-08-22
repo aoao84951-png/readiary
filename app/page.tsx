@@ -1039,6 +1039,12 @@ export default function FeedPage() {
           </aside>
         </>
       )}
+      {(statusFilter || categoryFilter) && (
+        <div className="activeFilters" aria-label="적용 중인 필터">
+          {statusFilter && <button onClick={() => setStatusFilter("")}>{statusFilter}<X size={10} /></button>}
+          {categoryFilter && <button onClick={() => setCategoryFilter("")}>{categoryFilter}<X size={10} /></button>}
+        </div>
+      )}
       {view === "records" && <ModalRecordArchive books={visible} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
