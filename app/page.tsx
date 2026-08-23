@@ -8,7 +8,8 @@ import {
   Grid3X3,
   LayoutGrid,
   ImagePlus,
-  CloudDownload,
+  ArrowDown,
+  Cloud,
   List,
   Hash,
   Ellipsis,
@@ -102,7 +103,7 @@ function ImageShareButton({ getTarget, filename, compact = false }: { getTarget:
     try { await saveElementAsImage(target, filename); }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
-  }}><CloudDownload size={compact ? 16 : 15} strokeWidth={1.45} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
+  }}><i className="cloudDownloadMark" aria-hidden="true"><Cloud size={compact ? 18 : 17} strokeWidth={1.55} /><ArrowDown size={compact ? 8 : 7} strokeWidth={1.8} /></i><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
 }
 const defaultPlatforms = ["리디북스", "카카오페이지", "네이버시리즈", "조아라", "디리토", "밀리의 서재"];
 const defaultPurchaseMethods = [

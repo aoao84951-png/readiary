@@ -1347,6 +1347,9 @@ html { scrollbar-gutter: stable; }
 .imageShareButton.compact { min-width: 26px; width: 26px; height: 28px; padding: 0; border-radius: 0; background: transparent; }
 .imageShareButton.compact span { display: none; }
 .imageShareButton:disabled { opacity: .55; }
+.cloudDownloadMark { position: relative; width: 19px; height: 18px; display: inline-grid; place-items: center; flex: 0 0 auto; }
+.cloudDownloadMark > svg:first-child { width: 18px; height: 18px; }
+.cloudDownloadMark > svg:last-child { position: absolute; left: 50%; top: 7px; padding: 0; color: currentColor; transform: translateX(-50%); }
 .postHeadTools { display: flex; align-items: center; gap: 8px; }
 .calendarHeader { position: relative; }
 .calendarHeadActions { position: absolute; right: 0; display: flex; align-items: center; justify-content: flex-end; gap: 1px; }
