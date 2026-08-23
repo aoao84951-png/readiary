@@ -1312,6 +1312,51 @@
 .bottomDock > button:not(.dockAdd) span { font-size: 6.7px; font-weight: 650; letter-spacing: -.01em; }
 .bottomDock > button.active { color: #716762; }
 .bottomDock > button.active::after { content: ''; width: 10px; height: 1px; border-radius: 2px; background: #c98ba0; }
+.bottomDock > button.dockProfile { position: relative; gap: 0; }
+.bottomDock > button.dockProfile.active::after { position: absolute; bottom: 1px; }
+.dockProfileRing {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: conic-gradient(from 205deg,#e6bd5d,#df8a5b 22%,#d96f83 46%,#bd77a8 72%,#7c91bd 88%,#e6bd5d);
+}
+.dockProfileRing img,
+.dockProfileRing i { width: 21px; height: 21px; display: grid; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #f2f0ee; object-fit: cover; color: #8f8985; font: 600 7px Georgia, serif; }
+.profileStatsHeader {
+  display: grid;
+  grid-template-columns: 92px minmax(0,1fr);
+  align-items: center;
+  gap: 18px 24px;
+  padding: 8px 10px 30px;
+  border-bottom: 1px solid #efedea;
+}
+.profileImagePicker { position: relative; width: 86px; height: 86px; display: block; cursor: pointer; }
+.profileImagePicker > span { width: 86px; height: 86px; display: grid; place-items: center; padding: 3px; border-radius: 50%; background: conic-gradient(from 205deg,#e8c55e,#e08b5c 22%,#dc6e83 46%,#bf75aa 72%,#7b91bf 88%,#e8c55e); }
+.profileImagePicker img,
+.profileImagePicker i { width: 80px; height: 80px; display: grid; place-items: center; border: 3px solid #fff; border-radius: 50%; background: #f0eeed; object-fit: cover; color: #a39d99; font: italic 22px Georgia, serif; }
+.profileImagePicker > b { position: absolute; right: 0; bottom: 2px; width: 24px; height: 24px; display: grid; place-items: center; border: 3px solid #fff; border-radius: 50%; background: #82a8cb; color: #fff; }
+.profileImagePicker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.profileNumbers { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.profileNumbers div { display: grid; justify-items: center; gap: 4px; }
+.profileNumbers strong { color: #55514e; font-size: 14px; font-weight: 760; }
+.profileNumbers small { color: #9e9995; font-size: 7.5px; font-weight: 650; white-space: nowrap; }
+.profileReadingBio { grid-column: 1 / -1; display: grid; gap: 5px; margin-top: -5px; }
+.profileReadingBio b { color: #55514e; font-size: 11px; }
+.profileReadingBio span { color: #c1849b; font: italic 8.5px Georgia, serif; letter-spacing: .02em; }
+@media (max-width: 520px) {
+  .profileStatsHeader { grid-template-columns: 76px minmax(0,1fr); gap: 15px 18px; padding: 5px 7px 24px; }
+  .profileImagePicker,
+  .profileImagePicker > span { width: 72px; height: 72px; }
+  .profileImagePicker img,
+  .profileImagePicker i { width: 66px; height: 66px; }
+  .profileImagePicker > b { width: 22px; height: 22px; }
+  .profileNumbers strong { font-size: 13px; }
+  .profileNumbers small { font-size: 7px; }
+}
 .bottomDock .dockAdd {
   align-self: center;
   justify-self: center;

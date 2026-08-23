@@ -2,7 +2,6 @@
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
-  CircleUserRound,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
@@ -193,6 +192,29 @@ async function prepareNoteImage(file: File) {
     }
     if (result.length > 210_000) throw new Error("이미지를 더 작게 잘라서 다시 첨부해주세요.");
     return result;
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
+
+async function prepareProfileImage(file: File) {
+  if (!file.type.startsWith("image/")) throw new Error("이미지 파일을 선택해주세요.");
+  const source = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("이미지를 불러오지 못했어요."));
+      element.src = source;
+    });
+    const size = Math.min(image.naturalWidth, image.naturalHeight);
+    const canvas = document.createElement("canvas");
+    canvas.width = 320;
+    canvas.height = 320;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("이미지를 처리하지 못했어요.");
+    context.drawImage(image, (image.naturalWidth - size) / 2, (image.naturalHeight - size) / 2, size, size, 0, 0, 320, 320);
+    return canvas.toDataURL("image/jpeg", .82);
   } finally {
     URL.revokeObjectURL(source);
   }
@@ -1010,7 +1032,7 @@ function StatSection({ title, subtitle, items }: { title: string; subtitle: stri
   return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statCards">{items.map((item, index) => <article className="statCard" key={item.name}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><strong>{item.paid.toLocaleString()}원</strong><small>{item.volumes}권 · {item.works}작품</small></article>)}</div></section>;
 }
 
-function StatsView({ books }: { books: Book[] }) {
+function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
   const [purchaseYear, setPurchaseYear] = useState("");
   const won = (value: number) => `${value.toLocaleString()}원`;
   const totalVolumes = books.reduce((sum, book) => sum + (book.total_count || 0), 0);
@@ -1045,12 +1067,18 @@ function StatsView({ books }: { books: Book[] }) {
   if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
   return (
     <section className="statsPage">
-      <header className="statsIntro">
-        <div className="statsCopy"><span>READING REPORT</span><h1>나의 독서 통계</h1><p>지금까지 기록한 모든 책을 바탕으로 정리했어요.</p><i>♡ &nbsp; books, notes &amp; little memories</i></div>
-        <div className="statsCovers" aria-hidden="true">
-          {books.filter(book => book.cover_url).slice(0, 4).map((book, index) => <img key={book.id} src={book.cover_url} alt="" style={{ right: 18 + index * 34, transform: `rotate(${(index - 1.5) * 5}deg)` }} />)}
-          <b>MY<br />SHELF</b>
+      <header className="profileStatsHeader">
+        <label className="profileImagePicker" aria-label={profileImage ? "프로필 사진 변경" : "프로필 사진 추가"}>
+          <span>{profileImage ? <img src={profileImage} alt="나의 프로필" /> : <i>R</i>}</span>
+          <b><Plus size={12} strokeWidth={1.7} /></b>
+          <input type="file" accept="image/*" onChange={(event) => { onProfileImage(event.target.files?.[0]); event.target.value = ""; }} />
+        </label>
+        <div className="profileNumbers">
+          <div><strong>{books.length}</strong><small>작품</small></div>
+          <div><strong>{readVolumes}</strong><small>읽은 권수</small></div>
+          <div><strong>{averageRating ? averageRating.toFixed(1) : "–"}</strong><small>평균 평점</small></div>
         </div>
+        <div className="profileReadingBio"><b>나의 독서 통계</b><span>books, notes &amp; little memories</span></div>
       </header>
       <div className="statsSummary">
         <div><small>기록한 작품</small><strong>{books.length}<i>작품</i></strong></div>
@@ -1102,6 +1130,7 @@ export default function FeedPage() {
   const [coverProcessing, setCoverProcessing] = useState(false);
   const [platformOptions, setPlatformOptions] = useState(defaultPlatforms);
   const [purchaseMethodOptions, setPurchaseMethodOptions] = useState(defaultPurchaseMethods);
+  const [profileImage, setProfileImage] = useState("");
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const scrollRef = useRef(0);
@@ -1131,6 +1160,8 @@ export default function FeedPage() {
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json()).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions([...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
+      const localProfile = window.localStorage.getItem("readiary-profile-image") || "";
+      setProfileImage(data.profile_image || localProfile);
     }).catch(() => undefined);
   }, []);
   const visible = useMemo(() => {
@@ -1275,6 +1306,21 @@ export default function FeedPage() {
     if (!response.ok) { setMessage(data.error || "선택지를 저장하지 못했어요."); throw new Error(data.error); }
     if (kind === "platforms") setPlatformOptions((prev) => [...new Set([...prev, value])]);
     else setPurchaseMethodOptions((prev) => [...new Set([...prev, value])]);
+  }
+  async function changeProfileImage(file?: File) {
+    if (!file) return;
+    try {
+      const image = await prepareProfileImage(file);
+      setProfileImage(image);
+      window.localStorage.setItem("readiary-profile-image", image);
+      const response = await fetch("/api/options", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "profile_image", value: image }) });
+      if (response.ok) setNotice("프로필 사진을 변경했어요");
+      else setNotice("이 기기에 프로필 사진을 저장했어요");
+      setTimeout(() => setNotice(""), 2200);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "프로필 사진을 변경하지 못했어요.");
+      setTimeout(() => setNotice(""), 2200);
+    }
   }
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -1424,7 +1470,7 @@ export default function FeedPage() {
         </nav>
       )}
       {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}
-      {view === "stats" && <StatsView books={books} />}
+      {view === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
       ) : view === "records" || view === "stats" ? null
@@ -1531,7 +1577,7 @@ export default function FeedPage() {
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><AlignJustify size={18} strokeWidth={1.4} /><span>피드</span></button>
         <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={21} strokeWidth={1.45} /></button>
         <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><BookOpen size={18} strokeWidth={1.4} /><span>기록</span></button>
-        <button className={currentSection === "stats" ? "active" : ""} onClick={() => navigateSection("stats")}><CircleUserRound size={18} strokeWidth={1.4} /><span>프로필</span></button>
+        <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span></button>
       </nav>
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
