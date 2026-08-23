@@ -499,7 +499,7 @@
 .recordModalHead {
   min-height: 78px;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 34px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
   gap: 11px;
   padding: 10px 13px;
@@ -541,7 +541,12 @@
   font-size: 8.5px;
   font-style: normal;
 }
-.recordModalHead button {
+.modalHeadActions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.recordModalHead .modalHeadActions button {
   width: 32px;
   height: 32px;
   display: grid;
@@ -551,6 +556,19 @@
   background: #f4f4f2;
   color: #888;
   cursor: pointer;
+}
+.recordModalHead .modalHeadActions .editRecordButton {
+  width: auto;
+  padding: 0 9px;
+  display: flex;
+  gap: 4px;
+  border-radius: 999px;
+  background: #f7f4f3;
+  color: #8e747c;
+}
+.editRecordButton span {
+  font-size: 7.5px;
+  font-weight: 750;
 }
 .recordModalBody {
   overflow-y: auto;

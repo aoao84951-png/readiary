@@ -24,3 +24,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) { return NextResponse.json({ error: '기록을 저장하지 못했습니다.', detail: error instanceof Error ? error.message : '' }, { status: 502 }); }
 }
+
+export async function PATCH(request: NextRequest) {
+  const input = await request.json() as BookRecord & { id?: string };
+  const { id, ...body } = input;
+  if (!id) return NextResponse.json({ error: '수정할 기록을 찾지 못했습니다.' }, { status: 400 });
+  if (!body.title?.trim()) return NextResponse.json({ error: '책 제목을 입력해주세요.' }, { status: 400 });
+  if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
+  const payload = {
+    ...body,
+    title: body.title.trim(),
+    author: body.author?.trim() || '작가 미상',
+    updated_at: new Date().toISOString(),
+  };
+  try {
+    const item = await setDocument('books', id, payload as unknown as Record<string, unknown>);
+    const productNo = body.source_url?.match(/[?&]productNo=([0-9]+)/)?.[1];
+    if (productNo && body.platform === '네이버시리즈' && /^https:\/\/comicthumb-phinf\.pstatic\.net\//.test(body.cover_url || '')) {
+      await setDocument('naver_covers', productNo, { cover_url: body.cover_url, title: body.title, updated_at: new Date().toISOString() });
+    }
+    return NextResponse.json({ item });
+  } catch (error) {
+    return NextResponse.json({ error: '기록을 수정하지 못했습니다.', detail: error instanceof Error ? error.message : '' }, { status: 502 });
+  }
+}

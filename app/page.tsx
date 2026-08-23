@@ -8,6 +8,7 @@ import {
   Grid3X3,
   List,
   NotebookTabs,
+  Pencil,
   Plus,
   RefreshCw,
   Search,
@@ -540,7 +541,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -655,12 +656,17 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       {book.author || "저자 미상"} · {book.category}
                     </em>
                   </span>
-                  <button
-                    onClick={closeSelected}
-                    aria-label="상세 기록 닫기"
-                  >
-                    <X size={17} />
-                  </button>
+                  <div className="modalHeadActions">
+                    {onEdit && (
+                      <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }} aria-label="기록 수정">
+                        <Pencil size={13} />
+                        <span>수정</span>
+                      </button>
+                    )}
+                    <button onClick={closeSelected} aria-label="상세 기록 닫기">
+                      <X size={17} />
+                    </button>
+                  </div>
                 </header>
                 <div className="recordModalBody">
                   <div className="recordHighlights">
@@ -815,6 +821,7 @@ export default function FeedPage() {
   const [results, setResults] = useState<SearchBook[]>([]);
   const [searching, setSearching] = useState(false);
   const [form, setForm] = useState<BookRecord>(empty);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [readingDate, setReadingDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -867,12 +874,23 @@ export default function FeedPage() {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     setAdding(true);
+    setEditingId(null);
     setStep("search");
     setSearch("");
     setResults([]);
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
+  }
+  function openEdit(book: Book) {
+    const { id, ...record } = book;
+    setEditingId(id);
+    setForm(record);
+    setReadingDate("");
+    setMessage("");
+    setStep("form");
+    setDetailBook(null);
+    setAdding(true);
   }
   async function findBooks(e: FormEvent) {
     e.preventDefault();
@@ -915,14 +933,17 @@ export default function FeedPage() {
     setMessage("");
     try {
       const r = await fetch("/api/books", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
-      setBooks((prev) => [data.item, ...prev]);
+      setBooks((prev) => editingId
+        ? prev.map((book) => book.id === editingId ? data.item : book)
+        : [data.item, ...prev]);
       setAdding(false);
+      setEditingId(null);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "저장하지 못했어요.");
     } finally {
@@ -1047,7 +1068,7 @@ export default function FeedPage() {
           {categoryFilters.map(value => <button key={value} onClick={() => setCategoryFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
         </div>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} />}
       {view === "stats" && <StatsView books={books} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
@@ -1150,19 +1171,17 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} hideList />}
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
           <aside className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
             <header>
               <button
-                onClick={() =>
-                  step === "form" ? setStep("search") : setAdding(false)
-                }
+                onClick={() => editingId ? setAdding(false) : step === "form" ? setStep("search") : setAdding(false)}
               >
-                {step === "form" ? "←" : "×"}
+                {editingId ? "×" : step === "form" ? "←" : "×"}
               </button>
-              <b>{step === "search" ? "책 추가" : "독서 기록"}</b>
+              <b>{editingId ? "기록 수정" : step === "search" ? "책 추가" : "독서 기록"}</b>
               <span />
             </header>
             {step === "search" ? (
@@ -1398,7 +1417,7 @@ export default function FeedPage() {
                 </div>
                 {message && <p className="formMessage">{message}</p>}
                 <button className="save" disabled={saving}>
-                  {saving ? "저장 중…" : "기록 저장"}
+                  {saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}
                 </button>
               </form>
             )}
