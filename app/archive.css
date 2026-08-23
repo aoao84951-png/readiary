@@ -140,6 +140,90 @@
 .recordHighlights .statusHighlight.reading > b { color: #c59b24; }
 .recordHighlights .statusHighlight.before > b { color: #6f9d7e; }
 .recordHighlights .statusHighlight.basket > b { color: #858580; }
+.bookBasics {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  min-height: 76px;
+  border-top: 1px solid #ecece9;
+  border-bottom: 1px solid #ecece9;
+}
+.genreIdentity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 16px 8px 2px;
+  border-right: 1px solid #ecece9;
+}
+.genreIdentity > img,
+.genreIdentity > span {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+.genreIdentity > span {
+  display: grid;
+  place-items: center;
+  border: 5px double rgba(255,255,255,.5);
+  border-radius: 45% 55% 48% 52%;
+  background: #a9a5b5;
+  box-shadow: inset 0 2px 7px rgba(255,255,255,.38),0 3px 8px rgba(60,55,70,.12);
+  color: #fffaf1;
+  font:700 8px 'Courier New',monospace;
+}
+.genreIdentity > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.genreIdentity small,
+.bookBasics dt {
+  color: #aaa;
+  font-size: 7.5px;
+}
+.genreIdentity b {
+  overflow: hidden;
+  color: #5d5d58;
+  font-size: 10px;
+  font-weight: 760;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bookBasics dl {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 0;
+  border: 0;
+}
+.bookBasics dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 2px 0 15px;
+  border-bottom: 1px solid #f0f0ed;
+}
+.bookBasics dl > div:last-child {
+  border-bottom: 0;
+}
+.bookBasics dd {
+  margin: 0;
+  overflow: hidden;
+  color: #5d5d58;
+  font-size: 9px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width:520px) {
+  .bookBasics { grid-template-columns: 1.15fr 1fr; min-height: 68px; }
+  .genreIdentity { gap: 7px; padding-right: 9px; }
+  .genreIdentity > img,.genreIdentity > span { width: 43px; height: 43px; }
+  .genreIdentity b { font-size: 8.5px; }
+  .bookBasics dl > div { padding-left: 9px; }
+  .bookBasics dd { font-size: 8px; }
+}
 .recordHighlights .statusHighlight small {
   max-width: 120px;
   overflow: hidden;

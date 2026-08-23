@@ -182,6 +182,30 @@ function ClassicRating({ rating }: { rating: number | null }) {
   );
 }
 
+function BookBasics({ book }: { book: Book }) {
+  const category = book.category || "미분류";
+  const seal = category === "BL" ? "/genre-seals/bl.png"
+    : category === "로맨스판타지" ? "/genre-seals/romance-fantasy.png"
+    : category === "로맨스" ? "/genre-seals/romance.png"
+    : ["문학", "일반문학"].includes(category) ? "/genre-seals/literature.png"
+    : "";
+  return (
+    <section className="recordGroup bookBasicsGroup">
+      <h3>BOOK INFO</h3>
+      <div className="bookBasics">
+        <div className="genreIdentity">
+          {seal ? <img src={seal} alt="" /> : <span>{category.slice(0, 2)}</span>}
+          <div><small>카테고리</small><b>{category}</b></div>
+        </div>
+        <dl>
+          <div><dt>저자</dt><dd>{book.author || "–"}</dd></div>
+          <div><dt>총 권수</dt><dd>{book.total_count}권</dd></div>
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 function InteractiveRating({
   value,
   onChange,
@@ -497,6 +521,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                 </div>
               </div>
+              <BookBasics book={book} />
               <section className="recordGroup purchaseGroup">
                 <h3>PURCHASE</h3>
                 <div className="priceLine">
@@ -679,6 +704,7 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                     </div>
                   </div>
+                  <BookBasics book={book} />
                   <section className="recordGroup purchaseGroup">
                     <h3>PURCHASE</h3>
                     <div className="priceLine">
