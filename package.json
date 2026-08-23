@@ -1,5 +1,5 @@
 {
-  "name": "sites-project",
+  "name": "readiary",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -9,6 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
+    "deploy:cloudflare": "npm run build && wrangler deploy --config dist/server/wrangler.json",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
