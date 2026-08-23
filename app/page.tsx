@@ -1205,7 +1205,7 @@ export default function FeedPage() {
     setLoading(true);
     try {
       const r = await fetch("/api/books", { cache: "no-store" });
-      const data = await r.json();
+      const data = await r.json() as { items?: Book[]; configured?: boolean };
       if (data.items?.length) setBooks(data.items);
       if (show) {
         setNotice(
@@ -1221,7 +1221,7 @@ export default function FeedPage() {
   }
   useEffect(() => {
     load();
-    fetch("/api/options", { cache: "no-store" }).then((response) => response.json()).then((data) => {
+    fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions([...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
       const localProfile = window.localStorage.getItem("readiary-profile-image") || "";
@@ -1285,7 +1285,7 @@ export default function FeedPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: book.id }),
     });
-    const data = await r.json();
+    const data = await r.json() as { error?: string };
     if (!r.ok) throw new Error(data.error || "삭제하지 못했어요.");
     setBooks((prev) => prev.filter((item) => item.id !== book.id));
     setDetailBook(null);
@@ -1297,7 +1297,7 @@ export default function FeedPage() {
     setMessage("");
     try {
       const r = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
-      const data = await r.json();
+      const data = await r.json() as { books?: SearchBook[] };
       setResults(data.books || []);
       if (!data.books?.length)
         setMessage("검색 결과가 없어요. 직접 입력할 수 있어요.");
@@ -1366,7 +1366,7 @@ export default function FeedPage() {
   }
   async function addOption(kind: "platforms" | "purchase_methods", value: string) {
     const response = await fetch("/api/options", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, value }) });
-    const data = await response.json();
+    const data = await response.json() as { error?: string };
     if (!response.ok) { setMessage(data.error || "선택지를 저장하지 못했어요."); throw new Error(data.error); }
     if (kind === "platforms") setPlatformOptions((prev) => [...new Set([...prev, value])]);
     else setPurchaseMethodOptions((prev) => [...new Set([...prev, value])]);
@@ -1401,7 +1401,7 @@ export default function FeedPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload),
       });
-      const data = await r.json();
+      const data = await r.json() as { error?: string; item: Book };
       if (!r.ok) throw new Error(data.error);
       setBooks((prev) => editingId
         ? prev.map((book) => book.id === editingId ? data.item : book)

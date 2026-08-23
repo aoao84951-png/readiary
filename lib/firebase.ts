@@ -73,7 +73,7 @@ function fields(record: Record<string, unknown>) {
   return Object.fromEntries(Object.entries(record).map(([key, value]) => [key, encode(value)]));
 }
 
-function record(document: FirestoreDocument) {
+function record(document: FirestoreDocument): Record<string, unknown> & { id: string | undefined } {
   const data = Object.fromEntries(Object.entries(document.fields || {}).map(([key, value]) => [key, decode(value)]));
   return { id: document.name.split('/').pop(), ...data };
 }

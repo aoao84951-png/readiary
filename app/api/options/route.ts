@@ -30,9 +30,10 @@ export async function PATCH(request: NextRequest) {
   if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
   try {
     const saved = await getDocument('settings', 'record_options') as OptionSettings | undefined;
-    const next: Required<OptionSettings> = {
+    const next: OptionSettings & { platforms: string[]; purchase_methods: string[] } = {
       platforms: saved?.platforms || [],
       purchase_methods: saved?.purchase_methods || [],
+      profile_image: saved?.profile_image || '',
     };
     next[kind] = [...new Set([...next[kind], clean])];
     const item = await setDocument('settings', 'record_options', next);
