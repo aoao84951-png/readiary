@@ -1418,6 +1418,8 @@ html { scrollbar-gutter: stable; }
   box-shadow: 0 2px 5px rgba(58, 52, 48, .055), 0 9px 24px rgba(58, 52, 48, .09);
   pointer-events: none;
 }
+.recordModal.imageExporting .noteHeart,
+.post.imageExporting .noteHeart { overflow: visible; }
 .profileStatsHeader {
   display: grid;
   grid-template-columns: 92px minmax(0,1fr);
