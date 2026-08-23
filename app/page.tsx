@@ -192,15 +192,17 @@ function BookBasics({ book }: { book: Book }) {
   return (
     <section className="recordGroup bookBasicsGroup">
       <h3>BOOK INFO</h3>
-      <div className="bookBasicsInline">
-        <span className="genreInline">
-          {seal ? <img src={seal} alt="" /> : <i>{category.slice(0, 1)}</i>}
-          <b>{category}</b>
-        </span>
-        <em />
+      <div className="bookBasicsGrid">
         <span><small>저자</small><b>{book.author || "–"}</b></span>
-        <em />
         <span><small>총 권수</small><b>{book.total_count}권</b></span>
+        <span>
+          <small>카테고리</small>
+          <b className="genreValue">
+            {seal ? <img src={seal} alt="" /> : <i>{category.slice(0, 1)}</i>}
+            {category}
+          </b>
+        </span>
+        <span><small>구성</small><b>{book.total_count > 1 ? "시리즈" : "단권"}</b></span>
       </div>
     </section>
   );
