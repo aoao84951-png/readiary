@@ -7,6 +7,7 @@ import {
   Grid3X3,
   ImagePlus,
   List,
+  Ellipsis,
   NotebookTabs,
   Pencil,
   Plus,
@@ -1080,6 +1081,7 @@ export default function FeedPage() {
   const [pending, setPending] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [topMenuOpen, setTopMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
@@ -1303,7 +1305,6 @@ export default function FeedPage() {
     ? Math.max(0, Math.round((1 - form.paid_price / form.list_price) * 100))
     : 0;
   const currentSection = view === "calendar" || view === "records" ? "record" : view;
-  const sectionTitle = currentSection === "grid" ? "모아보기" : currentSection === "feed" ? "피드" : currentSection === "record" ? "독서 기록" : "나의 기록";
   function selectRecordView(next: "calendar" | "records") {
     setRecordView(next);
     setView(next);
@@ -1320,6 +1321,7 @@ export default function FeedPage() {
     }
     setSearchOpen(false);
     setFilterOpen(false);
+    setTopMenuOpen(false);
   }
   function beginSwipe(event: TouchEvent<HTMLElement>) {
     const target = event.target as HTMLElement;
@@ -1343,36 +1345,36 @@ export default function FeedPage() {
   return (
     <main className="feedPage dockLayout" onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
       <header className="compactTopBar">
-        <div className="topBarTitle"><small>READIARY</small><b>{sectionTitle}</b></div>
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
           onClick={() => {
             setSearchOpen((v) => !v);
             setFilterOpen(false);
+            setTopMenuOpen(false);
           }}
           aria-label="내 기록 검색"
         >
           <Search size={15} />
         </button>
+        <span className="topBarQuietMark" aria-hidden="true"><i /><i /><i /></span>
         <button
-          className={`filterToggle ${filterOpen || statusFilters.length || categoryFilters.length ? "on" : ""}`}
-          onClick={() => {
-            setFilterOpen((v) => !v);
-            setSearchOpen(false);
-          }}
-          aria-label="상태 및 장르 필터"
+          className={`topMenuToggle ${topMenuOpen || filterOpen ? "on" : ""}`}
+          onClick={() => { setTopMenuOpen((open) => !open); setSearchOpen(false); }}
+          aria-label="보기 메뉴"
         >
-          <SlidersHorizontal size={14} />
+          <Ellipsis size={18} />
           {(statusFilters.length > 0 || categoryFilters.length > 0) && <i aria-hidden="true" />}
         </button>
-        <button
-          className={`refresh ${loading ? "loading" : ""}`}
-          onClick={() => load(true)}
-          disabled={loading}
-        >
-          <RefreshCw size={14} />
-        </button>
       </header>
+      {topMenuOpen && (
+        <>
+          <button className="topMenuBackdrop" aria-label="보기 메뉴 닫기" onClick={() => setTopMenuOpen(false)} />
+          <div className="topToolMenu">
+            <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
+            <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
+          </div>
+        </>
+      )}
       {notice && <div className="refreshNotice">{notice}</div>}
       {searchOpen && (
         <div className="searchBar">
