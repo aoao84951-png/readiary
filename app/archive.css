@@ -994,6 +994,32 @@
   color: #4d4d49;
   font-size: 11px;
 }
+
+/* Keep form selects visually identical on iOS instead of using its rounded
+   native picker styling. The two gradients draw the same quiet chevron used
+   by the desktop form without adding another visual container. */
+.recordForm select,
+.recordForm .editableSelect > select {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  background-color: transparent;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #77736f 50%),
+    linear-gradient(135deg, #77736f 50%, transparent 50%);
+  background-position:
+    calc(100% - 9px) 50%,
+    calc(100% - 5px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px, 4px 4px;
+  padding-right: 20px;
+}
+.recordForm .countField > span select {
+  padding-right: 16px;
+  background-position:
+    calc(100% - 7px) 50%,
+    calc(100% - 3px) 50%;
+}
 .newOptionField {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto 24px;
@@ -1471,9 +1497,34 @@ html { scrollbar-gutter: stable; }
 }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
-  .dockLayout { padding-bottom: 82px; }
+  .dockLayout { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
   .compactTopBar { height: 43px; padding-inline: 10px; }
   .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 53px; border-radius: 21px; }
   .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
   .dockLayout > .filterPanel { top: auto; }
+
+  /* iOS zooms focused controls whose computed text size is below 16px. */
+  .addDrawer .addSearch input,
+  .addDrawer .recordForm input,
+  .addDrawer .recordForm select,
+  .addDrawer .recordForm textarea,
+  .addDrawer .editableSelect > select { font-size: 16px; }
+  .addDrawer .recordForm label,
+  .addDrawer .editableSelect { font-size: 11px; }
+}
+
+/* In an installed iPhone web app the home-indicator inset belongs to the
+   navigation itself. Extending the dock through that inset prevents clipping
+   without leaving a conspicuous empty strip underneath the controls. */
+@media (display-mode: standalone) and (max-width: 520px) {
+  .dockLayout { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .bottomDock {
+    bottom: 0;
+    width: calc(100vw - 12px);
+    height: calc(57px + env(safe-area-inset-bottom));
+    padding: 4px 9px calc(4px + env(safe-area-inset-bottom));
+    border-bottom: 0;
+    border-radius: 23px 23px 0 0;
+    box-shadow: 0 -7px 24px rgba(63,55,50,.09);
+  }
 }

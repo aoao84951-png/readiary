@@ -1678,7 +1678,6 @@ export default function FeedPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="제목 또는 작가 검색"
-                    autoFocus
                   />
                   <button>{searching ? "…" : "검색"}</button>
                 </form>

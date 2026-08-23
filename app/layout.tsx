@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './archive.css';
 import './rating.css';
@@ -10,6 +10,17 @@ export const metadata: Metadata = {
     icon: '/favicon.png',
     apple: '/apple-touch-icon.png',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Readiary',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
