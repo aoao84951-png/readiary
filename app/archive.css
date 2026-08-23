@@ -685,3 +685,36 @@
     font-size: 8.5px;
   }
 }
+
+.bookFacts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.bookFacts > div,
+.bookFacts > div:first-child,
+.bookFacts > div:last-child {
+  min-height: 44px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 7px 10px;
+  text-align: center;
+}
+.bookFacts small,
+.bookFacts b {
+  flex: 0 1 auto;
+}
+@media (max-width: 520px) {
+  .bookFacts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .bookFacts > div,
+  .bookFacts > div:first-child,
+  .bookFacts > div:last-child {
+    min-height: 42px;
+    gap: 5px;
+    padding: 6px 5px;
+  }
+  .bookFacts small { font-size: 7px; }
+  .bookFacts b { font-size: 8px; }
+}
