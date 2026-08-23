@@ -154,12 +154,12 @@
 }
 .bookFacts > div {
   min-width: 0;
-  min-height: 54px;
+  min-height: 46px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 6px;
-  padding: 9px 13px;
+  gap: 4px;
+  padding: 7px 11px;
   border-right: 1px solid #ecece9;
 }
 .bookFacts > div:first-child {
@@ -187,8 +187,8 @@
     grid-template-columns: 1.25fr 0.75fr 1fr;
   }
   .bookFacts > div {
-    min-height: 50px;
-    padding: 8px;
+    min-height: 44px;
+    padding: 6px 8px;
   }
   .bookFacts > div:first-child { padding-left: 0; }
   .bookFacts > div:last-child { padding-right: 0; }
