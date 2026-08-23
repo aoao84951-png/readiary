@@ -1549,3 +1549,32 @@ html { scrollbar-gutter: stable; }
     box-shadow: none;
   }
 }
+
+/* Keep the compact report comparisons side by side on phones. */
+@media (max-width: 520px) {
+  .readingSnapshot {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .readingSnapshot > div {
+    min-width: 0;
+    min-height: 40px;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 6px;
+    border-right: 1px solid #efefec;
+    border-bottom: 0;
+  }
+  .readingSnapshot > div:last-child { border-right: 0; }
+  .readingSnapshot small { font-size: 7px; white-space: nowrap; }
+  .readingSnapshot b { font-size: 8.5px; white-space: nowrap; }
+
+  .statsSplit {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .statsSplit .statsSection { min-width: 0; }
+  .statsSplit .statsSection > header { gap: 6px; }
+  .statsSplit .statsSection > header span,
+  .statsSplit .statsSection > header small { white-space: nowrap; }
+  .statsSplit .statsSection > header small { font-size: 6.5px; }
+}
