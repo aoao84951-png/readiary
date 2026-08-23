@@ -135,6 +135,11 @@
   color: #5d5d58;
   font-size: 11px;
 }
+.recordHighlights .statusHighlight.done > b { color: #6f8fb9; }
+.recordHighlights .statusHighlight.paused > b { color: #c97887; }
+.recordHighlights .statusHighlight.reading > b { color: #c59b24; }
+.recordHighlights .statusHighlight.before > b { color: #6f9d7e; }
+.recordHighlights .statusHighlight.basket > b { color: #858580; }
 .recordHighlights small {
   color: #aaa;
   font-size: 7.5px;

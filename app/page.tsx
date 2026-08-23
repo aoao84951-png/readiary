@@ -492,9 +492,9 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   </b>
                   <small>독서량</small>
                 </div>
-                <div>
-                  <b>{progress}%</b>
-                  <small>진행률</small>
+                <div className={`statusHighlight ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
+                  <b>{book.status}</b>
+                  <small>상태</small>
                 </div>
               </div>
               <section className="recordGroup">
@@ -523,13 +523,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                     <b>{book.finished_date || "–"}</b>
                   </p>
                 </div>
-                <dl>
-                  <Row label="평점" value={<Rating rating={book.rating} />} />
-                  <Row
-                    label="독서량"
-                    value={`${book.read_count} / ${book.total_count}권`}
-                  />
-                </dl>
               </section>
               <section className="recordGroup purchaseGroup">
                 <h3>PURCHASE</h3>
@@ -708,9 +701,9 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       </b>
                       <small>독서량</small>
                     </div>
-                    <div>
-                      <b>{progress}%</b>
-                      <small>진행률</small>
+                    <div className={`statusHighlight ${statusClass(book.status)}`}>
+                      <b>{book.status}</b>
+                      <small>상태</small>
                     </div>
                   </div>
                   <section className="recordGroup">
@@ -739,16 +732,6 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                         <b>{book.finished_date || "–"}</b>
                       </p>
                     </div>
-                    <dl>
-                      <Row
-                        label="평점"
-                        value={<Rating rating={book.rating} />}
-                      />
-                      <Row
-                        label="독서량"
-                        value={`${book.read_count} / ${book.total_count}권`}
-                      />
-                    </dl>
                   </section>
                   <section className="recordGroup purchaseGroup">
                     <h3>PURCHASE</h3>
