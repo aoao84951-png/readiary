@@ -1308,9 +1308,8 @@
   cursor: pointer;
 }
 .bottomDock > button:not(.dockAdd) svg { transition: color .18s ease, transform .18s ease, stroke-width .18s ease; }
-.feedHashIcon { width: 21px; height: 21px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 6px; transition: color .18s ease, transform .18s ease, border-width .18s ease; }
-.bottomDock > button.active .feedHashIcon { border-width: 1.5px; transform: scale(1.08); }
-.bottomDock > button.active .feedHashIcon svg { transform: none; }
+.curledHeartIcon { width: 20px; height: 19px; display: block; background: currentColor; -webkit-mask: url('/curled-heart.png') center / contain no-repeat; mask: url('/curled-heart.png') center / contain no-repeat; transition: transform .18s ease; }
+.bottomDock > button.active .curledHeartIcon { transform: scale(1.12); }
 .bottomDock > button.active { color: #d07f9c; }
 .bottomDock > button.active svg { stroke-width: 1.9; transform: scale(1.12); }
 .dockProfileRing {
