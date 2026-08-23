@@ -1497,34 +1497,40 @@ html { scrollbar-gutter: stable; }
 }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
-  .dockLayout { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+  .dockLayout { padding-bottom: calc(58px + env(safe-area-inset-bottom)); }
   .compactTopBar { height: 43px; padding-inline: 10px; }
-  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 53px; border-radius: 21px; }
-  .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
-  .dockLayout > .filterPanel { top: auto; }
-
-  /* iOS zooms focused controls whose computed text size is below 16px. */
-  .addDrawer .addSearch input,
   .addDrawer .recordForm input,
   .addDrawer .recordForm select,
   .addDrawer .recordForm textarea,
-  .addDrawer .editableSelect > select { font-size: 16px; }
-  .addDrawer .recordForm label,
-  .addDrawer .editableSelect { font-size: 11px; }
-}
-
-/* In an installed iPhone web app the home-indicator inset belongs to the
-   navigation itself. Extending the dock through that inset prevents clipping
-   without leaving a conspicuous empty strip underneath the controls. */
-@media (display-mode: standalone) and (max-width: 520px) {
-  .dockLayout { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .addDrawer .editableSelect > select {
+    font-weight: 500;
+  }
   .bottomDock {
     bottom: 0;
-    width: calc(100vw - 12px);
-    height: calc(57px + env(safe-area-inset-bottom));
+    width: 100%;
+    height: calc(54px + env(safe-area-inset-bottom));
     padding: 4px 9px calc(4px + env(safe-area-inset-bottom));
-    border-bottom: 0;
-    border-radius: 23px 23px 0 0;
-    box-shadow: 0 -7px 24px rgba(63,55,50,.09);
+    border: 0;
+    border-top: 1px solid #eceae8;
+    border-radius: 0;
+    box-shadow: none;
+    background: rgba(255,255,255,.97);
+  }
+  .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
+  .dockLayout > .filterPanel { top: auto; }
+}
+
+/* Installed iPhone apps use the same flush navigation treatment. */
+@media (display-mode: standalone) and (max-width: 520px) {
+  .dockLayout { padding-bottom: calc(58px + env(safe-area-inset-bottom)); }
+  .bottomDock {
+    bottom: 0;
+    width: 100%;
+    height: calc(54px + env(safe-area-inset-bottom));
+    padding: 4px 9px calc(4px + env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 1px solid #eceae8;
+    border-radius: 0;
+    box-shadow: none;
   }
 }
