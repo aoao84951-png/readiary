@@ -630,10 +630,10 @@
     padding: 16px 2px 24px;
   }
   .recordGroup dl {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .recordRow:nth-child(odd) {
-    padding-right: 0;
+    padding-right: 10px;
   }
   .recordHighlights > div {
     min-height: 54px;
