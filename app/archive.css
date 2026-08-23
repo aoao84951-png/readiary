@@ -216,6 +216,57 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.bookBasicsInline {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 2px;
+  border-top: 1px solid #ecece9;
+  border-bottom: 1px solid #ecece9;
+}
+.bookBasicsInline > span {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.bookBasicsInline > span b {
+  overflow: hidden;
+  color: #5d5d58;
+  font-size: 9px;
+  font-weight: 720;
+  text-overflow: ellipsis;
+}
+.bookBasicsInline > span small {
+  color: #aaa;
+  font-size: 7.5px;
+}
+.bookBasicsInline > em {
+  width: 1px;
+  height: 13px;
+  flex: 0 0 auto;
+  background: #e8e8e5;
+}
+.genreInline {
+  margin-right: auto;
+}
+.genreInline img,
+.genreInline i {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+.genreInline i {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #aaa6b5;
+  color: #fff;
+  font: 700 6px 'Courier New',monospace;
+}
 @media (max-width:520px) {
   .bookBasics { grid-template-columns: 1.15fr 1fr; min-height: 68px; }
   .genreIdentity { gap: 7px; padding-right: 9px; }
@@ -223,6 +274,11 @@
   .genreIdentity b { font-size: 8.5px; }
   .bookBasics dl > div { padding-left: 9px; }
   .bookBasics dd { font-size: 8px; }
+  .bookBasicsInline { min-height: 39px; gap: 7px; padding-inline: 1px; }
+  .bookBasicsInline > span { gap: 4px; }
+  .bookBasicsInline > span b { max-width: 70px; font-size: 8px; }
+  .bookBasicsInline > span small { font-size: 6.5px; }
+  .genreInline img,.genreInline i { width: 18px; height: 18px; }
 }
 .recordHighlights .statusHighlight small {
   max-width: 120px;
