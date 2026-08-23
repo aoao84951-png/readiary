@@ -1,4 +1,9 @@
-export type VolumePurchase = { label: string; list_price: number; paid_price: number };
+export type VolumePurchase = {
+  label: string;
+  list_price: number;
+  paid_price: number;
+  methods?: string[];
+};
 
 export type BookRecord = {
   id?: string; title: string; author: string; total_count: number; category: string;

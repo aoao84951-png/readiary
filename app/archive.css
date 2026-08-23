@@ -1005,3 +1005,66 @@
 }
 .newOptionField button:last-child { padding: 0; display: grid; place-items: center; background: transparent; color: #aaa; }
 .newOptionField button:disabled { opacity: .45; }
+.purchaseMethodHint {
+  align-self: end;
+  margin: 0 0 8px;
+  color: #aaa49f;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.multiEditableSelect {
+  position: relative;
+  grid-column: 1 / -1;
+  margin: 0 33px 4px 0;
+}
+.multiEditableSelect summary {
+  min-height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f7f5f2;
+  color: #77716d;
+  font-size: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.multiEditableSelect summary::-webkit-details-marker { display: none; }
+.multiEditableSelect summary small { flex: none; color: #b9aaa5; font-size: 7px; }
+.multiOptionMenu {
+  position: absolute;
+  z-index: 12;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 190px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid #e8e3df;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(72, 62, 58, .12);
+}
+.multiOptionMenu > label {
+  min-height: 29px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  color: #67625f;
+  font-size: 8px;
+  cursor: pointer;
+}
+.multiOptionMenu > label:hover { background: #f8f6f4; }
+.recordForm .multiOptionMenu > label input { width: 13px; height: 13px; margin: 0; padding: 0; accent-color: #aa7f89; }
+.newMultiOption { display: grid; grid-template-columns: 1fr auto; gap: 5px; margin-top: 4px; }
+.recordForm .newMultiOption input { min-width: 0; margin: 0; padding: 6px 7px; font-size: 8px; }
+.newMultiOption button,
+.openNewMultiOption { border: 0; border-radius: 6px; background: #f2efec; color: #817a76; font-size: 7.5px; font-weight: 700; }
+.newMultiOption button { padding: 0 9px; }
+.openNewMultiOption { width: 100%; min-height: 28px; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; }
+.purchaseBreakdown span i { grid-column: 1 / -1; margin: -3px 0 6px; color: #a48680; font-size: 7px; font-style: normal; }

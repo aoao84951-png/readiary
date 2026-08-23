@@ -126,7 +126,7 @@ const empty: BookRecord = {
   list_price: 0,
   paid_price: 0,
   purchase_method: "",
-  purchase_items: [{ label: "1권", list_price: 0, paid_price: 0 }],
+  purchase_items: [{ label: "1권", list_price: 0, paid_price: 0, methods: [] }],
   liked_notes: [],
   disliked_notes: [],
   reading_dates: [],
@@ -194,6 +194,47 @@ function EditableSelect({ label, value, options, onChange, onAdd }: { label: str
         </select>
       )}
     </div>
+  );
+}
+
+function MultiEditableSelect({ values, options, onChange, onAdd }: { values: string[]; options: string[]; onChange: (values: string[]) => void; onAdd: (value: string) => Promise<void> }) {
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [savingOption, setSavingOption] = useState(false);
+  const all = [...new Set([...options, ...values])];
+  async function commit() {
+    const clean = draft.trim();
+    if (!clean) return;
+    setSavingOption(true);
+    try {
+      await onAdd(clean);
+      onChange([...new Set([...values, clean])]);
+      setDraft("");
+      setCreating(false);
+    } finally {
+      setSavingOption(false);
+    }
+  }
+  return (
+    <details className="multiEditableSelect">
+      <summary><span>{values.length ? values.join(" + ") : "구매방법 선택"}</span>{values.length > 0 && <small>{values.length}개</small>}</summary>
+      <div className="multiOptionMenu">
+        {all.map((option) => (
+          <label key={option}>
+            <input type="checkbox" checked={values.includes(option)} onChange={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])} />
+            <span>{option}</span>
+          </label>
+        ))}
+        {creating ? (
+          <span className="newMultiOption">
+            <input autoFocus value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void commit(); } if (event.key === "Escape") setCreating(false); }} placeholder="새 구매방법" />
+            <button type="button" disabled={savingOption || !draft.trim()} onClick={() => void commit()}>추가</button>
+          </span>
+        ) : (
+          <button type="button" className="openNewMultiOption" onClick={(event) => { event.preventDefault(); setCreating(true); }}><Plus size={11} /> 새 선택지 추가</button>
+        )}
+      </div>
+    </details>
   );
 }
 
@@ -272,6 +313,7 @@ function PurchaseBreakdown({ book }: { book: Book }) {
             <b>{item.label || `${index + 1}${unit}`}</b>
             <small>{item.list_price.toLocaleString()}원</small>
             <em>{item.paid_price.toLocaleString()}원</em>
+            {!!item.methods?.length && <i>{item.methods.join(" + ")}</i>}
           </span>
         ))}
       </div>
@@ -1020,12 +1062,14 @@ export default function FeedPage() {
   }
   function openEdit(book: Book) {
     const { id, ...record } = book;
+    const purchaseItems = record.purchase_items?.length
+      ? record.purchase_items.map((item) => ({ ...item, methods: item.methods || [] }))
+      : [{ label: "기존 합계", list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }];
+    if (record.purchase_method && !purchaseItems.some((item) => item.methods.length)) purchaseItems[0].methods = [record.purchase_method];
     setEditingId(id);
     setForm({
       ...record,
-      purchase_items: record.purchase_items?.length
-        ? record.purchase_items
-        : [{ label: "기존 합계", list_price: record.list_price || 0, paid_price: record.paid_price || 0 }],
+      purchase_items: purchaseItems,
     });
     setReadingDate("");
     setMessage("");
@@ -1071,7 +1115,7 @@ export default function FeedPage() {
       author: book.author,
       total_count: book.totalCount || 1,
       count_unit: unit,
-      purchase_items: [{ label: `1${unit}`, list_price: 0, paid_price: 0 }],
+      purchase_items: [{ label: `1${unit}`, list_price: 0, paid_price: 0, methods: [] }],
       category: book.category,
       platform: book.platform,
       cover_url: book.cover,
@@ -1085,9 +1129,10 @@ export default function FeedPage() {
   function setPurchaseItems(items: VolumePurchase[]) {
     const listPrice = items.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
     const paidPrice = items.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
-    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice }));
+    const methods = [...new Set(items.flatMap((item) => item.methods || []))];
+    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
   }
-  function updatePurchaseItem(index: number, key: keyof VolumePurchase, value: string | number) {
+  function updatePurchaseItem<K extends keyof VolumePurchase>(index: number, key: K, value: VolumePurchase[K]) {
     const items = [...(form.purchase_items || [])];
     items[index] = { ...items[index], [key]: value };
     setPurchaseItems(items);
@@ -1546,7 +1591,7 @@ export default function FeedPage() {
                       }
                     />
                   </label>
-                  <EditableSelect label="구매방법" value={form.purchase_method} options={purchaseMethodOptions} onChange={(value) => field("purchase_method", value)} onAdd={(value) => addOption("purchase_methods", value)} />
+                  <p className="purchaseMethodHint">구매방법은 아래에서 {form.count_unit || "권"}별로 선택할 수 있어요.</p>
                   <div className="volumePurchases full">
                     <div className="volumePurchaseHead"><span>{form.count_unit || "권"}별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
                     {(form.purchase_items || []).map((item, index) => (
@@ -1555,9 +1600,10 @@ export default function FeedPage() {
                         <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
                         <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
                         <button type="button" aria-label={`${item.label} 가격 행 삭제`} onClick={() => setPurchaseItems((form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index))}><X size={12} /></button>
+                        <MultiEditableSelect values={item.methods || []} options={purchaseMethodOptions} onChange={(values) => updatePurchaseItem(index, "methods", values)} onAdd={(value) => addOption("purchase_methods", value)} />
                       </div>
                     ))}
-                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0 }])}><Plus size={12} /> {form.count_unit || "권"} 추가</button>
+                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] }])}><Plus size={12} /> {form.count_unit || "권"} 추가</button>
                     <div className="purchaseTotals">
                       <span><small>총 판매가</small><b>{form.list_price.toLocaleString()}원</b></span>
                       <span><small>총 실구매가</small><b>{form.paid_price.toLocaleString()}원</b></span>
