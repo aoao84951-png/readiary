@@ -140,6 +140,60 @@
 .recordHighlights .statusHighlight.reading > b { color: #c59b24; }
 .recordHighlights .statusHighlight.before > b { color: #6f9d7e; }
 .recordHighlights .statusHighlight.basket > b { color: #858580; }
+.recordHighlights .statusHighlight small {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bookFacts {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1fr;
+  border-top: 1px solid #ecece9;
+  border-bottom: 1px solid #ecece9;
+}
+.bookFacts > div {
+  min-width: 0;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border-right: 1px solid #ecece9;
+}
+.bookFacts > div:first-child {
+  padding-left: 0;
+}
+.bookFacts > div:last-child {
+  padding-right: 0;
+  border-right: 0;
+  text-align: right;
+}
+.bookFacts small {
+  color: #aaa;
+  font-size: 7.5px;
+}
+.bookFacts b {
+  overflow: hidden;
+  color: #5d5d58;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 520px) {
+  .bookFacts {
+    grid-template-columns: 1.25fr 0.75fr 1fr;
+  }
+  .bookFacts > div {
+    min-height: 50px;
+    padding: 8px;
+  }
+  .bookFacts > div:first-child { padding-left: 0; }
+  .bookFacts > div:last-child { padding-right: 0; }
+  .bookFacts b { font-size: 8.5px; }
+}
 .recordHighlights small {
   color: #aaa;
   font-size: 7.5px;

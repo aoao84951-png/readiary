@@ -494,34 +494,15 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 </div>
                 <div className={`statusHighlight ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}>
                   <b>{book.status}</b>
-                  <small>상태</small>
+                  <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                 </div>
               </div>
               <section className="recordGroup">
                 <h3>BOOK</h3>
-                <dl>
-                  <Row label="저자" value={book.author || "–"} />
-                  <Row label="총 권수" value={`${book.total_count}권`} />
-                  <Row label="카테고리" value={book.category} />
-                  <Row
-                    label="커버 이미지"
-                    value={book.cover_url ? "등록됨" : "–"}
-                  />
-                </dl>
-              </section>
-              <section className="recordGroup readingGroup">
-                <h3>READING</h3>
-                <div
-                  className={`groupProgress ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
-                >
-                  <span>
-                    <small>상태</small>
-                    <b>{book.status}</b>
-                  </span>
-                  <p>
-                    <span>완독 / 하차일</span>
-                    <b>{book.finished_date || "–"}</b>
-                  </p>
+                <div className="bookFacts">
+                  <div><small>저자</small><b>{book.author || "–"}</b></div>
+                  <div><small>총 권수</small><b>{book.total_count}권</b></div>
+                  <div><small>카테고리</small><b>{book.category}</b></div>
                 </div>
               </section>
               <section className="recordGroup purchaseGroup">
@@ -703,34 +684,15 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                     </div>
                     <div className={`statusHighlight ${statusClass(book.status)}`}>
                       <b>{book.status}</b>
-                      <small>상태</small>
+                      <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                     </div>
                   </div>
                   <section className="recordGroup">
                     <h3>BOOK</h3>
-                    <dl>
-                      <Row label="저자" value={book.author || "–"} />
-                      <Row label="총 권수" value={`${book.total_count}권`} />
-                      <Row label="카테고리" value={book.category} />
-                      <Row
-                        label="커버 이미지"
-                        value={book.cover_url ? "등록됨" : "–"}
-                      />
-                    </dl>
-                  </section>
-                  <section className="recordGroup readingGroup">
-                    <h3>READING</h3>
-                    <div
-                      className={`groupProgress ${statusClass(book.status)}`}
-                    >
-                      <span>
-                        <small>상태</small>
-                        <b>{book.status}</b>
-                      </span>
-                      <p>
-                        <span>완독 / 하차일</span>
-                        <b>{book.finished_date || "–"}</b>
-                      </p>
+                    <div className="bookFacts">
+                      <div><small>저자</small><b>{book.author || "–"}</b></div>
+                      <div><small>총 권수</small><b>{book.total_count}권</b></div>
+                      <div><small>카테고리</small><b>{book.category}</b></div>
                     </div>
                   </section>
                   <section className="recordGroup purchaseGroup">
