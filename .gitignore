@@ -19,7 +19,10 @@
 # misc
 .DS_Store
 *.pem
+*.key
 *firebase-adminsdk*.json
+*service-account*.json
+*service_account*.json
 
 # debug
 npm-debug.log*
