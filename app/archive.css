@@ -769,3 +769,44 @@
   .bookFacts small { font-size: 7px; }
   .bookFacts b { font-size: 8px; }
 }
+
+/* Entry form sections mirror the quiet hierarchy of the record detail. */
+.recordForm .formTopTitle,
+.recordForm .formSectionTitle {
+  margin: 0;
+  color: #aaa9a4;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: .16em;
+}
+.recordForm .formTopTitle {
+  margin-bottom: 15px;
+}
+.recordForm .formSectionTitle {
+  grid-column: 1 / -1;
+  margin: 10px 0 0;
+  padding-top: 23px;
+  border-top: 1px solid #ecece8;
+}
+.recordForm .readingTitle { color: #8ea9c8; }
+.recordForm .purchaseTitle { color: #b8918b; }
+.recordForm .notesTitle { color: #c58ba0; }
+.recordForm .selectedBook {
+  margin-bottom: 18px;
+}
+.recordForm .fields {
+  gap: 15px 20px;
+}
+.recordForm .formSectionTitle + label,
+.recordForm .formSectionTitle + label + label {
+  margin-top: 1px;
+}
+.recordForm .notesTitle ~ label textarea {
+  min-height: 76px;
+}
+.recordForm .save {
+  margin-top: 24px;
+}
+@media (max-width: 420px) {
+  .recordForm .fields { gap: 14px 16px; }
+  .recordForm .formSectionTitle { padding-top: 21px; }
+}

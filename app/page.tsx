@@ -1272,6 +1272,7 @@ export default function FeedPage() {
               </div>
             ) : (
               <form className="recordForm" onSubmit={save}>
+                <h3 className="formTopTitle">BOOK</h3>
                 <div className="selectedBook">
                   {form.cover_url ? (
                     <img src={form.cover_url} alt="" />
@@ -1320,6 +1321,22 @@ export default function FeedPage() {
                     </select>
                   </label>
                   <label>
+                    플랫폼
+                    <input
+                      value={form.platform}
+                      onChange={(e) => field("platform", e.target.value)}
+                    />
+                  </label>
+                  <label className="full">
+                    커버 이미지 URL
+                    <input
+                      value={form.cover_url}
+                      onChange={(e) => field("cover_url", e.target.value)}
+                      placeholder="네이버 공식 표지 주소를 넣으면 다음 검색부터 자동 적용돼요"
+                    />
+                  </label>
+                  <h3 className="formSectionTitle readingTitle">READING</h3>
+                  <label>
                     상태
                     <select
                       value={form.status}
@@ -1331,23 +1348,6 @@ export default function FeedPage() {
                       <option>완독</option>
                       <option>하차</option>
                     </select>
-                  </label>
-                  <label>
-                    플랫폼
-                    <input
-                      value={form.platform}
-                      onChange={(e) => field("platform", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    구매일
-                    <input
-                      type="date"
-                      value={form.purchase_date || ""}
-                      onChange={(e) =>
-                        field("purchase_date", e.target.value || null)
-                      }
-                    />
                   </label>
                   <label>
                     완독 / 하차일
@@ -1393,6 +1393,17 @@ export default function FeedPage() {
                       onChange={(e) => field("read_count", +e.target.value)}
                     />
                   </label>
+                  <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
+                  <label>
+                    구매일
+                    <input
+                      type="date"
+                      value={form.purchase_date || ""}
+                      onChange={(e) =>
+                        field("purchase_date", e.target.value || null)
+                      }
+                    />
+                  </label>
                   <label>
                     총 판매가
                     <input
@@ -1421,14 +1432,7 @@ export default function FeedPage() {
                       onChange={(e) => field("purchase_method", e.target.value)}
                     />
                   </label>
-                  <label className="full">
-                    커버 이미지 URL
-                    <input
-                      value={form.cover_url}
-                      onChange={(e) => field("cover_url", e.target.value)}
-                      placeholder="네이버 공식 표지 주소를 넣으면 다음 검색부터 자동 적용돼요"
-                    />
-                  </label>
+                  <h3 className="formSectionTitle notesTitle">NOTES</h3>
                   <label className="full">
                     좋았던 점
                     <textarea
