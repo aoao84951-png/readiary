@@ -7,6 +7,7 @@ type FirestoreValue = {
   booleanValue?: boolean;
   nullValue?: null;
   arrayValue?: { values?: FirestoreValue[] };
+  mapValue?: { fields?: Record<string, FirestoreValue> };
 };
 
 type FirestoreDocument = {
@@ -54,6 +55,7 @@ function encode(value: unknown): FirestoreValue {
   if (Array.isArray(value)) return { arrayValue: { values: value.map(encode) } };
   if (typeof value === 'boolean') return { booleanValue: value };
   if (typeof value === 'number') return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+  if (typeof value === 'object') return { mapValue: { fields: fields(value as Record<string, unknown>) } };
   return { stringValue: String(value) };
 }
 
@@ -63,6 +65,7 @@ function decode(value: FirestoreValue): unknown {
   if ('doubleValue' in value) return value.doubleValue || 0;
   if ('booleanValue' in value) return Boolean(value.booleanValue);
   if ('arrayValue' in value) return (value.arrayValue?.values || []).map(decode);
+  if ('mapValue' in value) return Object.fromEntries(Object.entries(value.mapValue?.fields || {}).map(([key, item]) => [key, decode(item)]));
   return null;
 }
 

@@ -17,7 +17,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import type { BookRecord } from "@/lib/books";
+import type { BookRecord, VolumePurchase } from "@/lib/books";
 
 type Book = BookRecord & { id: string };
 type SearchBook = {
@@ -115,6 +115,7 @@ const empty: BookRecord = {
   list_price: 0,
   paid_price: 0,
   purchase_method: "",
+  purchase_items: [{ label: "1권", list_price: 0, paid_price: 0 }],
   liked_notes: [],
   disliked_notes: [],
   reading_dates: [],
@@ -181,6 +182,24 @@ function ClassicRating({ rating }: { rating: number | null }) {
       </b>
       <small>/ 5</small>
     </span>
+  );
+}
+
+function PurchaseBreakdown({ book }: { book: Book }) {
+  if (!book.purchase_items?.length) return null;
+  return (
+    <details className="purchaseBreakdown">
+      <summary>권별 구매 내역 <b>{book.purchase_items.length}</b></summary>
+      <div>
+        {book.purchase_items.map((item, index) => (
+          <span key={`${item.label}-${index}`}>
+            <b>{item.label || `${index + 1}권`}</b>
+            <small>{item.list_price.toLocaleString()}원</small>
+            <em>{item.paid_price.toLocaleString()}원</em>
+          </span>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -509,6 +528,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <b>{book.paid_price.toLocaleString()}원</b>
                   <em>{discount}% OFF</em>
                 </div>
+                <PurchaseBreakdown book={book} />
                 <dl>
                   <Row label="구매일" value={book.purchase_date || "–"} />
                   <Row label="플랫폼" value={book.platform || "–"} />
@@ -725,6 +745,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                       <b>{book.paid_price.toLocaleString()}원</b>
                       <em>{discount}% OFF</em>
                     </div>
+                    <PurchaseBreakdown book={book} />
                     <dl>
                       <Row label="구매일" value={book.purchase_date || "–"} />
                       <Row label="플랫폼" value={book.platform || "–"} />
@@ -915,7 +936,12 @@ export default function FeedPage() {
   function openEdit(book: Book) {
     const { id, ...record } = book;
     setEditingId(id);
-    setForm(record);
+    setForm({
+      ...record,
+      purchase_items: record.purchase_items?.length
+        ? record.purchase_items
+        : [{ label: "기존 합계", list_price: record.list_price || 0, paid_price: record.paid_price || 0 }],
+    });
     setReadingDate("");
     setMessage("");
     setStep("form");
@@ -968,6 +994,16 @@ export default function FeedPage() {
   }
   const field = <K extends keyof BookRecord>(key: K, value: BookRecord[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+  function setPurchaseItems(items: VolumePurchase[]) {
+    const listPrice = items.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
+    const paidPrice = items.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
+    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice }));
+  }
+  function updatePurchaseItem(index: number, key: keyof VolumePurchase, value: string | number) {
+    const items = [...(form.purchase_items || [])];
+    items[index] = { ...items[index], [key]: value };
+    setPurchaseItems(items);
+  }
   async function save(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -1404,27 +1440,23 @@ export default function FeedPage() {
                       }
                     />
                   </label>
-                  <label>
-                    총 판매가
-                    <input
-                      type="number"
-                      min="0"
-                      value={form.list_price}
-                      onChange={(e) => field("list_price", +e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    실구매가
-                    <input
-                      type="number"
-                      min="0"
-                      value={form.paid_price}
-                      onChange={(e) => field("paid_price", +e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    할인율<span className="calculated">{discount}%</span>
-                  </label>
+                  <div className="volumePurchases full">
+                    <div className="volumePurchaseHead"><span>권별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
+                    {(form.purchase_items || []).map((item, index) => (
+                      <div className="volumePurchaseRow" key={index}>
+                        <input aria-label={`${index + 1}번째 권 이름`} value={item.label} onChange={(e) => updatePurchaseItem(index, "label", e.target.value)} />
+                        <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
+                        <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
+                        <button type="button" aria-label={`${item.label} 가격 행 삭제`} onClick={() => setPurchaseItems((form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index))}><X size={12} /></button>
+                      </div>
+                    ))}
+                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}권`, list_price: 0, paid_price: 0 }])}><Plus size={12} /> 권 추가</button>
+                    <div className="purchaseTotals">
+                      <span><small>총 판매가</small><b>{form.list_price.toLocaleString()}원</b></span>
+                      <span><small>총 실구매가</small><b>{form.paid_price.toLocaleString()}원</b></span>
+                      <span><small>할인율</small><b>{discount}%</b></span>
+                    </div>
+                  </div>
                   <label className="full">
                     구매방법
                     <input
