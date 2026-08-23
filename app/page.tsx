@@ -497,14 +497,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                 </div>
               </div>
-              <section className="recordGroup">
-                <h3>BOOK</h3>
-                <div className="bookFacts">
-                  <div><small>저자</small><b>{book.author || "–"}</b></div>
-                  <div><small>총 권수</small><b>{book.total_count}권</b></div>
-                  <div><small>카테고리</small><b>{book.category}</b></div>
-                </div>
-              </section>
               <section className="recordGroup purchaseGroup">
                 <h3>PURCHASE</h3>
                 <div className="priceLine">
@@ -687,14 +679,6 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                     </div>
                   </div>
-                  <section className="recordGroup">
-                    <h3>BOOK</h3>
-                    <div className="bookFacts">
-                      <div><small>저자</small><b>{book.author || "–"}</b></div>
-                      <div><small>총 권수</small><b>{book.total_count}권</b></div>
-                      <div><small>카테고리</small><b>{book.category}</b></div>
-                    </div>
-                  </section>
                   <section className="recordGroup purchaseGroup">
                     <h3>PURCHASE</h3>
                     <div className="priceLine">
