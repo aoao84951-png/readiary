@@ -1023,8 +1023,8 @@
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  padding: 3px 2px 6px;
-  border-bottom: 1px solid #ebe7e3;
+  padding: 3px 2px 4px;
+  border: 0;
   background: transparent;
   color: #847975;
   font-size: 7.7px;
