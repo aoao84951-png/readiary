@@ -413,6 +413,17 @@ function Notes({
   );
 }
 
+function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const textarea = ref.current;
+    if (!textarea) return;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [value]);
+  return <textarea ref={ref} rows={1} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} aria-label={ariaLabel} />;
+}
+
 function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: string[]; kind: "liked" | "disliked"; onChange: (notes: string[]) => void }) {
   const [draft, setDraft] = useState("");
   const addNote = () => {
@@ -425,7 +436,7 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
     <section className={`noteEditor full ${kind}`}>
       <label>{label}</label>
       <div className="noteComposer">
-        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="감상을 적어주세요" />
+        <AutoTextarea value={draft} onChange={setDraft} placeholder="감상을 적어주세요" />
         <button type="button" disabled={!draft.trim()} onClick={addNote}>등록</button>
       </div>
       {!!notes.some((note) => note.trim()) && (
@@ -433,7 +444,7 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
           {notes.map((note, index) => note.trim() && (
             <div className="savedNote" key={index}>
               <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
-              <textarea aria-label={`${label} ${index + 1}`} value={note} onChange={(event) => onChange(notes.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} />
+              <AutoTextarea ariaLabel={`${label} ${index + 1}`} value={note} onChange={(value) => onChange(notes.map((item, itemIndex) => itemIndex === index ? value : item))} />
               <button type="button" aria-label={`${label} ${index + 1} 삭제`} onClick={() => onChange(notes.filter((_, itemIndex) => itemIndex !== index))}><X size={11} /></button>
             </div>
           ))}

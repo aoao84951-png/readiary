@@ -1025,19 +1025,18 @@
 .noteEditor { display: grid; gap: 7px; }
 .noteComposer { position: relative; }
 .recordForm .noteComposer textarea {
-  min-height: 40px;
-  height: 40px;
+  min-height: 32px;
   max-height: 120px;
   margin: 0;
-  padding: 10px 44px 7px 0;
+  padding: 7px 44px 5px 0;
   line-height: 1.45;
   resize: none;
-  field-sizing: content;
+  overflow-y: auto;
 }
 .noteComposer > button {
   position: absolute;
   right: 0;
-  bottom: 7px;
+  bottom: 4px;
   padding: 5px 8px;
   border: 0;
   border-radius: 7px;
@@ -1056,9 +1055,7 @@
   padding: 5px 0;
 }
 .recordForm .savedNote textarea {
-  min-height: 24px;
-  height: 24px;
-  field-sizing: content;
+  min-height: 18px;
   margin: 0;
   padding: 0;
   border: 0;
