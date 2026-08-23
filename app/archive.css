@@ -774,18 +774,30 @@
 .recordForm .formTopTitle,
 .recordForm .formSectionTitle {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   color: #aaa9a4;
   font: 700 8px "Courier New", monospace;
   letter-spacing: .16em;
+}
+.recordForm .formTopTitle::before,
+.recordForm .formSectionTitle::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .72;
 }
 .recordForm .formTopTitle {
   margin-bottom: 15px;
 }
 .recordForm .formSectionTitle {
   grid-column: 1 / -1;
-  margin: 10px 0 0;
-  padding-top: 23px;
-  border-top: 1px solid #ecece8;
+  margin: 16px 0 0;
+  padding-top: 13px;
 }
 .recordForm .readingTitle { color: #8ea9c8; }
 .recordForm .purchaseTitle { color: #b8918b; }
@@ -808,5 +820,5 @@
 }
 @media (max-width: 420px) {
   .recordForm .fields { gap: 14px 16px; }
-  .recordForm .formSectionTitle { padding-top: 21px; }
+  .recordForm .formSectionTitle { margin-top: 14px; padding-top: 12px; }
 }
