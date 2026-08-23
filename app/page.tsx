@@ -32,6 +32,14 @@ type SearchBook = {
   platform: string;
 };
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
+const defaultPlatforms = ["리디북스", "카카오페이지", "네이버시리즈", "조아라", "디리토", "밀리의 서재"];
+const defaultPurchaseMethods = [
+  "100년대여(70%)", "100년대여(50%)", "100년대여(40%)", "100년대여(30%)", "100년대여(10%)",
+  "100년 대여 15% 할인 쿠폰", "십오야 100년 보장 15% 할인 쿠폰", "포인트모아하나씩", "정가박치기",
+  "위클리쿠폰(10%)", "재정가(70%)", "재정가(50%)", "재정가(40%)", "재정가(30%)", "재정가(10%)",
+  "선물", "비공개이벤트(80%포백)", "비공개이벤트(90%포백)", "십오야쿠폰(10%)", "1권무료",
+  "노정나눔", "비포인트", "눈포인트", "십오야보너스포인트", "리디캐시", "십오야랜덤포인트",
+];
 const demo: Book[] = [
   {
     id: "sample-1",
@@ -149,6 +157,44 @@ async function prepareCoverImage(file: File) {
   } finally {
     URL.revokeObjectURL(source);
   }
+}
+
+function EditableSelect({ label, value, options, onChange, onAdd }: { label: string; value: string; options: string[]; onChange: (value: string) => void; onAdd: (value: string) => Promise<void> }) {
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [savingOption, setSavingOption] = useState(false);
+  const all = [...new Set([...options, ...(value ? [value] : [])])];
+  async function commit() {
+    const clean = draft.trim();
+    if (!clean) return;
+    setSavingOption(true);
+    try {
+      await onAdd(clean);
+      onChange(clean);
+      setDraft("");
+      setCreating(false);
+    } finally {
+      setSavingOption(false);
+    }
+  }
+  return (
+    <div className="editableSelect">
+      <span>{label}</span>
+      {creating ? (
+        <span className="newOptionField">
+          <input autoFocus value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void commit(); } if (event.key === "Escape") setCreating(false); }} placeholder="새 선택지" />
+          <button type="button" disabled={savingOption || !draft.trim()} onClick={() => void commit()}>추가</button>
+          <button type="button" aria-label="선택지 추가 취소" onClick={() => { setCreating(false); setDraft(""); }}><X size={11} /></button>
+        </span>
+      ) : (
+        <select value={value} onChange={(event) => { if (event.target.value === "__new__") setCreating(true); else onChange(event.target.value); }}>
+          <option value="">선택</option>
+          {all.map((option) => <option key={option}>{option}</option>)}
+          <option value="__new__">＋ 새 선택지 추가</option>
+        </select>
+      )}
+    </div>
+  );
 }
 
 function StarScale({
@@ -906,6 +952,8 @@ export default function FeedPage() {
   const [readingDate, setReadingDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [coverProcessing, setCoverProcessing] = useState(false);
+  const [platformOptions, setPlatformOptions] = useState(defaultPlatforms);
+  const [purchaseMethodOptions, setPurchaseMethodOptions] = useState(defaultPurchaseMethods);
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const scrollRef = useRef(0);
@@ -931,6 +979,10 @@ export default function FeedPage() {
   }
   useEffect(() => {
     load();
+    fetch("/api/options", { cache: "no-store" }).then((response) => response.json()).then((data) => {
+      setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
+      setPurchaseMethodOptions([...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
+    }).catch(() => undefined);
   }, []);
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -1064,6 +1116,13 @@ export default function FeedPage() {
         if (drawerRef.current) drawerRef.current.scrollTop = coverScrollRef.current;
       });
     }
+  }
+  async function addOption(kind: "platforms" | "purchase_methods", value: string) {
+    const response = await fetch("/api/options", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, value }) });
+    const data = await response.json();
+    if (!response.ok) { setMessage(data.error || "선택지를 저장하지 못했어요."); throw new Error(data.error); }
+    if (kind === "platforms") setPlatformOptions((prev) => [...new Set([...prev, value])]);
+    else setPurchaseMethodOptions((prev) => [...new Set([...prev, value])]);
   }
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -1416,7 +1475,7 @@ export default function FeedPage() {
                         <option>BL</option><option>로맨스</option><option>로맨스판타지</option><option>문학</option><option>기타</option>
                       </select>
                     </label>
-                    <label>플랫폼<input value={form.platform} onChange={(e) => field("platform", e.target.value)} /></label>
+                    <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                   </div>
                   <h3 className="formSectionTitle readingTitle">READING</h3>
                   <label>
@@ -1487,10 +1546,7 @@ export default function FeedPage() {
                       }
                     />
                   </label>
-                  <label>
-                    구매방법
-                    <input value={form.purchase_method} onChange={(e) => field("purchase_method", e.target.value)} />
-                  </label>
+                  <EditableSelect label="구매방법" value={form.purchase_method} options={purchaseMethodOptions} onChange={(value) => field("purchase_method", value)} onAdd={(value) => addOption("purchase_methods", value)} />
                   <div className="volumePurchases full">
                     <div className="volumePurchaseHead"><span>{form.count_unit || "권"}별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
                     {(form.purchase_items || []).map((item, index) => (
