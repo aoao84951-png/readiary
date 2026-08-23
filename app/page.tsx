@@ -1706,7 +1706,10 @@ export default function FeedPage() {
                   </div>
                   <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
                   {form.status === "책바구니" ? (
-                    <BasketNoteEditor reason={form.basket_reason || ""} images={form.basket_images || []} onReasonChange={(value) => field("basket_reason", value)} onImagesChange={(images) => field("basket_images", images)} />
+                    <>
+                      <BasketNoteEditor reason={form.basket_reason || ""} images={form.basket_images || []} onReasonChange={(value) => field("basket_reason", value)} onImagesChange={(images) => field("basket_images", images)} />
+                      {!!((form.basket_reason || "").trim() || form.basket_images?.length) && <div className="basketSavedPreview full"><small>저장 후 이렇게 보여요</small><BookNotes book={form} /></div>}
+                    </>
                   ) : (
                     <>
                       <NoteEditor label="좋았던 점" notes={form.liked_notes} kind="liked" onChange={(notes) => field("liked_notes", notes)} />
