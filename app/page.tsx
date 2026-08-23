@@ -39,7 +39,6 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   element.classList.add("imageExporting");
   const imageRestores: Array<() => void> = [];
-  let exportStage: HTMLDivElement | null = null;
   try {
     const images = Array.from(element.querySelectorAll("img"));
     for (const image of images) {
@@ -67,42 +66,15 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
         image.onerror = fallback;
       }
     })));
-    const exportCard = document.createElement("div");
-    const exportContent = element.cloneNode(true) as HTMLElement;
-    exportStage = document.createElement("div");
-    exportStage.className = "imageExportStage";
-    exportCard.className = "imageExportCard";
-    exportContent.style.width = `${element.scrollWidth}px`;
-    exportContent.style.maxWidth = "none";
-    exportContent.style.maxHeight = "none";
-    exportContent.style.height = "auto";
-    exportContent.style.overflow = "visible";
-    exportCard.appendChild(exportContent);
-    exportStage.appendChild(exportCard);
-    document.body.appendChild(exportStage);
-    const clonedImages = Array.from(exportContent.querySelectorAll("img"));
-    await Promise.all(clonedImages.map((image) => new Promise<void>((resolve) => {
-      if (image.complete) resolve();
-      else { image.onload = () => resolve(); image.onerror = () => resolve(); }
-    })));
-    const width = exportStage.scrollWidth;
-    const height = exportStage.scrollHeight;
-    const dataUrl = await toPng(exportStage, {
+    const width = Math.max(element.scrollWidth, element.offsetWidth);
+    const height = Math.max(element.scrollHeight, element.offsetHeight);
+    const dataUrl = await toPng(element, {
       cacheBust: true,
       backgroundColor: "#f6f4f2",
       pixelRatio: 4,
       width,
       height,
-      style: {
-        position: "relative",
-        zIndex: "0",
-        top: "0",
-        left: "0",
-        maxHeight: "none",
-        height: `${height}px`,
-        margin: "0",
-        overflow: "visible",
-      },
+      style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
       filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
     });
     const link = document.createElement("a");
@@ -110,7 +82,6 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     link.href = dataUrl;
     link.click();
   } finally {
-    exportStage?.remove();
     imageRestores.reverse().forEach((restore) => restore());
     element.classList.remove("imageExporting");
   }
