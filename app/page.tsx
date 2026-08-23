@@ -1474,7 +1474,7 @@ export default function FeedPage() {
                       {book.cover ? (
                         <img src={book.cover} alt="" />
                       ) : (
-                        <span className="miniNoCover">▦</span>
+                        <span className="miniNoCover">BOOK</span>
                       )}
                       <span>
                         <b>{book.title}</b>
@@ -1500,8 +1500,8 @@ export default function FeedPage() {
                 <div className="selectedBook">
                   <div className="selectedBookCover">
                     <label className="coverPicker" aria-label={form.cover_url ? "커버 이미지 변경" : "커버 이미지 추가"}>
-                      {form.cover_url ? <img src={form.cover_url} alt="" /> : <span className="miniNoCover">▦</span>}
-                      <span className="coverPickerHint"><ImagePlus size={13} />{coverProcessing ? "처리 중" : form.cover_url ? "표지 변경" : "표지 추가"}</span>
+                      {form.cover_url ? <img src={form.cover_url} alt="" /> : <span className="miniNoCover">BOOK</span>}
+                      {form.cover_url && <span className="coverPickerHint"><ImagePlus size={13} />{coverProcessing ? "처리 중" : "표지 변경"}</span>}
                       <input
                         type="file"
                         accept="image/*"

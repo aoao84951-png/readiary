@@ -820,6 +820,12 @@
 }
 .recordForm .coverPicker img,
 .recordForm .coverPicker > .miniNoCover { width: 100%; height: 100%; display: grid; place-items: center; object-fit: cover; }
+.miniNoCover {
+  background: #efeff1;
+  color: #99999b;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: .12em;
+}
 .recordForm .coverPicker input {
   position: absolute;
   z-index: 3;
