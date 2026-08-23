@@ -1170,7 +1170,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
 }
 
 export default function FeedPage() {
-  const [books, setBooks] = useState<Book[]>(demo);
+  const [books, setBooks] = useState<Book[]>([]);
   const [view, setView] = useState<ViewMode>("grid");
   const [recordView, setRecordView] = useState<"calendar" | "records">("calendar");
   const [pending, setPending] = useState<string | null>(null);
@@ -1206,7 +1206,7 @@ export default function FeedPage() {
     try {
       const r = await fetch("/api/books", { cache: "no-store" });
       const data = await r.json() as { items?: Book[]; configured?: boolean };
-      if (data.items?.length) setBooks(data.items);
+      setBooks(data.items || []);
       if (show) {
         setNotice(
           data.configured
