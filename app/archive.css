@@ -1097,7 +1097,14 @@
 .basketNoteImages a { display: block; overflow: hidden; border-radius: 7px; background: #f2f1ef; }
 .basketNoteImages img { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; }
 .basketNoteEditor { display: grid; gap: 10px; }
-.recordForm .basketNoteEditor textarea { min-height: 72px; resize: vertical; line-height: 1.55; }
+.recordForm .basketNoteEditor textarea {
+  min-height: 32px;
+  max-height: 150px;
+  padding: 7px 0 6px;
+  line-height: 1.45;
+  resize: none;
+  overflow-y: auto;
+}
 .basketImageEditor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .basketImageEditor > span,
 .addBasketImage { position: relative; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 8px; background: #f3f2f0; }

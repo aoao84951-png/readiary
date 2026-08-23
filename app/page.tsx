@@ -486,7 +486,7 @@ function BasketNoteEditor({ reason, images, onReasonChange, onImagesChange }: { 
   }
   return (
     <section className="basketNoteEditor full">
-      <label>담아둔 이유<textarea value={reason} onChange={(event) => onReasonChange(event.target.value)} placeholder="누가, 어떤 이유로 추천했는지 적어주세요" /></label>
+      <label>담아둔 이유<AutoTextarea value={reason} onChange={onReasonChange} placeholder="누가, 어떤 이유로 추천했는지 적어주세요" /></label>
       <div className="basketImageEditor">
         {images.map((image, index) => <span key={index}><img src={image} alt={`추천 캡처 ${index + 1}`} /><button type="button" aria-label={`추천 캡처 ${index + 1} 삭제`} onClick={() => onImagesChange(images.filter((_, itemIndex) => itemIndex !== index))}><X size={11} /></button></span>)}
         {images.length < 3 && <label className="addBasketImage"><ImagePlus size={15} /><b>{processing ? "처리 중" : "추천 캡처"}</b><small>{images.length}/3</small><input type="file" accept="image/*" multiple disabled={processing} onChange={(event) => { void addImages(event.target.files); event.target.value = ""; }} /></label>}
