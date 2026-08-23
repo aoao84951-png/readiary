@@ -74,11 +74,11 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     const dataUrl = await toPng(element, {
       cacheBust: true,
       backgroundColor: "#ffffff",
-      pixelRatio: Math.min(2.5, window.devicePixelRatio || 2),
+      pixelRatio: 3,
       width,
       height,
       style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
-      filter: (node) => !(node instanceof HTMLElement && node.classList.contains("imageShareButton")),
+      filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
     });
     const link = document.createElement("a");
     link.download = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
@@ -1001,19 +1001,15 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                       {book.author || "저자 미상"} · {book.category}
                     </em>
                   </span>
-                  <div className="modalHeadActions">
-                    <ImageShareButton compact filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
-                    {onEdit && (
-                      <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }} aria-label="기록 수정">
-                        <Pencil size={13} />
-                        <span>수정</span>
-                      </button>
-                    )}
-                    {onDelete && (
-                      <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)} aria-label="기록 삭제" title="기록 삭제">
-                        <Trash2 size={14} />
-                      </button>
-                    )}
+                  <div className="modalHeadActions imageExportExclude">
+                    <details className="recordActionMenu">
+                      <summary aria-label="상세 기록 메뉴"><Ellipsis size={17} /></summary>
+                      <div className="recordActionMenuPanel">
+                        <ImageShareButton filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
+                        {onEdit && <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }}><Pencil size={13} /><span>기록 수정</span></button>}
+                        {onDelete && <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)}><Trash2 size={13} /><span>기록 삭제</span></button>}
+                      </div>
+                    </details>
                     <button onClick={closeSelected} aria-label="상세 기록 닫기">
                       <X size={17} />
                     </button>

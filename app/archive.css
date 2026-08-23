@@ -1353,6 +1353,51 @@ html { scrollbar-gutter: stable; }
 .calendarHeadActions > button { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #999; cursor: pointer; }
 .calendarHeadActions .imageShareButton { width: 28px; height: 28px; background: #f7edf1; color: #b4778e; }
 .recordModalHead .modalHeadActions .imageShareButton { width: 32px; padding: 0; background: #f7edf1; color: #b4778e; }
+.recordActionMenu { position: relative; }
+.recordActionMenu > summary {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f5f3f1;
+  color: #8e8884;
+  cursor: pointer;
+  list-style: none;
+}
+.recordActionMenu > summary::-webkit-details-marker { display: none; }
+.recordActionMenuPanel {
+  position: absolute;
+  z-index: 5;
+  top: 38px;
+  right: 0;
+  width: 132px;
+  display: grid;
+  gap: 2px;
+  padding: 5px;
+  border: 1px solid rgba(91,80,74,.09);
+  border-radius: 12px;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 11px 30px rgba(54,46,42,.13);
+  backdrop-filter: blur(15px);
+}
+.recordModalHead .modalHeadActions .recordActionMenuPanel button,
+.recordModalHead .modalHeadActions .recordActionMenuPanel .imageShareButton {
+  width: 100%;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 9px;
+  border-radius: 8px;
+  background: transparent;
+  color: #746e6a;
+}
+.recordModalHead .modalHeadActions .recordActionMenuPanel button:hover { background: #f8f5f4; }
+.recordModalHead .modalHeadActions .recordActionMenuPanel .imageShareButton { color: #ad7288; }
+.recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
+.recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
 .recordModal.imageExporting { max-height: none !important; height: auto !important; overflow: visible !important; border-radius: 0; box-shadow: none; animation: none; }
 .recordModal.imageExporting .recordModalHead { position: static; }
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
