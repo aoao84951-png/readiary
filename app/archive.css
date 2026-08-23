@@ -860,6 +860,14 @@
 .recordForm .fields {
   gap: 15px 20px;
 }
+.bookMetaFields {
+  display: grid;
+  grid-template-columns: minmax(112px, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 13px;
+}
+.bookMetaFields label { min-width: 0; }
+.bookMetaFields input,
+.bookMetaFields select { min-width: 0; }
 .recordForm .formSectionTitle + label,
 .recordForm .formSectionTitle + label + label {
   margin-top: 1px;
@@ -873,6 +881,7 @@
 @media (max-width: 420px) {
   .recordForm .fields { gap: 14px 16px; }
   .recordForm .formSectionTitle { margin-top: 14px; padding-top: 12px; }
+  .bookMetaFields { grid-template-columns: minmax(104px, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); gap: 9px; }
 }
 .volumePurchases {
   display: grid;

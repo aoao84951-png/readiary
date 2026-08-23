@@ -1405,30 +1405,19 @@ export default function FeedPage() {
                   </div>
                 </div>
                 <div className="fields">
-                  <label className="countField">
-                    {form.count_unit === "화" ? "총 화수" : "총 권수"}
-                    <span><input type="number" min="1" value={form.total_count} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
-                  </label>
-                  <label>
-                    카테고리
-                    <select
-                      value={form.category}
-                      onChange={(e) => field("category", e.target.value)}
-                    >
-                      <option>BL</option>
-                      <option>로맨스</option>
-                      <option>로맨스판타지</option>
-                      <option>문학</option>
-                      <option>기타</option>
-                    </select>
-                  </label>
-                  <label>
-                    플랫폼
-                    <input
-                      value={form.platform}
-                      onChange={(e) => field("platform", e.target.value)}
-                    />
-                  </label>
+                  <div className="bookMetaFields full">
+                    <label className="countField">
+                      {form.count_unit === "화" ? "총 화수" : "총 권수"}
+                      <span><input type="number" min="1" value={form.total_count} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
+                    </label>
+                    <label>
+                      카테고리
+                      <select value={form.category} onChange={(e) => field("category", e.target.value)}>
+                        <option>BL</option><option>로맨스</option><option>로맨스판타지</option><option>문학</option><option>기타</option>
+                      </select>
+                    </label>
+                    <label>플랫폼<input value={form.platform} onChange={(e) => field("platform", e.target.value)} /></label>
+                  </div>
                   <h3 className="formSectionTitle readingTitle">READING</h3>
                   <label>
                     상태
