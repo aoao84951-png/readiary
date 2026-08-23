@@ -418,7 +418,7 @@ function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: stri
   useEffect(() => {
     const textarea = ref.current;
     if (!textarea) return;
-    textarea.style.height = "auto";
+    textarea.style.height = "0px";
     textarea.style.height = `${textarea.scrollHeight}px`;
   }, [value]);
   return <textarea ref={ref} rows={1} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} aria-label={ariaLabel} />;
