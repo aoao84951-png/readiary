@@ -129,6 +129,8 @@ const empty: BookRecord = {
   purchase_items: [{ label: "1권", list_price: 0, paid_price: 0, methods: [] }],
   liked_notes: [],
   disliked_notes: [],
+  basket_reason: "",
+  basket_images: [],
   reading_dates: [],
   source_url: "",
 };
@@ -154,6 +156,39 @@ async function prepareCoverImage(file: File) {
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL("image/jpeg", .84);
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
+
+async function prepareNoteImage(file: File) {
+  if (!file.type.startsWith("image/")) throw new Error("이미지 파일만 첨부할 수 있어요.");
+  if (file.size > 15 * 1024 * 1024) throw new Error("이미지는 장당 15MB 이하여야 해요.");
+  const source = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("이미지를 불러오지 못했어요."));
+      element.src = source;
+    });
+    const scale = Math.min(1, 1000 / image.naturalWidth, 1400 / image.naturalHeight);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("이미지를 처리하지 못했어요.");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    let quality = .78;
+    let result = canvas.toDataURL("image/jpeg", quality);
+    while (result.length > 170_000 && quality > .38) {
+      quality -= .08;
+      result = canvas.toDataURL("image/jpeg", quality);
+    }
+    if (result.length > 210_000) throw new Error("이미지를 더 작게 잘라서 다시 첨부해주세요.");
+    return result;
   } finally {
     URL.revokeObjectURL(source);
   }
@@ -413,6 +448,54 @@ function Notes({
   );
 }
 
+function BookNotes({ book, showEmpty = false }: { book: Book | BookRecord; showEmpty?: boolean }) {
+  if (book.status === "책바구니") {
+    const reason = (book.basket_reason || "").trim();
+    const images = book.basket_images || [];
+    if (!reason && !images.length) return showEmpty ? <p className="emptyNotes">담아둔 이유가 없습니다.</p> : null;
+    return (
+      <section className="basketNotes">
+        <span className="reviewLabel">BASKET NOTES</span>
+        {reason && <p>{reason}</p>}
+        {!!images.length && <div className="basketNoteImages">{images.map((image, index) => <a key={index} href={image} target="_blank" rel="noreferrer"><img src={image} alt={`추천 캡처 ${index + 1}`} /></a>)}</div>}
+      </section>
+    );
+  }
+  if (!book.liked_notes.length && !book.disliked_notes.length && showEmpty) return <p className="emptyNotes">기록된 감상이 없습니다.</p>;
+  return <><Notes notes={book.liked_notes} kind="liked" /><Notes notes={book.disliked_notes} kind="disliked" /></>;
+}
+
+function BasketNoteEditor({ reason, images, onReasonChange, onImagesChange }: { reason: string; images: string[]; onReasonChange: (value: string) => void; onImagesChange: (images: string[]) => void }) {
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState("");
+  async function addImages(files: FileList | null) {
+    if (!files?.length) return;
+    const slots = Math.max(0, 3 - images.length);
+    if (!slots) { setError("추천 캡처는 최대 3장까지 첨부할 수 있어요."); return; }
+    setProcessing(true);
+    setError("");
+    try {
+      const added: string[] = [];
+      for (const file of Array.from(files).slice(0, slots)) added.push(await prepareNoteImage(file));
+      onImagesChange([...images, ...added]);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "이미지를 첨부하지 못했어요.");
+    } finally {
+      setProcessing(false);
+    }
+  }
+  return (
+    <section className="basketNoteEditor full">
+      <label>담아둔 이유<textarea value={reason} onChange={(event) => onReasonChange(event.target.value)} placeholder="누가, 어떤 이유로 추천했는지 적어주세요" /></label>
+      <div className="basketImageEditor">
+        {images.map((image, index) => <span key={index}><img src={image} alt={`추천 캡처 ${index + 1}`} /><button type="button" aria-label={`추천 캡처 ${index + 1} 삭제`} onClick={() => onImagesChange(images.filter((_, itemIndex) => itemIndex !== index))}><X size={11} /></button></span>)}
+        {images.length < 3 && <label className="addBasketImage"><ImagePlus size={15} /><b>{processing ? "처리 중" : "추천 캡처"}</b><small>{images.length}/3</small><input type="file" accept="image/*" multiple disabled={processing} onChange={(event) => { void addImages(event.target.files); event.target.value = ""; }} /></label>}
+      </div>
+      {error && <p className="basketImageError">{error}</p>}
+    </section>
+  );
+}
+
 function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -580,8 +663,7 @@ function RecordArchive({ books }: { books: Book[] }) {
                 </div>
               </dl>
               <div className="archiveNotes">
-                <Notes notes={book.liked_notes} kind="liked" />
-                <Notes notes={book.disliked_notes} kind="disliked" />
+                <BookNotes book={book} />
               </div>
             </div>
           </details>
@@ -685,11 +767,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
               </section>
               <section className="recordGroup notesGroup">
                 <div className="archiveNotes">
-                  <Notes notes={book.liked_notes} kind="liked" />
-                  <Notes notes={book.disliked_notes} kind="disliked" />
-                  {!book.liked_notes.length && !book.disliked_notes.length && (
-                    <p className="emptyNotes">기록된 감상이 없습니다.</p>
-                  )}
+                  <BookNotes book={book} showEmpty />
                 </div>
               </section>
             </div>
@@ -903,12 +981,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                   </section>
                   <section className="recordGroup notesGroup">
                     <div className="archiveNotes">
-                      <Notes notes={book.liked_notes} kind="liked" />
-                      <Notes notes={book.disliked_notes} kind="disliked" />
-                      {!book.liked_notes.length &&
-                        !book.disliked_notes.length && (
-                          <p className="emptyNotes">기록된 감상이 없습니다.</p>
-                        )}
+                      <BookNotes book={book} showEmpty />
                     </div>
                   </section>
                 </div>
@@ -1428,8 +1501,7 @@ export default function FeedPage() {
                   <ClassicRating rating={book.rating} />
                 </div>
                 <div className="caption">
-                  <Notes notes={book.liked_notes} kind="liked" />
-                  <Notes notes={book.disliked_notes} kind="disliked" />
+                  <BookNotes book={book} />
                 </div>
               </div>
             </article>
@@ -1632,9 +1704,15 @@ export default function FeedPage() {
                       <span><small>할인율</small><b>{discount}%</b></span>
                     </div>
                   </div>
-                  <h3 className="formSectionTitle notesTitle">NOTES</h3>
-                  <NoteEditor label="좋았던 점" notes={form.liked_notes} kind="liked" onChange={(notes) => field("liked_notes", notes)} />
-                  <NoteEditor label="싫었던 점" notes={form.disliked_notes} kind="disliked" onChange={(notes) => field("disliked_notes", notes)} />
+                  <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
+                  {form.status === "책바구니" ? (
+                    <BasketNoteEditor reason={form.basket_reason || ""} images={form.basket_images || []} onReasonChange={(value) => field("basket_reason", value)} onImagesChange={(images) => field("basket_images", images)} />
+                  ) : (
+                    <>
+                      <NoteEditor label="좋았던 점" notes={form.liked_notes} kind="liked" onChange={(notes) => field("liked_notes", notes)} />
+                      <NoteEditor label="싫었던 점" notes={form.disliked_notes} kind="disliked" onChange={(notes) => field("disliked_notes", notes)} />
+                    </>
+                  )}
                 </div>
                 {message && <p className="formMessage">{message}</p>}
                 <button className="save" disabled={saving}>

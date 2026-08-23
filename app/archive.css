@@ -1090,6 +1090,24 @@
 }
 .noteEditor.liked .noteComposer > button { color: #bd7d94; }
 .noteEditor.disliked .noteComposer > button { color: #7799bc; }
+.basketNotes { display: grid; gap: 8px; }
+.basketNotes .reviewLabel { color: #9b8b76; }
+.basketNotes > p { margin: 0; color: #555551; font-size: 10.5px; font-weight: 550; line-height: 1.62; white-space: pre-wrap; }
+.basketNoteImages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.basketNoteImages a { display: block; overflow: hidden; border-radius: 7px; background: #f2f1ef; }
+.basketNoteImages img { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; }
+.basketNoteEditor { display: grid; gap: 10px; }
+.recordForm .basketNoteEditor textarea { min-height: 72px; resize: vertical; line-height: 1.55; }
+.basketImageEditor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.basketImageEditor > span,
+.addBasketImage { position: relative; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 8px; background: #f3f2f0; }
+.basketImageEditor > span img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.basketImageEditor > span button { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.9); color: #8f8883; }
+.recordForm .addBasketImage { display: grid; place-content: center; justify-items: center; gap: 3px; margin: 0; color: #97918d; cursor: pointer; }
+.addBasketImage b { font-size: 7.5px; }
+.addBasketImage small { color: #bbb4af; font-size: 6.5px; }
+.recordForm .addBasketImage input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.basketImageError { margin: -3px 0 0; color: #bd7680; font-size: 7.5px; }
 .multiEditableSelect {
   position: relative;
   grid-column: 1 / -1;

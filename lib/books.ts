@@ -13,4 +13,5 @@ export type BookRecord = {
   read_count: number; list_price: number; paid_price: number; purchase_method: string;
   purchase_items?: VolumePurchase[];
   liked_notes: string[]; disliked_notes: string[]; reading_dates?: string[]; source_url?: string; created_at?: string;
+  basket_reason?: string; basket_images?: string[];
 };
