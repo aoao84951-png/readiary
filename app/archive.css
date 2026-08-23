@@ -1344,14 +1344,14 @@ html { scrollbar-gutter: stable; }
   white-space: nowrap;
   cursor: pointer;
 }
-.imageShareButton.compact { min-width: 26px; width: 26px; height: 28px; padding: 0; border-radius: 0; background: transparent; }
+.imageShareButton.compact { min-width: 24px; width: 24px; height: 26px; padding: 0; border-radius: 0; background: transparent; color: #96918d; }
 .imageShareButton.compact span { display: none; }
 .imageShareButton:disabled { opacity: .55; }
 .postHeadTools { display: flex; align-items: center; gap: 8px; }
 .calendarHeader { position: relative; }
 .calendarHeadActions { position: absolute; right: 0; display: flex; align-items: center; justify-content: flex-end; gap: 1px; }
 .calendarHeadActions > button { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #999; cursor: pointer; }
-.calendarHeadActions .imageShareButton { width: 26px; height: 28px; border-radius: 0; background: transparent; color: #b4778e; }
+.calendarHeadActions .imageShareButton { width: 24px; height: 26px; border-radius: 0; background: transparent; color: #96918d; }
 .recordModalHead .modalHeadActions .imageShareButton { width: 32px; padding: 0; background: #f7edf1; color: #b4778e; }
 .recordActionMenu { position: relative; }
 .recordActionMenu > summary {
