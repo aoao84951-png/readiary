@@ -1247,6 +1247,8 @@
 }
 .topToolMenu button { width: 100%; height: 34px; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 5px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: #77736f; font-size: 8.5px; font-weight: 700; text-align: left; cursor: pointer; }
 .topToolMenu button:hover { background: #f7f5f3; }
+.topToolMenu button.selected { background: #faf3f5; color: #a9677e; }
+.topToolMenu button.selected svg { stroke-width: 2.2; }
 .topToolMenu button small { min-width: 17px; padding: 2px 5px; border-radius: 999px; background: #f4e9ed; color: #b77d91; font-size: 6.5px; text-align: center; }
 .topToolMenu button.loading svg { animation: spin .8s linear infinite; }
 .dockLayout > .searchBar { top: 50px; }

@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Search,
   SlidersHorizontal,
+  ArrowDownUp,
   Star,
   Trash2,
   X,
@@ -34,6 +35,7 @@ type SearchBook = {
   platform: string;
 };
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
+type SortMode = "created" | "purchase";
 
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
@@ -1180,6 +1182,7 @@ export default function FeedPage() {
   const [query, setQuery] = useState("");
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+  const [sortMode, setSortMode] = useState<SortMode>("created");
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
@@ -1221,6 +1224,8 @@ export default function FeedPage() {
   }
   useEffect(() => {
     load();
+    const savedSort = window.localStorage.getItem("readiary-sort-mode");
+    if (savedSort === "created" || savedSort === "purchase") setSortMode(savedSort);
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions([...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
@@ -1233,8 +1238,18 @@ export default function FeedPage() {
     return books.filter((book) => {
       const textMatch = !q || `${book.title} ${book.author}`.toLowerCase().includes(q);
       return textMatch && (!statusFilters.length || statusFilters.includes(book.status)) && (!categoryFilters.length || categoryFilters.includes(book.category));
+    }).sort((a, b) => {
+      const aDate = sortMode === "purchase" ? (a.purchase_date || "") : (a.created_at || "");
+      const bDate = sortMode === "purchase" ? (b.purchase_date || "") : (b.created_at || "");
+      if (aDate !== bDate) return bDate.localeCompare(aDate);
+      return String(b.created_at || "").localeCompare(String(a.created_at || ""));
     });
-  }, [books, query, statusFilters, categoryFilters]);
+  }, [books, query, statusFilters, categoryFilters, sortMode]);
+  function selectSort(mode: SortMode) {
+    setSortMode(mode);
+    window.localStorage.setItem("readiary-sort-mode", mode);
+    setTopMenuOpen(false);
+  }
   useEffect(() => {
     if (view === "feed" && pending)
       requestAnimationFrame(() =>
@@ -1483,6 +1498,8 @@ export default function FeedPage() {
           <button className="topMenuBackdrop" aria-label="보기 메뉴 닫기" onClick={() => setTopMenuOpen(false)} />
           <div className="topToolMenu">
             <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
+            <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>선택</small>}</button>
+            <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>선택</small>}</button>
             <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
           </div>
         </>
