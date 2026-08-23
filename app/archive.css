@@ -1522,10 +1522,15 @@ html { scrollbar-gutter: stable; }
     top: 0;
   }
   .bottomDock > button:not(.dockAdd) {
-    top: -8px;
+    top: -13px;
     height: 34px;
   }
-  .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
+  .bottomDock .dockAdd {
+    width: 43px;
+    height: 43px;
+    border-radius: 15px;
+    transform: translateY(-14px);
+  }
   .dockLayout > .filterPanel { top: auto; }
 }
 
