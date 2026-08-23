@@ -1,5 +1,6 @@
 "use client";
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import {
   CalendarDays,
   ChevronLeft,
@@ -7,6 +8,7 @@ import {
   Grid3X3,
   LayoutGrid,
   ImagePlus,
+  ImageDown,
   List,
   Hash,
   Ellipsis,
@@ -35,6 +37,73 @@ type SearchBook = {
   platform: string;
 };
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
+
+async function saveElementAsImage(element: HTMLElement, filename: string) {
+  await document.fonts.ready;
+  element.classList.add("imageExporting");
+  const imageRestores: Array<() => void> = [];
+  try {
+    const images = Array.from(element.querySelectorAll("img"));
+    for (const image of images) {
+      const original = image.getAttribute("src") || "";
+      if (!/^https:\/\//.test(original)) continue;
+      imageRestores.push(() => image.setAttribute("src", original));
+      image.setAttribute("src", `/api/image?url=${encodeURIComponent(original)}`);
+    }
+    const backgrounds = Array.from(element.querySelectorAll<HTMLElement>("[style*='background-image']"));
+    for (const background of backgrounds) {
+      const original = background.style.backgroundImage;
+      const match = original.match(/url\(["']?(https:\/\/[^"')]+)["']?\)/);
+      if (!match) continue;
+      imageRestores.push(() => { background.style.backgroundImage = original; });
+      background.style.backgroundImage = `url("/api/image?url=${encodeURIComponent(match[1])}")`;
+    }
+    const transparentPixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+    await Promise.all(images.map((image) => new Promise<void>((resolve) => {
+      const finish = () => resolve();
+      const fallback = () => { image.onload = finish; image.onerror = finish; image.src = transparentPixel; };
+      if (image.complete) {
+        if (image.naturalWidth > 0) finish(); else fallback();
+      } else {
+        image.onload = finish;
+        image.onerror = fallback;
+      }
+    })));
+    const width = element.scrollWidth;
+    const height = element.scrollHeight;
+    const dataUrl = await toPng(element, {
+      cacheBust: true,
+      backgroundColor: "#ffffff",
+      pixelRatio: Math.min(2.5, window.devicePixelRatio || 2),
+      width,
+      height,
+      style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
+      filter: (node) => !(node instanceof HTMLElement && node.classList.contains("imageShareButton")),
+    });
+    const link = document.createElement("a");
+    link.download = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
+    link.href = dataUrl;
+    link.click();
+  } finally {
+    imageRestores.reverse().forEach((restore) => restore());
+    element.classList.remove("imageExporting");
+  }
+}
+
+function ImageShareButton({ getTarget, filename, compact = false }: { getTarget: (button: HTMLButtonElement) => HTMLElement | null; filename: string; compact?: boolean }) {
+  const [savingImage, setSavingImage] = useState(false);
+  const [failed, setFailed] = useState("");
+  return <button type="button" className={`imageShareButton ${compact ? "compact" : ""}`} title={failed || "이미지로 멋지게 공유"} aria-label="이미지로 멋지게 공유" disabled={savingImage} onClick={async (event) => {
+    event.stopPropagation();
+    const target = getTarget(event.currentTarget);
+    if (!target) return;
+    setSavingImage(true);
+    setFailed("");
+    try { await saveElementAsImage(target, filename); }
+    catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
+    finally { setSavingImage(false); }
+  }}><ImageDown size={compact ? 13 : 14} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
+}
 const defaultPlatforms = ["리디북스", "카카오페이지", "네이버시리즈", "조아라", "디리토", "밀리의 서재"];
 const defaultPurchaseMethods = [
   "100년대여(70%)", "100년대여(50%)", "100년대여(40%)", "100년대여(30%)", "100년대여(10%)",
@@ -410,6 +479,7 @@ function CalendarCover({ books, onOpen }: { books: Book[]; onOpen: (book: Book) 
 }
 
 function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) => void }) {
+  const calendarRef = useRef<HTMLElement>(null);
   const now = new Date();
   const [cursor, setCursor] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
   const year = cursor.getFullYear();
@@ -427,11 +497,11 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
     return day > 0 && day <= dayCount ? day : null;
   });
   return (
-    <section className="calendarPage">
+    <section className="calendarPage" ref={calendarRef}>
       <header className="calendarHeader">
         <button onClick={() => setCursor(new Date(year, month - 1, 1))} aria-label="이전 달"><ChevronLeft size={17} /></button>
         <div><b>{year}</b><strong>{String(month + 1).padStart(2, "0")}</strong></div>
-        <button onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="다음 달"><ChevronRight size={17} /></button>
+        <span className="calendarHeadActions"><ImageShareButton compact filename={`readiary-${year}-${String(month + 1).padStart(2, "0")}-calendar`} getTarget={() => calendarRef.current} /><button onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="다음 달"><ChevronRight size={17} /></button></span>
       </header>
       <div className="calendarWeek">{["SUN","MON","TUE","WED","THU","FRI","SAT"].map(day => <span key={day}>{day}</span>)}</div>
       <div className="calendarGrid">
@@ -932,6 +1002,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                     </em>
                   </span>
                   <div className="modalHeadActions">
+                    <ImageShareButton compact filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
                     {onEdit && (
                       <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }} aria-label="기록 수정">
                         <Pencil size={13} />
@@ -1525,9 +1596,7 @@ export default function FeedPage() {
                   <b>{book.title}</b>
                   <small>{book.author || "저자 미상"}</small>
                 </span>
-                <span className="postNumber">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                <span className="postHeadTools"><ImageShareButton compact filename={`readiary-${book.title}-feed`} getTarget={(button) => button.closest(".post") as HTMLElement | null} /><span className="postNumber">{String(index + 1).padStart(2, "0")}</span></span>
               </header>
               <button className="feedCover" onClick={() => setDetailBook(book)} aria-label={`${book.title} 상세 기록 열기`}>
                 {book.cover_url && (
