@@ -14,6 +14,7 @@ import {
   Search,
   SlidersHorizontal,
   Star,
+  Trash2,
   X,
 } from "lucide-react";
 import type { BookRecord } from "@/lib/books";
@@ -541,15 +542,18 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
   } | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   useEffect(() => {
     if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
   }, [openBook, books]);
-  const closeSelected = () => { setSelected(null); onClose?.(); };
+  const closeSelected = () => { setSelected(null); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
   useEffect(() => {
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
@@ -663,11 +667,37 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, hideList = false
                         <span>수정</span>
                       </button>
                     )}
+                    {onDelete && (
+                      <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)} aria-label="기록 삭제" title="기록 삭제">
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                     <button onClick={closeSelected} aria-label="상세 기록 닫기">
                       <X size={17} />
                     </button>
                   </div>
                 </header>
+                {confirmingDelete && (
+                  <div className="deleteConfirm" role="alertdialog" aria-modal="true" aria-label="기록 삭제 확인">
+                    <div>
+                      <small>DELETE RECORD</small>
+                      <b>이 기록을 삭제할까요?</b>
+                      <p>삭제한 기록은 다시 되돌릴 수 없어요.</p>
+                      {deleteError && <em>{deleteError}</em>}
+                      <span>
+                        <button onClick={() => { setConfirmingDelete(false); setDeleteError(""); }} disabled={deleting}>취소</button>
+                        <button className="confirmDeleteButton" disabled={deleting} onClick={async () => {
+                          if (!onDelete) return;
+                          setDeleting(true);
+                          setDeleteError("");
+                          try { await onDelete(book); closeSelected(); }
+                          catch (error) { setDeleteError(error instanceof Error ? error.message : "삭제하지 못했어요."); }
+                          finally { setDeleting(false); }
+                        }}>{deleting ? "삭제 중…" : "삭제"}</button>
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <div className="recordModalBody">
                   <div className="recordHighlights">
                     <div>
@@ -892,6 +922,17 @@ export default function FeedPage() {
     setDetailBook(null);
     setAdding(true);
   }
+  async function deleteBook(book: Book) {
+    const r = await fetch("/api/books", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: book.id }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "삭제하지 못했어요.");
+    setBooks((prev) => prev.filter((item) => item.id !== book.id));
+    setDetailBook(null);
+  }
   async function findBooks(e: FormEvent) {
     e.preventDefault();
     if (!search.trim()) return;
@@ -1068,7 +1109,7 @@ export default function FeedPage() {
           {categoryFilters.map(value => <button key={value} onClick={() => setCategoryFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
         </div>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}
       {view === "stats" && <StatsView books={books} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
@@ -1171,7 +1212,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
           <aside className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>

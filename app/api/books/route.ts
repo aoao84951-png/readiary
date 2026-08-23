@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BookRecord } from '@/lib/books';
-import { createDocument, firebaseConfigured, listDocuments, setDocument } from '@/lib/firebase';
+import { createDocument, deleteDocument, firebaseConfigured, listDocuments, setDocument } from '@/lib/firebase';
 
 export async function GET() {
   if (!firebaseConfigured()) return NextResponse.json({ items: [], configured: false });
@@ -46,5 +46,17 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ item });
   } catch (error) {
     return NextResponse.json({ error: '기록을 수정하지 못했습니다.', detail: error instanceof Error ? error.message : '' }, { status: 502 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const { id } = await request.json() as { id?: string };
+  if (!id) return NextResponse.json({ error: '삭제할 기록을 찾지 못했습니다.' }, { status: 400 });
+  if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
+  try {
+    await deleteDocument('books', id);
+    return NextResponse.json({ id });
+  } catch (error) {
+    return NextResponse.json({ error: '기록을 삭제하지 못했습니다.', detail: error instanceof Error ? error.message : '' }, { status: 502 });
   }
 }

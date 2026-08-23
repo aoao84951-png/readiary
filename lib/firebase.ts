@@ -116,3 +116,10 @@ export async function setDocument(collection: string, id: string, data: Record<s
   if (!response.ok) throw new Error(await response.text());
   return record(await response.json() as FirestoreDocument);
 }
+
+export async function deleteDocument(collection: string, id: string) {
+  const response = await request(`${collection}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!response) return false;
+  if (!response.ok) throw new Error(await response.text());
+  return true;
+}
