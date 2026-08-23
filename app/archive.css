@@ -1516,6 +1516,10 @@ html { scrollbar-gutter: stable; }
     box-shadow: none;
     background: rgba(255,255,255,.97);
   }
+  .bottomDock > button {
+    position: relative;
+    top: min(9px, env(safe-area-inset-bottom));
+  }
   .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
   .dockLayout > .filterPanel { top: auto; }
 }
