@@ -8,7 +8,7 @@ import {
   Grid3X3,
   LayoutGrid,
   ImagePlus,
-  ImageDown,
+  CloudDownload,
   List,
   Hash,
   Ellipsis,
@@ -74,7 +74,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     const dataUrl = await toPng(element, {
       cacheBust: true,
       backgroundColor: "#ffffff",
-      pixelRatio: 3,
+      pixelRatio: 4,
       width,
       height,
       style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
@@ -102,7 +102,7 @@ function ImageShareButton({ getTarget, filename, compact = false }: { getTarget:
     try { await saveElementAsImage(target, filename); }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
-  }}><ImageDown size={compact ? 13 : 14} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
+  }}><CloudDownload size={compact ? 16 : 15} strokeWidth={1.45} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
 }
 const defaultPlatforms = ["리디북스", "카카오페이지", "네이버시리즈", "조아라", "디리토", "밀리의 서재"];
 const defaultPurchaseMethods = [
