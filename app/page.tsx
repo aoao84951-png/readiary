@@ -8,7 +8,7 @@ import {
   LayoutGrid,
   ImagePlus,
   List,
-  AlignJustify,
+  BookHeart,
   Ellipsis,
   NotebookTabs,
   BookOpen,
@@ -1573,11 +1573,11 @@ export default function FeedPage() {
       )}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
-        <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")}><LayoutGrid size={17} strokeWidth={1.45} /><span>모아보기</span></button>
-        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><AlignJustify size={18} strokeWidth={1.4} /><span>피드</span></button>
+        <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
+        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><BookHeart size={19} strokeWidth={1.35} /></button>
         <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={21} strokeWidth={1.45} /></button>
-        <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><BookOpen size={18} strokeWidth={1.4} /><span>기록</span></button>
-        <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span><span className="dockProfileSpacer" aria-hidden="true" /></button>
+        <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")} aria-label="기록"><BookOpen size={19} strokeWidth={1.35} /></button>
+        <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span></button>
       </nav>
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>

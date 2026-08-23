@@ -40,7 +40,7 @@
 .archiveCover,
 .archiveCover img {
   width: 42px;
-  height: 58px;
+  height: 54px;
   display: grid;
   place-items: center;
   object-fit: cover;
@@ -1297,22 +1297,18 @@
   transform: translateX(-50%);
 }
 .bottomDock > button:not(.dockAdd) {
-  height: 45px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+  position: relative;
+  height: 43px;
+  display: grid;
+  place-items: center;
   padding: 0;
   border: 0;
   background: transparent;
   color: #aaa5a0;
   cursor: pointer;
 }
-.bottomDock > button:not(.dockAdd) span { font-size: 6.7px; font-weight: 650; letter-spacing: -.01em; }
 .bottomDock > button.active { color: #716762; }
-.bottomDock > button.active::after { content: ''; width: 10px; height: 1px; border-radius: 2px; background: #c98ba0; }
-.bottomDock > button.dockProfile { gap: 4px; }
+.bottomDock > button.active::after { content: ''; position: absolute; left: 50%; bottom: 2px; width: 10px; height: 1px; border-radius: 2px; background: #c98ba0; transform: translateX(-50%); }
 .dockProfileRing {
   width: 20px;
   height: 20px;
@@ -1325,7 +1321,6 @@
 }
 .dockProfileRing img,
 .dockProfileRing i { width: 16px; height: 16px; display: grid; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #f2f0ee; object-fit: cover; color: #8f8985; font: 600 6px Georgia, serif; }
-.bottomDock > button:not(.dockAdd) .dockProfileSpacer { width: 1px; height: 7px; display: block; }
 .profileStatsHeader {
   display: grid;
   grid-template-columns: 92px minmax(0,1fr);
@@ -1377,7 +1372,7 @@
 @media (max-width: 520px) {
   .dockLayout { padding-bottom: 82px; }
   .compactTopBar { height: 43px; padding-inline: 10px; }
-  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 56px; border-radius: 21px; }
+  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 53px; border-radius: 21px; }
   .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
   .dockLayout > .filterPanel { top: auto; }
 }
