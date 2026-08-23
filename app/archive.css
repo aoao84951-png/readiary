@@ -826,6 +826,8 @@
   font: 700 8px "Courier New", monospace;
   letter-spacing: .12em;
 }
+.results img,
+.results .miniNoCover { border-radius: 4px; }
 .recordForm .coverPicker input {
   position: absolute;
   z-index: 3;
