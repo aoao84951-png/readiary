@@ -909,6 +909,8 @@ export default function FeedPage() {
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const scrollRef = useRef(0);
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const coverScrollRef = useRef(0);
   async function load(show = false) {
     setLoading(true);
     try {
@@ -1058,6 +1060,9 @@ export default function FeedPage() {
       setMessage(error instanceof Error ? error.message : "표지를 변경하지 못했어요.");
     } finally {
       setCoverProcessing(false);
+      requestAnimationFrame(() => {
+        if (drawerRef.current) drawerRef.current.scrollTop = coverScrollRef.current;
+      });
     }
   }
   async function save(e: FormEvent) {
@@ -1307,7 +1312,7 @@ export default function FeedPage() {
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
-          <aside className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
+          <aside ref={drawerRef} className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
             <header>
               <button
                 onClick={() => editingId ? setAdding(false) : step === "form" ? setStep("search") : setAdding(false)}
@@ -1370,7 +1375,14 @@ export default function FeedPage() {
                     <label className="coverPicker" aria-label={form.cover_url ? "커버 이미지 변경" : "커버 이미지 추가"}>
                       {form.cover_url ? <img src={form.cover_url} alt="" /> : <span className="miniNoCover">▦</span>}
                       <span className="coverPickerHint"><ImagePlus size={13} />{coverProcessing ? "처리 중" : form.cover_url ? "표지 변경" : "표지 추가"}</span>
-                      <input type="file" accept="image/*" disabled={coverProcessing} onChange={(e) => { void changeCover(e.target.files?.[0]); e.currentTarget.value = ""; }} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={coverProcessing}
+                        onPointerDown={() => { coverScrollRef.current = drawerRef.current?.scrollTop || 0; }}
+                        onFocus={() => requestAnimationFrame(() => { if (drawerRef.current) drawerRef.current.scrollTop = coverScrollRef.current; })}
+                        onChange={(e) => { void changeCover(e.target.files?.[0]); e.currentTarget.value = ""; }}
+                      />
                     </label>
                     {form.cover_url && <button type="button" onClick={() => field("cover_url", "")}>표지 제거</button>}
                   </div>
