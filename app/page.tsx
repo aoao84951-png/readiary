@@ -515,8 +515,8 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   className={`groupProgress ${book.status === "완독" ? "done" : book.status === "하차" ? "paused" : book.status === "읽는 중" ? "reading" : book.status === "읽기 전" ? "before" : "basket"}`}
                 >
                   <span>
+                    <small>상태</small>
                     <b>{book.status}</b>
-                    <small>{book.read_count}권 읽음</small>
                   </span>
                   <p>
                     <span>완독 / 하차일</span>
@@ -731,8 +731,8 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       className={`groupProgress ${statusClass(book.status)}`}
                     >
                       <span>
+                        <small>상태</small>
                         <b>{book.status}</b>
-                        <small>{book.read_count}권 읽음</small>
                       </span>
                       <p>
                         <span>완독 / 하차일</span>

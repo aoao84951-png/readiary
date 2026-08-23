@@ -547,3 +547,82 @@
     z-index: 2;
   }
 }
+
+.groupProgress,
+.groupProgress.done,
+.groupProgress.paused,
+.groupProgress.basket,
+.groupProgress.reading,
+.groupProgress.before {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 0;
+  border-top: 1px solid #ecece8;
+  border-bottom: 1px solid #ecece8;
+  border-radius: 0;
+  background: transparent;
+}
+.groupProgress > span,
+.groupProgress > p {
+  min-height: 48px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.groupProgress > span {
+  padding-right: 18px;
+  border-right: 1px solid #ecece8;
+}
+.groupProgress > p {
+  grid-column: 2;
+}
+.groupProgress > span small,
+.groupProgress > p span {
+  color: #aaa9a4;
+  font-size: 8px;
+  font-weight: 600;
+}
+.groupProgress > span b,
+.groupProgress > p b {
+  color: #676762;
+  font-size: 9.5px;
+  font-weight: 760;
+}
+.groupProgress.done > span b { color: #6f8fb9; }
+.groupProgress.paused > span b { color: #c97887; }
+.groupProgress.reading > span b { color: #c59b24; }
+.groupProgress.before > span b { color: #6f9d7e; }
+.groupProgress.basket > span b { color: #858580; }
+@media (max-width: 520px) {
+  .groupProgress,
+  .groupProgress.done,
+  .groupProgress.paused,
+  .groupProgress.basket,
+  .groupProgress.reading,
+  .groupProgress.before {
+    min-height: 44px;
+    gap: 12px;
+  }
+  .groupProgress > span,
+  .groupProgress > p {
+    min-height: 44px;
+  }
+  .groupProgress > span {
+    padding-right: 12px;
+  }
+  .groupProgress > span small,
+  .groupProgress > p span {
+    font-size: 7.5px;
+  }
+  .groupProgress > span b,
+  .groupProgress > p b {
+    font-size: 8.5px;
+  }
+}
