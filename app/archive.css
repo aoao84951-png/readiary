@@ -1069,6 +1069,7 @@
   line-height: 1.42;
   resize: none;
   overflow: hidden;
+  transform: translateY(1px);
 }
 .savedNote > button {
   width: 18px;
