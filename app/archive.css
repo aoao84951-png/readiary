@@ -1197,3 +1197,127 @@
 .newMultiOption button { padding: 0 9px; }
 .openNewMultiOption { width: 100%; min-height: 28px; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; }
 .purchaseBreakdown span i { grid-column: 1 / -1; margin: -3px 0 6px; color: #a48680; font-size: 7px; font-style: normal; }
+
+/* Compact app navigation */
+.dockLayout { padding-bottom: 88px; }
+.compactTopBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 34px 34px;
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid #ecece8;
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(14px);
+}
+.topBarTitle { min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.topBarTitle small { color: #b4aaa5; font: 700 6.5px 'Courier New', monospace; letter-spacing: .14em; }
+.topBarTitle b { overflow: hidden; color: #555550; font-size: 10px; font-weight: 780; text-overflow: ellipsis; white-space: nowrap; }
+.compactTopBar > button {
+  position: relative;
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #9d9d98;
+  cursor: pointer;
+}
+.compactTopBar > button.on { background: #f4f2f0; color: #66615d; }
+.compactTopBar .filterToggle i { position: absolute; top: 5px; right: 5px; width: 4px; height: 4px; border-radius: 50%; background: #c98298; }
+.compactTopBar .refresh.loading svg { animation: spin .8s linear infinite; }
+.dockLayout > .searchBar { top: 55px; }
+.dockLayout > .refreshNotice { top: 56px; }
+.recordModeSwitch {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 13px auto 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: #f5f4f1;
+}
+.recordModeSwitch button {
+  min-width: 76px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #a3a09b;
+  font-size: 8px;
+  font-weight: 720;
+  cursor: pointer;
+}
+.recordModeSwitch button.on { background: #fff; color: #68645f; box-shadow: 0 2px 9px rgba(66,57,52,.07); }
+.bottomDock {
+  position: fixed;
+  z-index: 42;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: min(430px, calc(100vw - 24px));
+  height: 61px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 64px 1fr 1fr;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid rgba(103,94,88,.1);
+  border-radius: 24px;
+  background: rgba(255,255,255,.95);
+  box-shadow: 0 10px 34px rgba(63,55,50,.14);
+  backdrop-filter: blur(18px);
+  transform: translateX(-50%);
+}
+.bottomDock > button:not(.dockAdd) {
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #aaa6a1;
+  cursor: pointer;
+}
+.bottomDock > button:not(.dockAdd) span { font-size: 6.8px; font-weight: 720; }
+.bottomDock > button.active { color: #69645f; }
+.bottomDock > button.active::after { content: ''; width: 3px; height: 3px; border-radius: 50%; background: #c98ba0; }
+.bottomDock .dockAdd {
+  align-self: center;
+  justify-self: center;
+  width: 47px;
+  height: 47px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 5px solid #fff;
+  border-radius: 17px;
+  background: #625f5a;
+  box-shadow: 0 7px 18px rgba(62,56,52,.22);
+  color: #fff;
+  cursor: pointer;
+  transform: translateY(-12px);
+}
+.dockLayout > .filterPanel { top: 56px; }
+@media (max-width: 520px) {
+  .dockLayout { padding-bottom: 82px; }
+  .compactTopBar { height: 46px; padding-inline: 12px; }
+  .topBarTitle small { display: none; }
+  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 58px; border-radius: 22px; }
+  .bottomDock .dockAdd { width: 45px; height: 45px; border-radius: 16px; }
+  .dockLayout > .filterPanel { top: auto; }
+}

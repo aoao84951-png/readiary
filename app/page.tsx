@@ -1,7 +1,6 @@
 "use client";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
-  BarChart3,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -16,6 +15,7 @@ import {
   SlidersHorizontal,
   Star,
   Trash2,
+  UserRound,
   X,
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
@@ -1076,6 +1076,7 @@ function StatsView({ books }: { books: Book[] }) {
 export default function FeedPage() {
   const [books, setBooks] = useState<Book[]>(demo);
   const [view, setView] = useState<ViewMode>("grid");
+  const [recordView, setRecordView] = useState<"calendar" | "records">("calendar");
   const [pending, setPending] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -1101,6 +1102,7 @@ export default function FeedPage() {
   const scrollRef = useRef(0);
   const drawerRef = useRef<HTMLElement | null>(null);
   const coverScrollRef = useRef(0);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   async function load(show = false) {
     setLoading(true);
     try {
@@ -1300,9 +1302,48 @@ export default function FeedPage() {
   const discount = form.list_price
     ? Math.max(0, Math.round((1 - form.paid_price / form.list_price) * 100))
     : 0;
+  const currentSection = view === "calendar" || view === "records" ? "record" : view;
+  const sectionTitle = currentSection === "grid" ? "모아보기" : currentSection === "feed" ? "피드" : currentSection === "record" ? "독서 기록" : "나의 기록";
+  function selectRecordView(next: "calendar" | "records") {
+    setRecordView(next);
+    setView(next);
+  }
+  function navigateSection(section: "grid" | "feed" | "record" | "stats") {
+    if (section === "grid") showGrid();
+    else if (section === "record") setView(recordView);
+    else {
+      if (section === "feed") {
+        scrollRef.current = window.scrollY;
+        setPending(null);
+      }
+      setView(section);
+    }
+    setSearchOpen(false);
+    setFilterOpen(false);
+  }
+  function beginSwipe(event: TouchEvent<HTMLElement>) {
+    const target = event.target as HTMLElement;
+    if (adding || detailBook || target.closest("button, input, textarea, select, a, [role='dialog']")) return;
+    const touch = event.touches[0];
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }
+  function finishSwipe(event: TouchEvent<HTMLElement>) {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
+    const sections: Array<"grid" | "feed" | "record" | "stats"> = ["grid", "feed", "record", "stats"];
+    const index = sections.indexOf(currentSection as "grid" | "feed" | "record" | "stats");
+    const next = dx < 0 ? index + 1 : index - 1;
+    if (sections[next]) navigateSection(sections[next]);
+  }
   return (
-    <main className="feedPage">
-      <nav className="viewTabs" aria-label="독서 기록 보기 방식">
+    <main className="feedPage dockLayout" onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
+      <header className="compactTopBar">
+        <div className="topBarTitle"><small>READIARY</small><b>{sectionTitle}</b></div>
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
           onClick={() => {
@@ -1312,49 +1353,6 @@ export default function FeedPage() {
           aria-label="내 기록 검색"
         >
           <Search size={15} />
-        </button>
-        <button
-          className={`addToggle ${adding ? "on" : ""}`}
-          onClick={openAdd}
-          aria-label="책 추가"
-        >
-          <Plus size={16} />
-        </button>
-        <button className={view === "grid" ? "active" : ""} onClick={showGrid}>
-          <Grid3X3 size={18} />
-          <span>모아보기</span>
-        </button>
-        <button
-          className={view === "feed" ? "active" : ""}
-          onClick={() => {
-            scrollRef.current = window.scrollY;
-            setPending(null);
-            setView("feed");
-          }}
-        >
-          <List size={19} />
-          <span>피드</span>
-        </button>
-        <button
-          className={view === "calendar" ? "active" : ""}
-          onClick={() => setView("calendar")}
-        >
-          <CalendarDays size={18} />
-          <span>달력</span>
-        </button>
-        <button
-          className={view === "records" ? "active" : ""}
-          onClick={() => setView("records")}
-        >
-          <NotebookTabs size={18} />
-          <span>기록</span>
-        </button>
-        <button
-          className={view === "stats" ? "active" : ""}
-          onClick={() => setView("stats")}
-        >
-          <BarChart3 size={18} />
-          <span>통계</span>
         </button>
         <button
           className={`filterToggle ${filterOpen || statusFilters.length || categoryFilters.length ? "on" : ""}`}
@@ -1374,7 +1372,7 @@ export default function FeedPage() {
         >
           <RefreshCw size={14} />
         </button>
-      </nav>
+      </header>
       {notice && <div className="refreshNotice">{notice}</div>}
       {searchOpen && (
         <div className="searchBar">
@@ -1414,6 +1412,12 @@ export default function FeedPage() {
           {statusFilters.map(value => <button key={value} onClick={() => setStatusFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
           {categoryFilters.map(value => <button key={value} onClick={() => setCategoryFilters(current => current.filter(item => item !== value))}>{value}<X size={10} /></button>)}
         </div>
+      )}
+      {(view === "calendar" || view === "records") && (
+        <nav className="recordModeSwitch" aria-label="독서 기록 보기 방식">
+          <button className={view === "calendar" ? "on" : ""} onClick={() => selectRecordView("calendar")}><CalendarDays size={14} />달력</button>
+          <button className={view === "records" ? "on" : ""} onClick={() => selectRecordView("records")}><NotebookTabs size={14} />기록 목록</button>
+        </nav>
       )}
       {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}
       {view === "stats" && <StatsView books={books} />}
@@ -1518,6 +1522,13 @@ export default function FeedPage() {
         </section>
       )}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
+      <nav className="bottomDock" aria-label="주요 화면">
+        <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")}><Grid3X3 size={19} /><span>모아보기</span></button>
+        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><List size={20} /><span>피드</span></button>
+        <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={23} /></button>
+        <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><NotebookTabs size={19} /><span>기록</span></button>
+        <button className={currentSection === "stats" ? "active" : ""} onClick={() => navigateSection("stats")}><UserRound size={19} /><span>프로필</span></button>
+      </nav>
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
           <aside ref={drawerRef} className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
