@@ -1284,55 +1284,55 @@
   left: 50%;
   bottom: max(12px, env(safe-area-inset-bottom));
   width: min(430px, calc(100vw - 24px));
-  height: 61px;
+  height: 58px;
   display: grid;
   grid-template-columns: 1fr 1fr 64px 1fr 1fr;
   align-items: center;
   padding: 5px 9px;
-  border: 1px solid rgba(103,94,88,.1);
-  border-radius: 24px;
+  border: 1px solid rgba(103,94,88,.075);
+  border-radius: 22px;
   background: rgba(255,255,255,.95);
-  box-shadow: 0 10px 34px rgba(63,55,50,.14);
+  box-shadow: 0 9px 28px rgba(63,55,50,.105);
   backdrop-filter: blur(18px);
   transform: translateX(-50%);
 }
 .bottomDock > button:not(.dockAdd) {
-  height: 48px;
+  height: 45px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #aaa6a1;
+  color: #aaa5a0;
   cursor: pointer;
 }
-.bottomDock > button:not(.dockAdd) span { font-size: 6.8px; font-weight: 720; }
-.bottomDock > button.active { color: #69645f; }
-.bottomDock > button.active::after { content: ''; width: 3px; height: 3px; border-radius: 50%; background: #c98ba0; }
+.bottomDock > button:not(.dockAdd) span { font-size: 6.7px; font-weight: 650; letter-spacing: -.01em; }
+.bottomDock > button.active { color: #716762; }
+.bottomDock > button.active::after { content: ''; width: 10px; height: 1px; border-radius: 2px; background: #c98ba0; }
 .bottomDock .dockAdd {
   align-self: center;
   justify-self: center;
-  width: 47px;
-  height: 47px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 5px solid #fff;
-  border-radius: 17px;
-  background: #625f5a;
-  box-shadow: 0 7px 18px rgba(62,56,52,.22);
+  border: 4px solid #fff;
+  border-radius: 16px;
+  background: #706b66;
+  box-shadow: 0 6px 16px rgba(62,56,52,.17);
   color: #fff;
   cursor: pointer;
-  transform: translateY(-12px);
+  transform: translateY(-10px);
 }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
   .dockLayout { padding-bottom: 82px; }
   .compactTopBar { height: 43px; padding-inline: 10px; }
-  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 58px; border-radius: 22px; }
-  .bottomDock .dockAdd { width: 45px; height: 45px; border-radius: 16px; }
+  .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 56px; border-radius: 21px; }
+  .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
   .dockLayout > .filterPanel { top: auto; }
 }

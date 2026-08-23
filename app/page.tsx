@@ -2,13 +2,17 @@
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
+  CircleUserRound,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
+  LayoutGrid,
   ImagePlus,
   List,
+  AlignJustify,
   Ellipsis,
   NotebookTabs,
+  BookOpen,
   Pencil,
   Plus,
   RefreshCw,
@@ -16,7 +20,6 @@ import {
   SlidersHorizontal,
   Star,
   Trash2,
-  UserRound,
   X,
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
@@ -1524,11 +1527,11 @@ export default function FeedPage() {
       )}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
-        <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")}><Grid3X3 size={19} /><span>모아보기</span></button>
-        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><List size={20} /><span>피드</span></button>
-        <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={23} /></button>
-        <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><NotebookTabs size={19} /><span>기록</span></button>
-        <button className={currentSection === "stats" ? "active" : ""} onClick={() => navigateSection("stats")}><UserRound size={19} /><span>프로필</span></button>
+        <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")}><LayoutGrid size={17} strokeWidth={1.45} /><span>모아보기</span></button>
+        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><AlignJustify size={18} strokeWidth={1.4} /><span>피드</span></button>
+        <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={21} strokeWidth={1.45} /></button>
+        <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><BookOpen size={18} strokeWidth={1.4} /><span>기록</span></button>
+        <button className={currentSection === "stats" ? "active" : ""} onClick={() => navigateSection("stats")}><CircleUserRound size={18} strokeWidth={1.4} /><span>프로필</span></button>
       </nav>
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
