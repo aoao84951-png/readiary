@@ -93,7 +93,16 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       pixelRatio: 4,
       width,
       height,
-      style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
+      style: {
+        position: "relative",
+        zIndex: "0",
+        top: "0",
+        left: "0",
+        maxHeight: "none",
+        height: `${height}px`,
+        margin: "0",
+        overflow: "visible",
+      },
       filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
     });
     const link = document.createElement("a");
