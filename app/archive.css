@@ -1330,6 +1330,22 @@
 html { scrollbar-gutter: stable; }
 
 /* 이멋공: image export actions */
+.imageExportStage {
+  position: absolute;
+  z-index: -1000;
+  top: 0;
+  left: -100000px;
+  width: max-content;
+  padding: 26px;
+  background: #f6f4f2;
+}
+.imageExportCard {
+  overflow: hidden;
+  border: 1px solid #e5e1dd;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(66, 58, 53, .09);
+}
 .imageShareButton {
   min-width: 68px;
   height: 28px;
@@ -1401,10 +1417,10 @@ html { scrollbar-gutter: stable; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .imageShareButton { color: #ad7288; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
 .recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
-.recordModal.imageExporting { max-height: none !important; height: auto !important; overflow: visible !important; border-radius: 0; box-shadow: none; animation: none; }
+.recordModal.imageExporting { max-height: none !important; height: auto !important; overflow: visible !important; border: 0; border-radius: 0; box-shadow: none; animation: none; }
 .recordModal.imageExporting .recordModalHead { position: static; }
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
-.calendarPage.imageExporting { padding-bottom: 18px; }
+.calendarPage.imageExporting { padding: 20px 20px 24px; }
 .post.imageExporting { width: 520px; padding: 20px 0 26px; background: #fff; }
 .profileStatsHeader {
   display: grid;
