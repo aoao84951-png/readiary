@@ -301,26 +301,6 @@ function ClassicRating({ rating }: { rating: number | null }) {
   );
 }
 
-function PurchaseBreakdown({ book }: { book: Book }) {
-  if (!book.purchase_items?.length) return null;
-  const unit = book.count_unit || "권";
-  return (
-    <details className="purchaseBreakdown">
-      <summary>{unit}별 구매 내역 <b>{book.purchase_items.length}</b></summary>
-      <div>
-        {book.purchase_items.map((item, index) => (
-          <span key={`${item.label}-${index}`}>
-            <b>{item.label || `${index + 1}${unit}`}</b>
-            <small>{item.list_price.toLocaleString()}원</small>
-            <em>{item.paid_price.toLocaleString()}원</em>
-            {!!item.methods?.length && <i>{item.methods.join(" + ")}</i>}
-          </span>
-        ))}
-      </div>
-    </details>
-  );
-}
-
 function InteractiveRating({
   value,
   onChange,
@@ -415,16 +395,17 @@ function Notes({
   notes: string[];
   kind: "liked" | "disliked";
 }) {
-  if (!notes.length) return null;
+  const visibleNotes = notes.map((note) => note.trim()).filter(Boolean);
+  if (!visibleNotes.length) return null;
   return (
     <section className={`reviewNotes ${kind}`}>
       <span className="reviewLabel">
         {kind === "liked" ? "LOVE NOTES" : "NOPE NOTES"}{" "}
-        <small>{String(notes.length).padStart(2, "0")}</small>
+        <small>{String(visibleNotes.length).padStart(2, "0")}</small>
       </span>
-      {notes.map((note, i) => (
+      {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
-          <span className="noteHeart">{kind === "liked" ? "♥" : "♡"}</span>
+          <img className="noteHeart" src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" />
           <p>{note}</p>
         </div>
       ))}
@@ -646,7 +627,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <b>{book.paid_price.toLocaleString()}원</b>
                   <em>{discount}% OFF</em>
                 </div>
-                <PurchaseBreakdown book={book} />
                 <dl>
                   <Row label="구매일" value={book.purchase_date || "–"} />
                   <Row label="플랫폼" value={book.platform || "–"} />
@@ -663,7 +643,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 </dl>
               </section>
               <section className="recordGroup notesGroup">
-                <h3>NOTES</h3>
                 <div className="archiveNotes">
                   <Notes notes={book.liked_notes} kind="liked" />
                   <Notes notes={book.disliked_notes} kind="disliked" />
@@ -863,7 +842,6 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                       <b>{book.paid_price.toLocaleString()}원</b>
                       <em>{discount}% OFF</em>
                     </div>
-                    <PurchaseBreakdown book={book} />
                     <dl>
                       <Row label="구매일" value={book.purchase_date || "–"} />
                       <Row label="플랫폼" value={book.platform || "–"} />
@@ -883,7 +861,6 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                     </dl>
                   </section>
                   <section className="recordGroup notesGroup">
-                    <h3>NOTES</h3>
                     <div className="archiveNotes">
                       <Notes notes={book.liked_notes} kind="liked" />
                       <Notes notes={book.disliked_notes} kind="disliked" />
@@ -1174,10 +1151,15 @@ export default function FeedPage() {
     setSaving(true);
     setMessage("");
     try {
+      const payload = {
+        ...form,
+        liked_notes: form.liked_notes.map((note) => note.trim()).filter(Boolean),
+        disliked_notes: form.disliked_notes.map((note) => note.trim()).filter(Boolean),
+      };
       const r = await fetch("/api/books", {
         method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
+        body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
@@ -1591,7 +1573,6 @@ export default function FeedPage() {
                       }
                     />
                   </label>
-                  <p className="purchaseMethodHint">구매방법은 아래에서 {form.count_unit || "권"}별로 선택할 수 있어요.</p>
                   <div className="volumePurchases full">
                     <div className="volumePurchaseHead"><span>{form.count_unit || "권"}별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
                     {(form.purchase_items || []).map((item, index) => (
@@ -1618,12 +1599,13 @@ export default function FeedPage() {
                       onChange={(e) =>
                         field(
                           "liked_notes",
-                          e.target.value.split("\n").filter(Boolean),
+                          e.target.value.split("\n"),
                         )
                       }
                       placeholder="한 줄에 하나씩"
                     />
                   </label>
+                  <div className="noteFormPreview full"><Notes notes={form.liked_notes} kind="liked" /></div>
                   <label className="full">
                     싫었던 점
                     <textarea
@@ -1631,12 +1613,13 @@ export default function FeedPage() {
                       onChange={(e) =>
                         field(
                           "disliked_notes",
-                          e.target.value.split("\n").filter(Boolean),
+                          e.target.value.split("\n"),
                         )
                       }
                       placeholder="한 줄에 하나씩"
                     />
                   </label>
+                  <div className="noteFormPreview full"><Notes notes={form.disliked_notes} kind="disliked" /></div>
                 </div>
                 {message && <p className="formMessage">{message}</p>}
                 <button className="save" disabled={saving}>
