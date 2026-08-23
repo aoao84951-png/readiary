@@ -1312,11 +1312,10 @@
 .bottomDock > button:not(.dockAdd) span { font-size: 6.7px; font-weight: 650; letter-spacing: -.01em; }
 .bottomDock > button.active { color: #716762; }
 .bottomDock > button.active::after { content: ''; width: 10px; height: 1px; border-radius: 2px; background: #c98ba0; }
-.bottomDock > button.dockProfile { position: relative; gap: 0; }
-.bottomDock > button.dockProfile.active::after { position: absolute; bottom: 1px; }
+.bottomDock > button.dockProfile { gap: 4px; }
 .dockProfileRing {
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
   padding: 2px;
@@ -1325,7 +1324,8 @@
   background: conic-gradient(from 205deg,#e6bd5d,#df8a5b 22%,#d96f83 46%,#bd77a8 72%,#7c91bd 88%,#e6bd5d);
 }
 .dockProfileRing img,
-.dockProfileRing i { width: 21px; height: 21px; display: grid; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #f2f0ee; object-fit: cover; color: #8f8985; font: 600 7px Georgia, serif; }
+.dockProfileRing i { width: 16px; height: 16px; display: grid; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #f2f0ee; object-fit: cover; color: #8f8985; font: 600 6px Georgia, serif; }
+.bottomDock > button:not(.dockAdd) .dockProfileSpacer { width: 1px; height: 7px; display: block; }
 .profileStatsHeader {
   display: grid;
   grid-template-columns: 92px minmax(0,1fr);

@@ -1577,7 +1577,7 @@ export default function FeedPage() {
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")}><AlignJustify size={18} strokeWidth={1.4} /><span>피드</span></button>
         <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={21} strokeWidth={1.45} /></button>
         <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")}><BookOpen size={18} strokeWidth={1.4} /><span>기록</span></button>
-        <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span></button>
+        <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span><span className="dockProfileSpacer" aria-hidden="true" /></button>
       </nav>
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
