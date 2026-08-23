@@ -1522,7 +1522,7 @@ html { scrollbar-gutter: stable; }
     top: 0;
   }
   .bottomDock > button:not(.dockAdd) {
-    top: -5px;
+    top: -8px;
     height: 34px;
   }
   .bottomDock .dockAdd { width: 43px; height: 43px; border-radius: 15px; }
