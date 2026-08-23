@@ -10,7 +10,6 @@ import {
   ImagePlus,
   CircleArrowDown,
   List,
-  Hash,
   Ellipsis,
   NotebookTabs,
   Pencil,
@@ -1638,7 +1637,7 @@ export default function FeedPage() {
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
-        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><Hash size={17} strokeWidth={1.55} /></button>
+        <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><span className="feedMarkIcon" aria-hidden="true" /></button>
         <button className="dockAdd" onClick={openAdd} aria-label="책 추가"><Plus size={23} strokeWidth={2.25} /></button>
         <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")} aria-label="기록"><span className="curledHeartIcon" aria-hidden="true" /></button>
         <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span></button>

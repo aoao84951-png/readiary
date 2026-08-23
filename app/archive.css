@@ -1308,6 +1308,8 @@
   cursor: pointer;
 }
 .bottomDock > button:not(.dockAdd) svg { transition: color .18s ease, transform .18s ease, stroke-width .18s ease; }
+.feedMarkIcon { width: 18px; height: 22px; display: block; background: currentColor; -webkit-mask: url('/feed-mark.png') center / contain no-repeat; mask: url('/feed-mark.png') center / contain no-repeat; transition: transform .18s ease; }
+.bottomDock > button.active .feedMarkIcon { transform: scale(1.12); }
 .curledHeartIcon { width: 20px; height: 19px; display: block; background: currentColor; -webkit-mask: url('/curled-heart.png') center / contain no-repeat; mask: url('/curled-heart.png') center / contain no-repeat; transition: transform .18s ease; }
 .bottomDock > button.active .curledHeartIcon { transform: scale(1.12); }
 .bottomDock > button.active { color: #d07f9c; }
