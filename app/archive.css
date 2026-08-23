@@ -1312,8 +1312,6 @@
 .bottomDock > button.active .curledHeartIcon { transform: scale(1.12); }
 .bottomDock > button.active { color: #d07f9c; }
 .bottomDock > button.active svg { stroke-width: 1.9; transform: scale(1.12); }
-.bottomDock > button .feedHashIcon { stroke-linecap: round; stroke-linejoin: round; }
-.bottomDock > button.active .feedHashIcon { stroke-width: 2.35; }
 .dockProfileRing {
   width: 24px;
   height: 24px;
