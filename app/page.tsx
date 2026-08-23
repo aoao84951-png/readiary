@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Grid3X3,
+  ImagePlus,
   List,
   NotebookTabs,
   Pencil,
@@ -123,6 +124,32 @@ const empty: BookRecord = {
   reading_dates: [],
   source_url: "",
 };
+
+async function prepareCoverImage(file: File) {
+  if (!file.type.startsWith("image/")) throw new Error("이미지 파일을 선택해주세요.");
+  if (file.size > 12 * 1024 * 1024) throw new Error("12MB 이하의 이미지를 선택해주세요.");
+  const source = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("이미지를 불러오지 못했어요."));
+      element.src = source;
+    });
+    const scale = Math.min(1, 600 / image.naturalWidth, 900 / image.naturalHeight);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("이미지를 처리하지 못했어요.");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", .84);
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
 
 function StarScale({
   value,
@@ -878,6 +905,7 @@ export default function FeedPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [readingDate, setReadingDate] = useState("");
   const [saving, setSaving] = useState(false);
+  const [coverProcessing, setCoverProcessing] = useState(false);
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const scrollRef = useRef(0);
@@ -1019,6 +1047,18 @@ export default function FeedPage() {
         label: /^\d+[권화]$/.test(item.label) ? `${index + 1}${unit}` : item.label,
       })),
     }));
+  }
+  async function changeCover(file?: File) {
+    if (!file) return;
+    setCoverProcessing(true);
+    setMessage("");
+    try {
+      field("cover_url", await prepareCoverImage(file));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "표지를 변경하지 못했어요.");
+    } finally {
+      setCoverProcessing(false);
+    }
   }
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -1326,11 +1366,14 @@ export default function FeedPage() {
               <form className="recordForm" onSubmit={save}>
                 <h3 className="formTopTitle">BOOK</h3>
                 <div className="selectedBook">
-                  {form.cover_url ? (
-                    <img src={form.cover_url} alt="" />
-                  ) : (
-                    <span className="miniNoCover">▦</span>
-                  )}
+                  <div className="selectedBookCover">
+                    <label className="coverPicker" aria-label={form.cover_url ? "커버 이미지 변경" : "커버 이미지 추가"}>
+                      {form.cover_url ? <img src={form.cover_url} alt="" /> : <span className="miniNoCover">▦</span>}
+                      <span className="coverPickerHint"><ImagePlus size={13} />{coverProcessing ? "처리 중" : form.cover_url ? "표지 변경" : "표지 추가"}</span>
+                      <input type="file" accept="image/*" disabled={coverProcessing} onChange={(e) => { void changeCover(e.target.files?.[0]); e.currentTarget.value = ""; }} />
+                    </label>
+                    {form.cover_url && <button type="button" onClick={() => field("cover_url", "")}>표지 제거</button>}
+                  </div>
                   <div>
                     <label>
                       제목
@@ -1372,14 +1415,6 @@ export default function FeedPage() {
                     <input
                       value={form.platform}
                       onChange={(e) => field("platform", e.target.value)}
-                    />
-                  </label>
-                  <label className="full">
-                    커버 이미지 URL
-                    <input
-                      value={form.cover_url}
-                      onChange={(e) => field("cover_url", e.target.value)}
-                      placeholder="네이버 공식 표지 주소를 넣으면 다음 검색부터 자동 적용돼요"
                     />
                   </label>
                   <h3 className="formSectionTitle readingTitle">READING</h3>
