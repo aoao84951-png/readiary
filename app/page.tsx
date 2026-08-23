@@ -182,32 +182,6 @@ function ClassicRating({ rating }: { rating: number | null }) {
   );
 }
 
-function BookBasics({ book }: { book: Book }) {
-  const category = book.category || "미분류";
-  const seal = category === "BL" ? "/genre-seals/bl.png"
-    : category === "로맨스판타지" ? "/genre-seals/romance-fantasy.png"
-    : category === "로맨스" ? "/genre-seals/romance.png"
-    : ["문학", "일반문학"].includes(category) ? "/genre-seals/literature.png"
-    : "";
-  return (
-    <section className="recordGroup bookBasicsGroup">
-      <h3>BOOK INFO</h3>
-      <div className="bookBasicsGrid">
-        <span><small>저자</small><b>{book.author || "–"}</b></span>
-        <span><small>총 권수</small><b>{book.total_count}권</b></span>
-        <span>
-          <small>카테고리</small>
-          <b className="genreValue">
-            {seal ? <img src={seal} alt="" /> : <i>{category.slice(0, 1)}</i>}
-            {category}
-          </b>
-        </span>
-        <span><small>구성</small><b>{book.total_count > 1 ? "시리즈" : "단권"}</b></span>
-      </div>
-    </section>
-  );
-}
-
 function InteractiveRating({
   value,
   onChange,
@@ -523,7 +497,6 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                 </div>
               </div>
-              <BookBasics book={book} />
               <section className="recordGroup purchaseGroup">
                 <h3>PURCHASE</h3>
                 <div className="priceLine">
@@ -706,7 +679,6 @@ function ModalRecordArchive({ books, openBook, onClose, hideList = false }: { bo
                       <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                     </div>
                   </div>
-                  <BookBasics book={book} />
                   <section className="recordGroup purchaseGroup">
                     <h3>PURCHASE</h3>
                     <div className="priceLine">
