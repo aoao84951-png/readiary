@@ -1356,7 +1356,6 @@ export default function FeedPage() {
         >
           <Search size={15} />
         </button>
-        <span className="topBarQuietMark" aria-hidden="true"><i /><i /><i /></span>
         <button
           className={`topMenuToggle ${topMenuOpen || filterOpen ? "on" : ""}`}
           onClick={() => { setTopMenuOpen((open) => !open); setSearchOpen(false); }}

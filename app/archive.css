@@ -1204,13 +1204,13 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  height: 48px;
+  height: 43px;
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr) 34px;
   align-items: center;
   gap: 2px;
   padding: 0 12px;
-  border-bottom: 1px solid #ecece8;
+  border-bottom: 1px solid #f2f0ed;
   background: rgba(255,255,255,.94);
   backdrop-filter: blur(14px);
 }
@@ -1231,9 +1231,6 @@
 .compactTopBar .searchToggle { grid-column: 1; }
 .compactTopBar .topMenuToggle { grid-column: 3; }
 .compactTopBar .topMenuToggle > i { position: absolute; top: 5px; right: 5px; width: 4px; height: 4px; border-radius: 50%; background: #c98298; }
-.topBarQuietMark { grid-column: 2; display: flex; align-items: center; justify-content: center; gap: 3px; opacity: .7; }
-.topBarQuietMark i { width: 3px; height: 3px; border-radius: 50%; background: #d8d3cf; }
-.topBarQuietMark i:nth-child(2) { background: #c69aa8; }
 .topMenuBackdrop { position: fixed; z-index: 28; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; }
 .topToolMenu {
   position: fixed;
@@ -1252,8 +1249,8 @@
 .topToolMenu button:hover { background: #f7f5f3; }
 .topToolMenu button small { min-width: 17px; padding: 2px 5px; border-radius: 999px; background: #f4e9ed; color: #b77d91; font-size: 6.5px; text-align: center; }
 .topToolMenu button.loading svg { animation: spin .8s linear infinite; }
-.dockLayout > .searchBar { top: 55px; }
-.dockLayout > .refreshNotice { top: 56px; }
+.dockLayout > .searchBar { top: 50px; }
+.dockLayout > .refreshNotice { top: 51px; }
 .recordModeSwitch {
   width: fit-content;
   display: flex;
@@ -1331,10 +1328,10 @@
   cursor: pointer;
   transform: translateY(-12px);
 }
-.dockLayout > .filterPanel { top: 56px; }
+.dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
   .dockLayout { padding-bottom: 82px; }
-  .compactTopBar { height: 46px; padding-inline: 12px; }
+  .compactTopBar { height: 43px; padding-inline: 10px; }
   .bottomDock { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 18px); height: 58px; border-radius: 22px; }
   .bottomDock .dockAdd { width: 45px; height: 45px; border-radius: 16px; }
   .dockLayout > .filterPanel { top: auto; }
