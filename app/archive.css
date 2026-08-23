@@ -1324,9 +1324,7 @@
 .dockProfileRing i { width: 20px; height: 20px; display: grid; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #f2f0ee; object-fit: cover; color: #8f8985; font: 600 6.5px Georgia, serif; }
 .dockProfileRing { transition: none; }
 
-@media (min-width: 761px) {
-  html { scrollbar-gutter: stable; }
-}
+html { scrollbar-gutter: stable; }
 .profileStatsHeader {
   display: grid;
   grid-template-columns: 92px minmax(0,1fr);
