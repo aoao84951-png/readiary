@@ -1094,7 +1094,7 @@
 .basketNotes .reviewLabel { color: #9b8b76; }
 .basketNotes > p { margin: 0; color: #555551; font-size: 10.5px; font-weight: 550; line-height: 1.62; white-space: pre-wrap; }
 .basketNoteImages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.basketNoteImages a { display: block; overflow: hidden; border-radius: 7px; background: #f2f1ef; }
+.basketNoteImages button { display: block; padding: 0; overflow: hidden; border: 0; border-radius: 7px; background: #f2f1ef; cursor: zoom-in; }
 .basketNoteImages img { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; }
 .basketNoteEditor { display: grid; gap: 10px; }
 .recordForm .basketNoteEditor textarea {
@@ -1115,17 +1115,23 @@
 .addBasketImage small { color: #bbb4af; font-size: 6.5px; }
 .recordForm .addBasketImage input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
 .basketImageError { margin: -3px 0 0; color: #bd7680; font-size: 7.5px; }
-.basketSavedPreview {
+.noteImageLightbox {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
   display: grid;
-  gap: 10px;
-  margin-top: 2px;
-  padding: 12px 13px;
-  border-radius: 10px;
-  background: #faf9f7;
+  place-items: center;
+  padding: 34px;
+  background: rgba(30, 29, 28, .74);
+  backdrop-filter: blur(5px);
+  cursor: zoom-out;
 }
-.basketSavedPreview > small { color: #b4aaa3; font-size: 6.8px; letter-spacing: .06em; }
-.basketSavedPreview .basketNotes { gap: 7px; }
-.basketSavedPreview .basketNotes > p { font-size: 9px; }
+.noteImageLightbox > img { max-width: min(900px, 92vw); max-height: 88dvh; display: block; border-radius: 8px; object-fit: contain; box-shadow: 0 18px 60px rgba(0,0,0,.28); }
+.noteImageLightbox > button { position: fixed; z-index: 1; top: 18px; right: 18px; width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: #66615e; cursor: pointer; }
+@media (max-width: 520px) {
+  .noteImageLightbox { padding: 18px; }
+  .noteImageLightbox > img { max-width: 100%; max-height: 84dvh; }
+}
 .multiEditableSelect {
   position: relative;
   grid-column: 1 / -1;

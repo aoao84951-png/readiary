@@ -448,8 +448,16 @@ function Notes({
   );
 }
 
-function BookNotes({ book, showEmpty = false }: { book: Book | BookRecord; showEmpty?: boolean }) {
+function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book | BookRecord; showEmpty?: boolean; hideBasket?: boolean }) {
+  const [openImage, setOpenImage] = useState<string | null>(null);
+  useEffect(() => {
+    if (!openImage) return;
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpenImage(null); };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [openImage]);
   if (book.status === "책바구니") {
+    if (hideBasket) return null;
     const reason = (book.basket_reason || "").trim();
     const images = book.basket_images || [];
     if (!reason && !images.length) return showEmpty ? <p className="emptyNotes">담아둔 이유가 없습니다.</p> : null;
@@ -457,7 +465,8 @@ function BookNotes({ book, showEmpty = false }: { book: Book | BookRecord; showE
       <section className="basketNotes">
         <span className="reviewLabel">BASKET NOTES</span>
         {reason && <p>{reason}</p>}
-        {!!images.length && <div className="basketNoteImages">{images.map((image, index) => <a key={index} href={image} target="_blank" rel="noreferrer"><img src={image} alt={`추천 캡처 ${index + 1}`} /></a>)}</div>}
+        {!!images.length && <div className="basketNoteImages">{images.map((image, index) => <button type="button" key={index} onClick={() => setOpenImage(image)}><img src={image} alt={`추천 캡처 ${index + 1}`} /></button>)}</div>}
+        {openImage && <div className="noteImageLightbox" role="dialog" aria-modal="true" aria-label="추천 캡처 크게 보기" onMouseDown={() => setOpenImage(null)}><button type="button" aria-label="이미지 닫기" onClick={() => setOpenImage(null)}><X size={18} /></button><img src={openImage} alt="추천 캡처 크게 보기" onMouseDown={(event) => event.stopPropagation()} /></div>}
       </section>
     );
   }
@@ -1501,7 +1510,7 @@ export default function FeedPage() {
                   <ClassicRating rating={book.rating} />
                 </div>
                 <div className="caption">
-                  <BookNotes book={book} />
+                  <BookNotes book={book} hideBasket />
                 </div>
               </div>
             </article>
@@ -1708,7 +1717,6 @@ export default function FeedPage() {
                   {form.status === "책바구니" ? (
                     <>
                       <BasketNoteEditor reason={form.basket_reason || ""} images={form.basket_images || []} onReasonChange={(value) => field("basket_reason", value)} onImagesChange={(images) => field("basket_images", images)} />
-                      {!!((form.basket_reason || "").trim() || form.basket_images?.length) && <div className="basketSavedPreview full"><small>저장 후 이렇게 보여요</small><BookNotes book={form} /></div>}
                     </>
                   ) : (
                     <>
