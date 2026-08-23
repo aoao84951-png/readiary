@@ -2,7 +2,6 @@
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import {
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
@@ -12,7 +11,6 @@ import {
   List,
   Hash,
   Ellipsis,
-  NotebookTabs,
   Pencil,
   Plus,
   RefreshCw,
@@ -1531,8 +1529,8 @@ export default function FeedPage() {
       )}
       {(view === "calendar" || view === "records") && (
         <nav className="recordModeSwitch" aria-label="독서 기록 보기 방식">
-          <button className={view === "calendar" ? "on" : ""} onClick={() => selectRecordView("calendar")}><CalendarDays size={14} />달력</button>
-          <button className={view === "records" ? "on" : ""} onClick={() => selectRecordView("records")}><NotebookTabs size={14} />기록 목록</button>
+          <button className={view === "calendar" ? "on" : ""} onClick={() => selectRecordView("calendar")} aria-label="달력 보기">CALENDAR</button>
+          <button className={view === "records" ? "on" : ""} onClick={() => selectRecordView("records")} aria-label="기록 목록 보기">ARCHIVE</button>
         </nav>
       )}
       {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}

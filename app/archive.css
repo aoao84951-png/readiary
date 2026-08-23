@@ -1255,29 +1255,30 @@
   width: fit-content;
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 13px auto 4px;
-  padding: 3px;
-  border-radius: 999px;
-  background: #f5f4f1;
+  gap: 22px;
+  margin: 16px auto 6px;
+  padding: 0 4px 7px;
 }
 .recordModeSwitch button {
-  min-width: 76px;
-  height: 29px;
+  position: relative;
+  min-width: 72px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 0 11px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
   background: transparent;
-  color: #a3a09b;
-  font-size: 8px;
-  font-weight: 720;
+  color: #b7b2ae;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: .18em;
   cursor: pointer;
+  transition: color .18s ease, letter-spacing .18s ease;
 }
-.recordModeSwitch button.on { background: #fff; color: #68645f; box-shadow: 0 2px 9px rgba(66,57,52,.07); }
+.recordModeSwitch button.on { color: #c47d96; letter-spacing: .22em; }
+.recordModeSwitch button.on::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 3px; height: 3px; border-radius: 50%; background: #d995aa; transform: translateX(-50%); }
 .bottomDock {
   position: fixed;
   z-index: 42;
