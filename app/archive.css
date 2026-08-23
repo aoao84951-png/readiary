@@ -1015,25 +1015,34 @@
 .multiEditableSelect {
   position: relative;
   grid-column: 1 / -1;
-  margin: 0 33px 4px 0;
+  margin: -1px 33px 5px 0;
 }
 .multiEditableSelect summary {
-  min-height: 29px;
+  min-height: 25px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: #f7f5f2;
-  color: #77716d;
-  font-size: 8px;
+  padding: 3px 2px 6px;
+  border-bottom: 1px solid #ebe7e3;
+  background: transparent;
+  color: #847975;
+  font-size: 7.7px;
   font-weight: 700;
   cursor: pointer;
   list-style: none;
 }
 .multiEditableSelect summary::-webkit-details-marker { display: none; }
-.multiEditableSelect summary small { flex: none; color: #b9aaa5; font-size: 7px; }
+.multiEditableSelect summary::after {
+  content: "⌄";
+  margin-left: auto;
+  color: #bbb3af;
+  font-size: 9px;
+  font-weight: 400;
+  transform: translateY(-1px);
+}
+.multiEditableSelect[open] summary::after { content: "⌃"; transform: translateY(2px); }
+.multiEditableSelect summary small { flex: none; color: #c1b7b2; font-size: 6.8px; font-weight: 500; }
 .multiOptionMenu {
   position: absolute;
   z-index: 12;
