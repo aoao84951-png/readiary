@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocument } from '@/lib/firebase';
 
-type SearchBook = { title:string; author:string; cover:string; url:string; totalCount:number; category:string; platform:string };
+type SearchBook = { title:string; author:string; cover:string; url:string; totalCount:number; countUnit?:'권'|'화'; category:string; platform:string };
 const category = (text:string) => /BL|비엘/i.test(text) ? 'BL' : /로맨스판타지|로판/i.test(text) ? '로맨스판타지' : /로맨스/i.test(text) ? '로맨스' : '문학';
 const positiveCount = (...values:unknown[]) => {
   for (const value of values) {
@@ -38,7 +38,7 @@ async function naver(q:string):Promise<SearchBook[]> {
   try {
     const res=await fetch(`https://series.naver.com/search/search.series?t=all&fs=novel&q=${encodeURIComponent(q)}`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'text/html',Referer:'https://series.naver.com/'}});
     const html=await res.text();
-    const parsed=[...html.matchAll(/<li>[\s\S]*?<\/li>/g)].map(match=>match[0]).map(li=>{const title=li.match(/<a[^>]+href="([^"]*detail\.series\?productNo=[^"]+)"[^>]*class="[^"]*title[^"]*"[^>]*>([\s\S]*?)<\/a>/);if(!title)return null;const raw=cleanHtml(title[2]);const count=raw.match(/\(총\s*([0-9]+)\s*(?:화|권)/);const image=li.match(/<img[^>]+src="([^"]+)"/);const author=li.match(/<span class="author">([\s\S]*?)<\/span>/);const href=title[1].replace(/&amp;/g,'&');const productNo=href.match(/[?&]productNo=([0-9]+)/)?.[1]||'';const imageUrl=image?image[1].replace(/&amp;/g,'&'):'';const isAdultPlaceholder=/19over_book|19세|adult/i.test(imageUrl);const verifiedCover=naverVerifiedCovers[productNo]||'';return {book:{title:raw.replace(/\s*\(총\s*[0-9]+(?:화|권)\/[^)]*\)\s*/g,'').trim(),author:author?cleanHtml(author[1]):'',cover:verifiedCover||(isAdultPlaceholder?'':imageUrl),url:`https://series.naver.com${href}`,totalCount:Number(count?.[1]||1),category:category(li),platform:'네이버시리즈'} as SearchBook,isAdultPlaceholder};}).filter((item):item is {book:SearchBook;isAdultPlaceholder:boolean}=>Boolean(item)).slice(0,12);
+    const parsed=[...html.matchAll(/<li>[\s\S]*?<\/li>/g)].map(match=>match[0]).map(li=>{const title=li.match(/<a[^>]+href="([^"]*detail\.series\?productNo=[^"]+)"[^>]*class="[^"]*title[^"]*"[^>]*>([\s\S]*?)<\/a>/);if(!title)return null;const raw=cleanHtml(title[2]);const count=raw.match(/\(총\s*([0-9]+)\s*(화|권)/);const image=li.match(/<img[^>]+src="([^"]+)"/);const author=li.match(/<span class="author">([\s\S]*?)<\/span>/);const href=title[1].replace(/&amp;/g,'&');const productNo=href.match(/[?&]productNo=([0-9]+)/)?.[1]||'';const imageUrl=image?image[1].replace(/&amp;/g,'&'):'';const isAdultPlaceholder=/19over_book|19세|adult/i.test(imageUrl);const verifiedCover=naverVerifiedCovers[productNo]||'';return {book:{title:raw.replace(/\s*\(총\s*[0-9]+(?:화|권)\/[^)]*\)\s*/g,'').trim(),author:author?cleanHtml(author[1]):'',cover:verifiedCover||(isAdultPlaceholder?'':imageUrl),url:`https://series.naver.com${href}`,totalCount:Number(count?.[1]||1),countUnit:count?.[2] as '권'|'화'|undefined,category:category(li),platform:'네이버시리즈'} as SearchBook,isAdultPlaceholder};}).filter((item):item is {book:SearchBook;isAdultPlaceholder:boolean}=>Boolean(item)).slice(0,12);
     return parsed.map(item=>item.book);
   } catch { return []; }
 }
@@ -46,6 +46,7 @@ async function naver(q:string):Promise<SearchBook[]> {
 export async function GET(req:NextRequest) {
   const q=req.nextUrl.searchParams.get('q')?.trim(); if(!q) return NextResponse.json({books:[]});
   const results=(await Promise.all([ridi(q),kakao(q),naver(q)])).flat().filter(item=>item.title);
+  for (const item of results) item.countUnit ||= item.platform === '카카오페이지' && !/단행본|단권/.test(item.title) || item.totalCount >= 50 ? '화' : '권';
   const normalize=(text:string)=>text.toLowerCase().replace(/\[[^\]]*\]|\(총[^)]*\)|단행본|개정판|완전판|외전|특별/g,'').replace(/[^0-9a-z가-힣]/g,'');
   for(const item of results) {
     if(item.cover || item.platform!=='네이버시리즈') continue;

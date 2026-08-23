@@ -898,3 +898,11 @@
 .purchaseBreakdown span b { color: #77716e; font-size: 8px; }
 .purchaseBreakdown span small { color: #aaa19f; font-size: 7.5px; text-decoration: line-through; }
 .purchaseBreakdown span em { color: #665f5c; font-size: 8.5px; font-style: normal; font-weight: 700; }
+.recordForm .countField > span {
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  gap: 7px;
+}
+.recordForm .countField > span input,
+.recordForm .countField > span select { margin-top: 5px; }
+.recordForm .countField > span select { text-align: center; }

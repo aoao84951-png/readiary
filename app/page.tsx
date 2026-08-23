@@ -26,6 +26,7 @@ type SearchBook = {
   cover: string;
   url: string;
   totalCount: number;
+  countUnit?: "권" | "화";
   category: string;
   platform: string;
 };
@@ -104,6 +105,7 @@ const empty: BookRecord = {
   title: "",
   author: "",
   total_count: 1,
+  count_unit: "권",
   category: "문학",
   status: "책바구니",
   purchase_date: null,
@@ -187,13 +189,14 @@ function ClassicRating({ rating }: { rating: number | null }) {
 
 function PurchaseBreakdown({ book }: { book: Book }) {
   if (!book.purchase_items?.length) return null;
+  const unit = book.count_unit || "권";
   return (
     <details className="purchaseBreakdown">
-      <summary>권별 구매 내역 <b>{book.purchase_items.length}</b></summary>
+      <summary>{unit}별 구매 내역 <b>{book.purchase_items.length}</b></summary>
       <div>
         {book.purchase_items.map((item, index) => (
           <span key={`${item.label}-${index}`}>
-            <b>{item.label || `${index + 1}권`}</b>
+            <b>{item.label || `${index + 1}${unit}`}</b>
             <small>{item.list_price.toLocaleString()}원</small>
             <em>{item.paid_price.toLocaleString()}원</em>
           </span>
@@ -375,8 +378,8 @@ function RecordArchive({ books }: { books: Book[] }) {
                   <dd>{book.author || "–"}</dd>
                 </div>
                 <div>
-                  <dt>총 권수</dt>
-                  <dd>{book.total_count}권</dd>
+                  <dt>{book.count_unit === "화" ? "총 화수" : "총 권수"}</dt>
+                  <dd>{book.total_count}{book.count_unit || "권"}</dd>
                 </div>
                 <div>
                   <dt>카테고리</dt>
@@ -411,7 +414,7 @@ function RecordArchive({ books }: { books: Book[] }) {
                 <div>
                   <dt>독서량</dt>
                   <dd>
-                    {book.read_count} / {book.total_count}권
+                    {book.read_count} / {book.total_count}{book.count_unit || "권"}
                   </dd>
                 </div>
                 <div>
@@ -509,7 +512,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 </div>
                 <div>
                   <b>
-                    {book.read_count} / {book.total_count}권
+                    {book.read_count} / {book.total_count}{book.count_unit || "권"}
                   </b>
                   <small>독서량</small>
                 </div>
@@ -726,7 +729,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                     </div>
                     <div>
                       <b>
-                        {book.read_count} / {book.total_count}권
+                        {book.read_count} / {book.total_count}{book.count_unit || "권"}
                       </b>
                       <small>독서량</small>
                     </div>
@@ -979,11 +982,14 @@ export default function FeedPage() {
   function choose(book: SearchBook) {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const unit = book.countUnit || "권";
     setForm({
       ...empty,
       title: book.title,
       author: book.author,
       total_count: book.totalCount || 1,
+      count_unit: unit,
+      purchase_items: [{ label: `1${unit}`, list_price: 0, paid_price: 0 }],
       category: book.category,
       platform: book.platform,
       cover_url: book.cover,
@@ -1003,6 +1009,16 @@ export default function FeedPage() {
     const items = [...(form.purchase_items || [])];
     items[index] = { ...items[index], [key]: value };
     setPurchaseItems(items);
+  }
+  function changeCountUnit(unit: "권" | "화") {
+    setForm((prev) => ({
+      ...prev,
+      count_unit: unit,
+      purchase_items: (prev.purchase_items || []).map((item, index) => ({
+        ...item,
+        label: /^\d+[권화]$/.test(item.label) ? `${index + 1}${unit}` : item.label,
+      })),
+    }));
   }
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -1334,14 +1350,9 @@ export default function FeedPage() {
                   </div>
                 </div>
                 <div className="fields">
-                  <label>
-                    총 권수
-                    <input
-                      type="number"
-                      min="1"
-                      value={form.total_count}
-                      onChange={(e) => field("total_count", +e.target.value)}
-                    />
+                  <label className="countField">
+                    {form.count_unit === "화" ? "총 화수" : "총 권수"}
+                    <span><input type="number" min="1" value={form.total_count} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
                   </label>
                   <label>
                     카테고리
@@ -1440,30 +1451,27 @@ export default function FeedPage() {
                       }
                     />
                   </label>
+                  <label>
+                    구매방법
+                    <input value={form.purchase_method} onChange={(e) => field("purchase_method", e.target.value)} />
+                  </label>
                   <div className="volumePurchases full">
-                    <div className="volumePurchaseHead"><span>권별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
+                    <div className="volumePurchaseHead"><span>{form.count_unit || "권"}별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
                     {(form.purchase_items || []).map((item, index) => (
                       <div className="volumePurchaseRow" key={index}>
-                        <input aria-label={`${index + 1}번째 권 이름`} value={item.label} onChange={(e) => updatePurchaseItem(index, "label", e.target.value)} />
+                        <input aria-label={`${index + 1}번째 ${form.count_unit || "권"} 이름`} value={item.label} onChange={(e) => updatePurchaseItem(index, "label", e.target.value)} />
                         <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
                         <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
                         <button type="button" aria-label={`${item.label} 가격 행 삭제`} onClick={() => setPurchaseItems((form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index))}><X size={12} /></button>
                       </div>
                     ))}
-                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}권`, list_price: 0, paid_price: 0 }])}><Plus size={12} /> 권 추가</button>
+                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0 }])}><Plus size={12} /> {form.count_unit || "권"} 추가</button>
                     <div className="purchaseTotals">
                       <span><small>총 판매가</small><b>{form.list_price.toLocaleString()}원</b></span>
                       <span><small>총 실구매가</small><b>{form.paid_price.toLocaleString()}원</b></span>
                       <span><small>할인율</small><b>{discount}%</b></span>
                     </div>
                   </div>
-                  <label className="full">
-                    구매방법
-                    <input
-                      value={form.purchase_method}
-                      onChange={(e) => field("purchase_method", e.target.value)}
-                    />
-                  </label>
                   <h3 className="formSectionTitle notesTitle">NOTES</h3>
                   <label className="full">
                     좋았던 점
