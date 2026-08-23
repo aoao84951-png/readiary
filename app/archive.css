@@ -1054,11 +1054,12 @@
 .savedNoteList { display: grid; gap: 0; padding-top: 1px; }
 .savedNote {
   display: grid;
-  grid-template-columns: 11px minmax(0, 1fr) 24px;
+  grid-template-columns: 11px minmax(0, 1fr) 18px;
   align-items: start;
   gap: 7px;
-  padding: 2px 0;
+  padding: 1px 0;
 }
+.savedNote .noteHeart { margin-top: 0; }
 .recordForm .savedNote textarea {
   min-height: 0;
   margin: 0;
@@ -1070,8 +1071,8 @@
   overflow: hidden;
 }
 .savedNote > button {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
   border: 0;
