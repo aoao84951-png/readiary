@@ -1497,7 +1497,7 @@ html { scrollbar-gutter: stable; }
 }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
-  .dockLayout { padding-bottom: calc(38px + env(safe-area-inset-bottom)); }
+  .dockLayout { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
   .compactTopBar { height: 43px; padding-inline: 10px; }
   .addDrawer .recordForm input,
   .addDrawer .recordForm select,
@@ -1508,9 +1508,9 @@ html { scrollbar-gutter: stable; }
   .bottomDock {
     bottom: 0;
     width: 100%;
-    height: calc(34px + env(safe-area-inset-bottom));
+    height: calc(50px + env(safe-area-inset-bottom));
     align-items: end;
-    padding: 0 9px max(0px, calc(env(safe-area-inset-bottom) - 18px));
+    padding: 0 9px max(0px, calc(env(safe-area-inset-bottom) - 10px));
     border: 0;
     border-top: 1px solid #eceae8;
     border-radius: 0;
@@ -1522,27 +1522,27 @@ html { scrollbar-gutter: stable; }
     top: 0;
   }
   .bottomDock > button:not(.dockAdd) {
-    top: -13px;
+    top: -16px;
     height: 34px;
   }
   .bottomDock .dockAdd {
     width: 43px;
     height: 43px;
     border-radius: 15px;
-    transform: translateY(-14px);
+    transform: translateY(-17px);
   }
   .dockLayout > .filterPanel { top: auto; }
 }
 
 /* Installed iPhone apps use the same flush navigation treatment. */
 @media (display-mode: standalone) and (max-width: 520px) {
-  .dockLayout { padding-bottom: calc(38px + env(safe-area-inset-bottom)); }
+  .dockLayout { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
   .bottomDock {
     bottom: 0;
     width: 100%;
-    height: calc(34px + env(safe-area-inset-bottom));
+    height: calc(50px + env(safe-area-inset-bottom));
     align-items: end;
-    padding: 0 9px max(0px, calc(env(safe-area-inset-bottom) - 18px));
+    padding: 0 9px max(0px, calc(env(safe-area-inset-bottom) - 10px));
     border: 0;
     border-top: 1px solid #eceae8;
     border-radius: 0;
