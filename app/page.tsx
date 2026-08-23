@@ -405,10 +405,40 @@ function Notes({
       </span>
       {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
-          <img className="noteHeart" src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" />
+          <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
           <p>{note}</p>
         </div>
       ))}
+    </section>
+  );
+}
+
+function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: string[]; kind: "liked" | "disliked"; onChange: (notes: string[]) => void }) {
+  const [draft, setDraft] = useState("");
+  const addNote = () => {
+    const clean = draft.trim();
+    if (!clean) return;
+    onChange([...notes.filter((note) => note.trim()), clean]);
+    setDraft("");
+  };
+  return (
+    <section className={`noteEditor full ${kind}`}>
+      <label>{label}</label>
+      <div className="noteComposer">
+        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="감상을 적어주세요" />
+        <button type="button" disabled={!draft.trim()} onClick={addNote}>등록</button>
+      </div>
+      {!!notes.some((note) => note.trim()) && (
+        <div className="savedNoteList">
+          {notes.map((note, index) => note.trim() && (
+            <div className="savedNote" key={index}>
+              <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
+              <textarea aria-label={`${label} ${index + 1}`} value={note} onChange={(event) => onChange(notes.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} />
+              <button type="button" aria-label={`${label} ${index + 1} 삭제`} onClick={() => onChange(notes.filter((_, itemIndex) => itemIndex !== index))}><X size={11} /></button>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -1592,34 +1622,8 @@ export default function FeedPage() {
                     </div>
                   </div>
                   <h3 className="formSectionTitle notesTitle">NOTES</h3>
-                  <label className="full">
-                    좋았던 점
-                    <textarea
-                      value={form.liked_notes.join("\n")}
-                      onChange={(e) =>
-                        field(
-                          "liked_notes",
-                          e.target.value.split("\n"),
-                        )
-                      }
-                      placeholder="한 줄에 하나씩"
-                    />
-                  </label>
-                  <div className="noteFormPreview full"><Notes notes={form.liked_notes} kind="liked" /></div>
-                  <label className="full">
-                    싫었던 점
-                    <textarea
-                      value={form.disliked_notes.join("\n")}
-                      onChange={(e) =>
-                        field(
-                          "disliked_notes",
-                          e.target.value.split("\n"),
-                        )
-                      }
-                      placeholder="한 줄에 하나씩"
-                    />
-                  </label>
-                  <div className="noteFormPreview full"><Notes notes={form.disliked_notes} kind="disliked" /></div>
+                  <NoteEditor label="좋았던 점" notes={form.liked_notes} kind="liked" onChange={(notes) => field("liked_notes", notes)} />
+                  <NoteEditor label="싫었던 점" notes={form.disliked_notes} kind="disliked" onChange={(notes) => field("disliked_notes", notes)} />
                 </div>
                 {message && <p className="formMessage">{message}</p>}
                 <button className="save" disabled={saving}>
