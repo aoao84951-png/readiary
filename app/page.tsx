@@ -70,7 +70,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     const height = Math.max(element.scrollHeight, element.offsetHeight);
     const dataUrl = await toPng(element, {
       cacheBust: true,
-      backgroundColor: "#f6f4f2",
+      backgroundColor: "#ffffff",
       pixelRatio: 4,
       width,
       height,
