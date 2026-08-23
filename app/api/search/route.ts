@@ -17,12 +17,22 @@ const naverVerifiedCovers:Record<string,string> = {
   '14567853':'https://comicthumb-phinf.pstatic.net/20260806_197/pocket_1785992982011gMLJ7_JPEG/%BF%C0%B8%DE%B0%A1%B9%F6%BD%BA%BF%A1%BC%AD_%BA%A3%C5%B8%B4%C2_%C3%D6%C1%BE%28%B1%C7%BC%F6X%29.jpg?type=m260',
 };
 
-async function ridi(q:string):Promise<SearchBook[]> {
+async function ridiSearch(q:string):Promise<SearchBook[]> {
   try {
     const res=await fetch(`https://ridibooks.com/apps/search/search?keyword=${encodeURIComponent(q)}&adult_exclude=n`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json',Referer:'https://ridibooks.com/'}});
     const data=await res.json() as { books?: Record<string, unknown>[] };
-    return (data?.books||[]).slice(0,12).map((item:Record<string,unknown>)=>{const id=String(item.b_id||item.book_id||item.id||'');const prices=Array.isArray(item.series_prices_info)?item.series_prices_info as Record<string,unknown>[]:[];const normal=prices.find(price=>price.type==='normal')||prices[0];return {title:String(item.title||item.web_title||''),author:String(item.author||item.author_name||''),cover:id?`https://img.ridicdn.net/cover/${id}/xxlarge?dpi=xxhdpi`:'',url:id?`https://ridibooks.com/books/${id}`:'',totalCount:positiveCount(item.book_count,item.volume_count,item.total_count,normal?.book_count,item.setbook_count),category:category(`${item.parent_category_name||''} ${item.parent_category_name2||''} ${item.category_name||''}`),platform:'리디북스'};});
+    return (data?.books||[]).slice(0,24).map((item:Record<string,unknown>)=>{const id=String(item.b_id||item.book_id||item.id||'');const prices=Array.isArray(item.series_prices_info)?item.series_prices_info as Record<string,unknown>[]:[];const normal=prices.find(price=>price.type==='normal')||prices[0];return {title:String(item.title||item.web_title||''),author:String(item.author||item.author_name||''),cover:id?`https://img.ridicdn.net/cover/${id}/xxlarge?dpi=xxhdpi`:'',url:id?`https://ridibooks.com/books/${id}`:'',totalCount:positiveCount(item.book_count,item.volume_count,item.total_count,normal?.book_count,item.setbook_count),category:category(`${item.parent_category_name||''} ${item.parent_category_name2||''} ${item.category_name||''}`),platform:'리디북스'};});
   } catch { return []; }
+}
+
+async function ridi(q:string):Promise<SearchBook[]> {
+  // Ridi separates ebooks and webtoons in search strongly enough that an
+  // exact title query can omit the ebook entirely. Search the ebook scope as
+  // well, with it first so the original book wins equal-title ordering.
+  const queries=/\[?e북\]?/i.test(q)?[q]:[`[e북] ${q}`,q];
+  const groups=await Promise.all(queries.map(ridiSearch));
+  const seen=new Set<string>();
+  return groups.flat().filter(item=>{const key=item.url||`${item.title}-${item.author}`;if(seen.has(key))return false;seen.add(key);return true;});
 }
 
 async function kakao(q:string):Promise<SearchBook[]> {
@@ -63,6 +73,6 @@ export async function GET(req:NextRequest) {
   }));
   const queryKey=normalize(q);const exactKey=(text:string)=>text.toLowerCase().replace(/\s+/g,' ').trim();const exactQuery=exactKey(q);const platformRank:Record<string,number>={'리디북스':0,'카카오페이지':1,'네이버시리즈':2};
   results.sort((a,b)=>{const relevance=(item:SearchBook)=>{const key=normalize(item.title);return exactKey(item.title)===exactQuery?0:key===queryKey?1:key.startsWith(queryKey)?2:key.includes(queryKey)?3:4;};return relevance(a)-relevance(b)||(platformRank[a.platform]??9)-(platformRank[b.platform]??9);});
-  const seen=new Set<string>(); const books=results.filter(item=>{const key=`${item.title}-${item.platform}`;if(seen.has(key))return false;seen.add(key);return true;});
+  const seen=new Set<string>(); const books=results.filter(item=>{const key=item.url||`${item.title}-${item.author}-${item.platform}`;if(seen.has(key))return false;seen.add(key);return true;});
   return NextResponse.json({books});
 }
