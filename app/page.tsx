@@ -68,6 +68,109 @@ function isSafariBrowser() {
   return /Safari/i.test(userAgent) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/i.test(userAgent);
 }
 
+function loadExportImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("이미지 효과를 준비하지 못했어요"));
+    image.src = src;
+  });
+}
+
+function rasterGradientRing(size = 160) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext("2d");
+  if (!context) return "";
+  const center = size / 2;
+  const gradient = context.createConicGradient(205 * Math.PI / 180, center, center);
+  gradient.addColorStop(0, "#ffd33d");
+  gradient.addColorStop(.2, "#ff8a22");
+  gradient.addColorStop(.43, "#ff334f");
+  gradient.addColorStop(.68, "#ef168c");
+  gradient.addColorStop(.84, "#a62cdb");
+  gradient.addColorStop(1, "#ffd33d");
+  context.fillStyle = gradient;
+  context.beginPath();
+  context.arc(center, center, center, 0, Math.PI * 2);
+  context.fill();
+  return canvas.toDataURL("image/png");
+}
+
+async function rasterBlurredCover(image: HTMLImageElement, width: number, height: number) {
+  const scale = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.ceil(width * scale));
+  canvas.height = Math.max(1, Math.ceil(height * scale));
+  const context = canvas.getContext("2d");
+  if (!context) return image.src;
+  const canvasRatio = canvas.width / canvas.height;
+  const imageRatio = image.naturalWidth / image.naturalHeight;
+  let drawWidth = canvas.width * 1.18;
+  let drawHeight = canvas.height * 1.18;
+  if (imageRatio > canvasRatio) drawWidth = drawHeight * imageRatio;
+  else drawHeight = drawWidth / imageRatio;
+  context.fillStyle = "#f7f7f5";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.filter = `blur(${28 * scale}px) saturate(.78)`;
+  context.globalAlpha = .56;
+  context.drawImage(image, (canvas.width - drawWidth) / 2, (canvas.height - drawHeight) / 2, drawWidth, drawHeight);
+  return canvas.toDataURL("image/png");
+}
+
+async function prepareSafariExport(element: HTMLElement) {
+  element.classList.add("safariImageExporting");
+  await document.fonts.load('700 16px "ReadDiary Export"');
+  await document.fonts.ready;
+  const nodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
+  for (const node of nodes) {
+    if (/(-apple-system|BlinkMacSystemFont|Pretendard|system-ui)/i.test(getComputedStyle(node).fontFamily)) {
+      node.style.fontFamily = '"ReadDiary Export", sans-serif';
+    }
+  }
+
+  const ring = rasterGradientRing();
+  for (const profile of element.querySelectorAll<HTMLElement>(".profileCover")) {
+    if (ring) {
+      profile.style.background = `url("${ring}") center / 100% 100% no-repeat`;
+    }
+  }
+
+  await Promise.all(Array.from(element.querySelectorAll<HTMLImageElement>(".coverBackdrop")).map(async (backdrop) => {
+    const source = await loadExportImage(backdrop.src);
+    const container = backdrop.closest<HTMLElement>(".feedCover");
+    const width = container?.clientWidth || backdrop.clientWidth;
+    const height = container?.clientHeight || backdrop.clientHeight;
+    backdrop.src = await rasterBlurredCover(source, width, height);
+    Object.assign(backdrop.style, { inset: "0", width: "100%", height: "100%", filter: "none", opacity: "1", transform: "none", zIndex: "0" });
+    container?.querySelector<HTMLElement>(".coverWash")?.style.setProperty("z-index", "1");
+    container?.querySelector<HTMLElement>(".coverMain")?.style.setProperty("z-index", "2");
+  }));
+
+  await Promise.all(Array.from(element.querySelectorAll<HTMLElement>(".frontCover")).map(async (cover) => {
+    const match = cover.style.backgroundImage.match(/url\(["']?(.+?)["']?\)$/);
+    if (!match) return;
+    const image = await loadExportImage(match[1]);
+    const parent = cover.parentElement;
+    if (!parent) return;
+    const ratio = image.naturalWidth / image.naturalHeight;
+    const parentRatio = parent.clientWidth / parent.clientHeight;
+    const width = ratio > parentRatio ? parent.clientWidth : parent.clientHeight * ratio;
+    const height = ratio > parentRatio ? parent.clientWidth / ratio : parent.clientHeight;
+    Object.assign(cover.style, {
+      inset: "auto",
+      left: `${(parent.clientWidth - width) / 2}px`,
+      top: `${(parent.clientHeight - height) / 2}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+      backgroundSize: "100% 100%",
+      filter: "none",
+      boxShadow: "0 5px 14px rgba(45,43,38,.1)",
+    });
+  }));
+}
+
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
@@ -124,10 +227,13 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       }
     })));
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
-    const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
-    const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
+    let width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
+    let height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
     let dataUrl: string;
     if (isSafariBrowser()) {
+      await prepareSafariExport(exportElement);
+      width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
+      height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
       Object.assign(exportElement.style, { maxHeight: "none", height: `${height}px`, overflow: "visible" });
       const canvas = await html2canvas(exportElement, {
         backgroundColor: "#ffffff",
