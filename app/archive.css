@@ -21,6 +21,7 @@
   .feedPage > .bookGrid {
     width: min(100%, 900px);
     margin-inline: auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .feedPage > .calendarPage,
@@ -43,6 +44,10 @@
   .feedPage > .calendarPage,
   .feedPage > .statsPage {
     width: min(100%, 960px);
+  }
+
+  .feedPage > .bookGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 .archiveList + .feedList {
