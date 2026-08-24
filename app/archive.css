@@ -782,9 +782,9 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: center;
   gap: 0;
-  min-height: 78px;
-  margin: 4px 0 8px;
-  padding: 15px 0 12px;
+  min-height: 64px;
+  margin: 2px 0 0;
+  padding: 10px 0 8px;
   color: #bbb7b3;
 }
 .wizardProgress span {
@@ -833,8 +833,8 @@
 }
 .recordForm .wizardPage .formTopTitle,
 .recordForm .wizardPage .formSectionTitle {
-  margin: 16px 0 15px;
-  padding: 13px 0 0;
+  margin: 5px 0 12px;
+  padding: 4px 0 0;
 }
 .recordForm .wizardPage > label,
 .wizardBookPage .bookMetaFields > label,
@@ -982,11 +982,11 @@
 }
 @media (max-width: 520px) {
   .wizardProgress {
-    min-height: 84px;
-    margin-top: 6px;
-    margin-bottom: 10px;
-    padding-top: 17px;
-    padding-bottom: 13px;
+    min-height: 68px;
+    margin-top: 2px;
+    margin-bottom: 0;
+    padding-top: 11px;
+    padding-bottom: 8px;
   }
   .wizardProgress span { gap: 7px; font-size: 7.5px; }
   .wizardProgress span::before { top: 10px; }
