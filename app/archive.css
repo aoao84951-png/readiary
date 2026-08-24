@@ -1898,7 +1898,15 @@ html { scrollbar-gutter: stable; }
 .recordModal.imageExporting { position: relative; max-height: none !important; height: auto !important; overflow: visible !important; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; animation: none; }
 .recordModal.imageExporting .recordModalHead { position: static; }
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
-.calendarPage.imageExporting { position: relative; padding: 20px 20px 24px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
+.calendarPage.imageExporting {
+  position: relative;
+  padding: 20px 20px 24px;
+  border: 24px solid transparent;
+  border-radius: 34px;
+  background: #fff;
+  background-clip: padding-box;
+  box-shadow: none;
+}
 .post.imageExporting { position: relative; width: 520px; padding: 20px 18px 26px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
 .recordModal.imageExporting::before,
 .calendarPage.imageExporting::before,

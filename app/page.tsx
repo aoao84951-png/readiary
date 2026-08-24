@@ -102,8 +102,9 @@ async function inlineExportResources(source: HTMLElement, clone: HTMLElement) {
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const fontEmbedCSS = await getFontEmbedCSS(element);
+  const isCalendarExport = element.classList.contains("calendarPage");
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
-  const exportWidth = element.classList.contains("calendarPage") ? 635 : sourceWidth;
+  const exportWidth = isCalendarExport ? 635 : sourceWidth;
   const staging = document.createElement("div");
   Object.assign(staging.style, {
     position: "fixed",
@@ -139,7 +140,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     const dataUrl = await toPng(exportElement, {
       cacheBust: true,
       includeQueryParams: true,
-      backgroundColor: "#ffffff",
+      backgroundColor: isCalendarExport ? undefined : "#ffffff",
       pixelRatio: 4,
       fontEmbedCSS,
       width,
