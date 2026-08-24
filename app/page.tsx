@@ -2255,7 +2255,7 @@ export default function FeedPage() {
                     </div>
                     {!!form.purchase_items?.length && <div className="savedPurchaseList">
                     {(form.purchase_items || []).map((item, index) => (
-                      <div className="savedPurchaseItem" key={`${item.label}-${index}`}>
+                      <div className={`savedPurchaseItem ${item.label.trim().length >= 9 ? "longLabel" : ""}`} key={`${item.label}-${index}`}>
                         <div><b>{item.label}</b><span><small>판매가 {item.list_price.toLocaleString()}원</small><strong>{item.paid_price.toLocaleString()}원</strong></span></div>
                         {!!item.methods?.length && <p>{item.methods.join(" · ")}</p>}
                         <span className="savedPurchaseActions"><button type="button" aria-label={`${item.label} 수정`} onClick={() => editPurchaseItem(index)}><Pencil size={11} /></button><button type="button" aria-label={`${item.label} 삭제`} onClick={() => { const next = (form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index); setPurchaseItems(next); resetPurchaseDraft(next); }}><X size={12} /></button></span>
