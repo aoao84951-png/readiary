@@ -153,9 +153,10 @@
 
 /* Long volume labels keep their own space and never collide with prices. */
 .recordForm .savedPurchaseItem>div:first-child{
-  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-columns:180px auto!important;
   align-items:start!important;
-  column-gap:16px!important;
+  justify-content:start!important;
+  column-gap:18px!important;
 }
 .recordForm .savedPurchaseItem>div:first-child>b{
   min-width:0;
@@ -173,11 +174,8 @@
 .recordForm .savedPurchaseItem p{margin-left:0!important}
 @media(max-width:420px){
   .recordForm .savedPurchaseItem>div:first-child{
-    grid-template-columns:minmax(0,1fr)!important;
-    row-gap:5px!important;
-  }
-  .recordForm .savedPurchaseItem>div:first-child>span{
-    justify-content:start;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    column-gap:10px!important;
   }
 }
 
