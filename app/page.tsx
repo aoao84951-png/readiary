@@ -62,6 +62,16 @@ async function imageUrlToDataUrl(url: string) {
   });
 }
 
+function normalizeExportFonts(element: HTMLElement) {
+  const nodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
+  for (const node of nodes) {
+    const family = window.getComputedStyle(node).fontFamily;
+    if (/(-apple-system|BlinkMacSystemFont|Pretendard|system-ui)/i.test(family)) {
+      node.style.fontFamily = '"Apple SD Gothic Neo", Arial, sans-serif';
+    }
+  }
+}
+
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
@@ -93,6 +103,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   staging.appendChild(exportElement);
   document.body.appendChild(staging);
   try {
+    normalizeExportFonts(exportElement);
     const images = Array.from(exportElement.querySelectorAll("img"));
     for (const image of images) {
       const original = image.getAttribute("src") || "";
