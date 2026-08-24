@@ -2127,8 +2127,8 @@ html { scrollbar-gutter: stable; }
    more-specific rules appeared after the broad mobile form rule. */
 @media (max-width: 520px) {
   .addDrawer .wizardPage {
-    --mobile-property-label-size: 9px;
-    --mobile-property-value-size: 9.5px;
+    --mobile-property-label-size: 12px;
+    --mobile-property-value-size: 12px;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
   }

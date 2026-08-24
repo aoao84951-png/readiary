@@ -43,8 +43,8 @@
 .recordForm .purchaseMethodProperty .multiEditableSelect summary.isEmpty{color:var(--property-muted)!important;font-weight:500!important}
 
 @media(max-width:520px){
-  .recordForm.wizardForm{--property-font:16px}
-  .recordForm .wizardPage .formTopTitle,.recordForm .wizardPage .formSectionTitle{font-size:16px!important}
+  .recordForm.wizardForm{--property-font:12px}
+  .recordForm .wizardPage .formTopTitle,.recordForm .wizardPage .formSectionTitle{font-size:10px!important}
   .recordForm .selectedBook{grid-template-columns:84px minmax(0,1fr)!important;gap:16px!important}
   .recordForm .selectedBookCover,.recordForm .coverPicker{width:84px!important}
   .recordForm .coverPicker,.recordForm .coverPicker img,.recordForm .coverPicker .miniNoCover{min-height:126px!important}
