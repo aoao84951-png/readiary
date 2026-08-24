@@ -116,9 +116,10 @@ function ImageShareButton({ getTarget, filename, compact = false }: { getTarget:
     event.stopPropagation();
     const target = getTarget(event.currentTarget);
     if (!target) return;
+    const targetFilename = target.dataset.exportFilename || filename;
     setSavingImage(true);
     setFailed("");
-    try { await saveElementAsImage(target, filename); }
+    try { await saveElementAsImage(target, targetFilename); }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
   }}><CircleArrowDown size={compact ? 15 : 16} strokeWidth={1.45} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
@@ -1242,7 +1243,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
               onMouseDown={closeSelected}
             >
               <section
+                key={book.id}
                 className="recordModal"
+                data-export-filename={`readiary-${book.title}-detail`}
                 role="dialog"
                 aria-modal="true"
                 aria-label={`${book.title} 상세 기록`}
@@ -1267,7 +1270,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                     <details className="recordActionMenu">
                       <summary aria-label="상세 기록 메뉴"><Ellipsis size={17} /></summary>
                       <div className="recordActionMenuPanel">
-                        <ImageShareButton filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
+                        <ImageShareButton key={book.id} filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
                         {onEdit && <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }}><Pencil size={13} /><span>기록 수정</span></button>}
                         {onDelete && <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)}><Trash2 size={13} /><span>기록 삭제</span></button>}
                       </div>
@@ -1962,6 +1965,7 @@ export default function FeedPage() {
             <article
               id={`post-${book.id || index}`}
               className="post"
+              data-export-filename={`readiary-${book.title}-feed`}
               key={book.id}
             >
               <header className="postHead">
