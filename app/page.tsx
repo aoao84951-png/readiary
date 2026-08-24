@@ -327,10 +327,22 @@ function EditableSelect({ label, value, options, onChange, onAdd }: { label: str
 }
 
 function MultiEditableSelect({ values, options, onChange, onAdd }: { values: string[]; options: string[]; onChange: (values: string[]) => void; onAdd: (value: string) => Promise<void> }) {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState("");
   const [savingOption, setSavingOption] = useState(false);
   const all = [...new Set([...options, ...values])];
+  useEffect(() => {
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const details = detailsRef.current;
+      if (!details?.open || !(event.target instanceof Node) || details.contains(event.target)) return;
+      details.open = false;
+      setCreating(false);
+      setDraft("");
+    }
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, []);
   async function commit() {
     const clean = draft.trim();
     if (!clean) return;
@@ -345,7 +357,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
     }
   }
   return (
-    <details className="multiEditableSelect">
+    <details ref={detailsRef} className="multiEditableSelect">
       <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span></summary>
       <div className="multiOptionMenu">
         {all.map((option) => (
