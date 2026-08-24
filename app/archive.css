@@ -15,7 +15,7 @@
   }
 
   .feedPage > .archiveList {
-    width: min(100%, 760px);
+    width: 100%;
   }
 
   .feedPage > .bookGrid {
@@ -37,10 +37,6 @@
 
   .feedPage > .feedList {
     width: min(100%, 660px);
-  }
-
-  .feedPage > .archiveList {
-    width: min(100%, 860px);
   }
 
   .feedPage > .bookGrid,
