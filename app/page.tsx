@@ -105,28 +105,35 @@ async function rasterBlurredCover(image: HTMLImageElement, width: number, height
   canvas.height = Math.max(1, Math.ceil(height * scale));
   const context = canvas.getContext("2d");
   if (!context) return image.src;
-  const canvasRatio = canvas.width / canvas.height;
+  const reduced = document.createElement("canvas");
+  reduced.width = 24;
+  reduced.height = 24;
+  const reducedContext = reduced.getContext("2d");
+  if (!reducedContext) return image.src;
+  const canvasRatio = reduced.width / reduced.height;
   const imageRatio = image.naturalWidth / image.naturalHeight;
-  let drawWidth = canvas.width * 1.18;
-  let drawHeight = canvas.height * 1.18;
+  let drawWidth = reduced.width * 1.35;
+  let drawHeight = reduced.height * 1.35;
   if (imageRatio > canvasRatio) drawWidth = drawHeight * imageRatio;
   else drawHeight = drawWidth / imageRatio;
+  reducedContext.drawImage(image, (reduced.width - drawWidth) / 2, (reduced.height - drawHeight) / 2, drawWidth, drawHeight);
   context.fillStyle = "#f7f7f5";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.filter = `blur(${28 * scale}px) saturate(.78)`;
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
   context.globalAlpha = .56;
-  context.drawImage(image, (canvas.width - drawWidth) / 2, (canvas.height - drawHeight) / 2, drawWidth, drawHeight);
+  context.drawImage(reduced, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/png");
 }
 
 async function prepareSafariExport(element: HTMLElement) {
   element.classList.add("safariImageExporting");
-  await document.fonts.load('700 16px "ReadDiary Export"');
+  await Promise.all([400, 500, 600, 700, 800].map((weight) => document.fonts.load(`${weight} 16px "ReadDiary Export"`)));
   await document.fonts.ready;
   const nodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
   for (const node of nodes) {
     if (/(-apple-system|BlinkMacSystemFont|Pretendard|system-ui)/i.test(getComputedStyle(node).fontFamily)) {
-      node.style.fontFamily = '"ReadDiary Export", sans-serif';
+      node.style.setProperty("font-family", '"ReadDiary Export", sans-serif', "important");
     }
   }
 
