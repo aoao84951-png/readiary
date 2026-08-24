@@ -2208,38 +2208,3 @@ html { scrollbar-gutter: stable; }
     font-size: var(--mobile-property-value-size);
   }
 }
-@font-face {
-  font-family: "ReadDiary Export";
-  src: url("/fonts/Pretendard-Regular.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: block;
-}
-@font-face {
-  font-family: "ReadDiary Export";
-  src: url("/fonts/Pretendard-Medium.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 500;
-  font-display: block;
-}
-@font-face {
-  font-family: "ReadDiary Export";
-  src: url("/fonts/Pretendard-SemiBold.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 600;
-  font-display: block;
-}
-@font-face {
-  font-family: "ReadDiary Export";
-  src: url("/fonts/Pretendard-Bold.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 700;
-  font-display: block;
-}
-@font-face {
-  font-family: "ReadDiary Export";
-  src: url("/fonts/Pretendard-ExtraBold.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 800 900;
-  font-display: block;
-}

@@ -1,7 +1,7 @@
 "use client";
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
-import html2canvas from "html2canvas";
+import { renderFeedExport } from "@/lib/feed-export";
 import {
   ChevronLeft,
   ChevronRight,
@@ -51,6 +51,18 @@ async function downloadImage(dataUrl: string, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 }
 
+function downloadBlob(blob: Blob, filename: string) {
+  const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = safeFilename;
+  link.href = objectUrl;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+}
+
 async function imageUrlToDataUrl(url: string) {
   const response = await fetch(`/api/image?url=${encodeURIComponent(url)}`, { cache: "no-store" });
   if (!response.ok) throw new Error("표지 이미지를 불러오지 못했어요");
@@ -61,121 +73,6 @@ async function imageUrlToDataUrl(url: string) {
     reader.onerror = () => reject(new Error("표지 이미지를 변환하지 못했어요"));
     reader.readAsDataURL(blob);
   });
-}
-
-function isSafariBrowser() {
-  const userAgent = navigator.userAgent;
-  return /Safari/i.test(userAgent) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/i.test(userAgent);
-}
-
-function loadExportImage(src: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("이미지 효과를 준비하지 못했어요"));
-    image.src = src;
-  });
-}
-
-function rasterGradientRing(size = 160) {
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const context = canvas.getContext("2d");
-  if (!context) return "";
-  const center = size / 2;
-  const gradient = context.createConicGradient(205 * Math.PI / 180, center, center);
-  gradient.addColorStop(0, "#ffd33d");
-  gradient.addColorStop(.2, "#ff8a22");
-  gradient.addColorStop(.43, "#ff334f");
-  gradient.addColorStop(.68, "#ef168c");
-  gradient.addColorStop(.84, "#a62cdb");
-  gradient.addColorStop(1, "#ffd33d");
-  context.fillStyle = gradient;
-  context.beginPath();
-  context.arc(center, center, center, 0, Math.PI * 2);
-  context.fill();
-  return canvas.toDataURL("image/png");
-}
-
-async function rasterBlurredCover(image: HTMLImageElement, width: number, height: number) {
-  const scale = 2;
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.ceil(width * scale));
-  canvas.height = Math.max(1, Math.ceil(height * scale));
-  const context = canvas.getContext("2d");
-  if (!context) return image.src;
-  const reduced = document.createElement("canvas");
-  reduced.width = 24;
-  reduced.height = 24;
-  const reducedContext = reduced.getContext("2d");
-  if (!reducedContext) return image.src;
-  const canvasRatio = reduced.width / reduced.height;
-  const imageRatio = image.naturalWidth / image.naturalHeight;
-  let drawWidth = reduced.width * 1.35;
-  let drawHeight = reduced.height * 1.35;
-  if (imageRatio > canvasRatio) drawWidth = drawHeight * imageRatio;
-  else drawHeight = drawWidth / imageRatio;
-  reducedContext.drawImage(image, (reduced.width - drawWidth) / 2, (reduced.height - drawHeight) / 2, drawWidth, drawHeight);
-  context.fillStyle = "#f7f7f5";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.imageSmoothingEnabled = true;
-  context.imageSmoothingQuality = "high";
-  context.globalAlpha = .56;
-  context.drawImage(reduced, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
-}
-
-async function prepareSafariExport(element: HTMLElement) {
-  element.classList.add("safariImageExporting");
-  await Promise.all([400, 500, 600, 700, 800].map((weight) => document.fonts.load(`${weight} 16px "ReadDiary Export"`)));
-  await document.fonts.ready;
-  const nodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
-  for (const node of nodes) {
-    if (/(-apple-system|BlinkMacSystemFont|Pretendard|system-ui)/i.test(getComputedStyle(node).fontFamily)) {
-      node.style.setProperty("font-family", '"ReadDiary Export", sans-serif', "important");
-    }
-  }
-
-  const ring = rasterGradientRing();
-  for (const profile of element.querySelectorAll<HTMLElement>(".profileCover")) {
-    if (ring) {
-      profile.style.background = `url("${ring}") center / 100% 100% no-repeat`;
-    }
-  }
-
-  await Promise.all(Array.from(element.querySelectorAll<HTMLImageElement>(".coverBackdrop")).map(async (backdrop) => {
-    const source = await loadExportImage(backdrop.src);
-    const container = backdrop.closest<HTMLElement>(".feedCover");
-    const width = container?.clientWidth || backdrop.clientWidth;
-    const height = container?.clientHeight || backdrop.clientHeight;
-    backdrop.src = await rasterBlurredCover(source, width, height);
-    Object.assign(backdrop.style, { inset: "0", width: "100%", height: "100%", filter: "none", opacity: "1", transform: "none", zIndex: "0" });
-    container?.querySelector<HTMLElement>(".coverWash")?.style.setProperty("z-index", "1");
-    container?.querySelector<HTMLElement>(".coverMain")?.style.setProperty("z-index", "2");
-  }));
-
-  await Promise.all(Array.from(element.querySelectorAll<HTMLElement>(".frontCover")).map(async (cover) => {
-    const match = cover.style.backgroundImage.match(/url\(["']?(.+?)["']?\)$/);
-    if (!match) return;
-    const image = await loadExportImage(match[1]);
-    const parent = cover.parentElement;
-    if (!parent) return;
-    const ratio = image.naturalWidth / image.naturalHeight;
-    const parentRatio = parent.clientWidth / parent.clientHeight;
-    const width = ratio > parentRatio ? parent.clientWidth : parent.clientHeight * ratio;
-    const height = ratio > parentRatio ? parent.clientWidth / ratio : parent.clientHeight;
-    Object.assign(cover.style, {
-      inset: "auto",
-      left: `${(parent.clientWidth - width) / 2}px`,
-      top: `${(parent.clientHeight - height) / 2}px`,
-      width: `${width}px`,
-      height: `${height}px`,
-      backgroundSize: "100% 100%",
-      filter: "none",
-      boxShadow: "0 5px 14px rgba(45,43,38,.1)",
-    });
-  }));
 }
 
 async function saveElementAsImage(element: HTMLElement, filename: string) {
@@ -234,38 +131,18 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       }
     })));
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
-    let width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
-    let height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
-    let dataUrl: string;
-    if (isSafariBrowser()) {
-      await prepareSafariExport(exportElement);
-      width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
-      height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
-      Object.assign(exportElement.style, { maxHeight: "none", height: `${height}px`, overflow: "visible" });
-      const canvas = await html2canvas(exportElement, {
-        backgroundColor: "#ffffff",
-        scale: 4,
-        width,
-        height,
-        windowWidth: width,
-        windowHeight: height,
-        logging: false,
-        useCORS: true,
-        ignoreElements: (node) => node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude")),
-      });
-      dataUrl = canvas.toDataURL("image/png");
-    } else {
-      dataUrl = await toPng(exportElement, {
-        cacheBust: true,
-        includeQueryParams: true,
-        backgroundColor: "#ffffff",
-        pixelRatio: 4,
-        width,
-        height,
-        style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
-        filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
-      });
-    }
+    const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
+    const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
+    const dataUrl = await toPng(exportElement, {
+      cacheBust: true,
+      includeQueryParams: true,
+      backgroundColor: "#ffffff",
+      pixelRatio: 4,
+      width,
+      height,
+      style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
+      filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
+    });
     await downloadImage(dataUrl, filename);
   } finally {
     staging.remove();
@@ -286,7 +163,14 @@ function ImageShareButton({ getTarget, targetId, bookId, filename, compact = fal
     const targetFilename = target.dataset.exportFilename || filename;
     setSavingImage(true);
     setFailed("");
-    try { await saveElementAsImage(target, targetFilename); }
+    try {
+      if (target.classList.contains("post")) {
+        const pages = await renderFeedExport(target);
+        pages.forEach((page, index) => downloadBlob(page, pages.length === 1 ? targetFilename : `${targetFilename}-${String(index + 1).padStart(2, "0")}`));
+      } else {
+        await saveElementAsImage(target, targetFilename);
+      }
+    }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
   }}><CircleArrowDown size={compact ? 15 : 16} strokeWidth={1.45} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
