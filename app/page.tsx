@@ -64,18 +64,30 @@ async function imageUrlToDataUrl(url: string) {
 
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
+  const staging = document.createElement("div");
+  Object.assign(staging.style, {
+    position: "fixed",
+    left: "0",
+    top: "0",
+    width: "0",
+    height: "0",
+    overflow: "hidden",
+    pointerEvents: "none",
+    zIndex: "-2147483648",
+  });
   const exportElement = element.cloneNode(true) as HTMLElement;
   exportElement.removeAttribute("id");
   exportElement.classList.add("imageExporting");
   Object.assign(exportElement.style, {
-    position: "fixed",
-    left: "-100000px",
+    position: "relative",
+    left: "0",
     top: "0",
     margin: "0",
     transform: "none",
     pointerEvents: "none",
   });
-  document.body.appendChild(exportElement);
+  staging.appendChild(exportElement);
+  document.body.appendChild(staging);
   try {
     const images = Array.from(exportElement.querySelectorAll("img"));
     for (const image of images) {
@@ -115,7 +127,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     });
     await downloadImage(dataUrl, filename);
   } finally {
-    exportElement.remove();
+    staging.remove();
   }
 }
 
