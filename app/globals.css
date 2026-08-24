@@ -86,7 +86,7 @@
 @media(max-width:520px){
   .recordForm.wizardForm{width:100%!important;overflow-x:hidden!important}
   .recordForm .wizardPage{padding-right:0!important;padding-left:0!important}
-  .recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
+  .recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .bookMetaFields>label,.recordForm .wizardPage .purchaseEntryComposer>label,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
   .recordForm .datePropertyValue,.recordForm .dateAdder,.recordForm .dateDisplay{min-height:38px}
   .recordForm .multiOptionMenu{position:absolute!important;left:0!important;right:auto!important;max-height:min(45vh,340px)!important;overflow-y:auto!important}
 }
