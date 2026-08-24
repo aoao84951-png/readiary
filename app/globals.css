@@ -154,7 +154,7 @@
 /* Long volume labels keep their own space and never collide with prices. */
 .recordForm .savedPurchaseItem>div:first-child{
   grid-template-columns:92px auto!important;
-  align-items:start!important;
+  align-items:baseline!important;
   justify-content:start!important;
   column-gap:0!important;
 }
@@ -171,15 +171,20 @@
   gap:16px!important;
   white-space:nowrap;
 }
-.recordForm .savedPurchaseItem p{margin-left:0!important}
-.recordForm .savedPurchaseItem.longLabel>div:first-child{
+.recordForm .savedPurchaseItem small,.recordForm .savedPurchaseItem strong{line-height:1.45}
+.recordForm .savedPurchaseItem p{margin:3px 0 0!important;line-height:1.45!important}
+.recordForm .savedPurchaseList.hasLongLabels .savedPurchaseItem>div:first-child{
   grid-template-columns:minmax(0,1fr) auto!important;
   column-gap:16px!important;
 }
 @media(max-width:520px){
-  .recordForm .savedPurchaseItem:not(.longLabel)>div:first-child{
+  .recordForm .savedPurchaseList:not(.hasLongLabels) .savedPurchaseItem>div:first-child{
     grid-template-columns:112px auto!important;
   }
+}
+.recordForm .savedPurchaseActions{
+  top:4px!important;
+  transform:none!important;
 }
 
 /* Date-picker controls share the same geometry on desktop and mobile. */

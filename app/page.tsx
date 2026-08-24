@@ -2253,7 +2253,7 @@ export default function FeedPage() {
                         <button type="button" className="primary" onClick={commitPurchaseDraft}>{editingPurchaseIndex === null ? `${form.count_unit || "권"} 기록` : "수정 완료"}</button>
                       </div>
                     </div>
-                    {!!form.purchase_items?.length && <div className="savedPurchaseList">
+                    {!!form.purchase_items?.length && <div className={`savedPurchaseList ${form.purchase_items.some((item) => item.label.trim().length >= 9) ? "hasLongLabels" : ""}`}>
                     {(form.purchase_items || []).map((item, index) => (
                       <div className={`savedPurchaseItem ${item.label.trim().length >= 9 ? "longLabel" : ""}`} key={`${item.label}-${index}`}>
                         <div><b>{item.label}</b><span><small>판매가 {item.list_price.toLocaleString()}원</small><strong>{item.paid_price.toLocaleString()}원</strong></span></div>
