@@ -267,6 +267,39 @@
     width:28px!important;
     height:28px!important;
   }
+
+  /* Give iOS one dedicated scrolling surface for long editor pages. */
+  .drawerShade{
+    height:100dvh;
+    overflow:hidden;
+  }
+  .addDrawer{
+    height:100dvh!important;
+    max-height:100dvh!important;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden!important;
+  }
+  .addDrawer>header{
+    position:relative;
+    top:auto;
+    flex:0 0 54px;
+  }
+  .addDrawer>.recordForm,
+  .addDrawer>.drawerBody{
+    flex:1 1 auto;
+    min-height:0!important;
+    height:auto!important;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:auto;
+    touch-action:pan-y;
+    scroll-padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+  .addDrawer>.recordForm.wizardForm{
+    min-height:0!important;
+  }
 }
 
 /* Tablet and desktop record editor: centered, focused workspace. */
