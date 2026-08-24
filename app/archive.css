@@ -19,18 +19,14 @@
   }
 
   .feedPage > .bookGrid {
-    width: min(100%, 900px);
+    width: 100%;
     margin-inline: auto;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .feedPage > .compactTopBar.gridTopBar {
-    width: min(100%, 900px);
-    margin-inline: auto;
   }
 
   .feedPage > .calendarPage,
   .feedPage > .statsPage {
-    width: min(100%, 900px);
+    width: 100%;
     margin-inline: auto;
   }
 }
@@ -47,10 +43,7 @@
   .feedPage > .bookGrid,
   .feedPage > .calendarPage,
   .feedPage > .statsPage {
-    width: min(100%, 960px);
-  }
-  .feedPage > .compactTopBar.gridTopBar {
-    width: min(100%, 960px);
+    width: 100%;
   }
 
   .feedPage > .bookGrid {
