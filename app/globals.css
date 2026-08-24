@@ -70,6 +70,9 @@
 .recordForm .readingDatesField>.dateAdder{align-self:center!important}
 .recordForm .statusProperty>.propertyLabel,.recordForm .statusProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .statusProperty>.propertyLabel{display:flex!important;align-items:center!important}
+.recordForm .countField>.propertyLabel,.recordForm .countField>.countValue,.recordForm .countField>.countValue>input,.recordForm .countField>.countValue>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
+.recordForm .countField>.propertyLabel{display:flex!important;grid-template-columns:none!important;gap:0!important;align-items:center!important}
+.recordForm .countField>.countValue{align-items:center!important}
 
 .recordForm .multiEditableSelect{position:relative;width:100%}
 .recordForm .multiOptionMenu{z-index:20!important;min-width:100%!important;width:min(330px,calc(100vw - 48px))!important;padding:5px!important;border:1px solid #e6e3df!important;border-radius:10px!important;background:#fff!important;box-shadow:0 10px 28px rgba(50,48,44,.12)!important}
