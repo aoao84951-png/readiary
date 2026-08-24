@@ -110,3 +110,29 @@
   .recordForm .wizardPage .multiEditableSelect summary,
   .recordForm .wizardPage .ratingControl{position:relative;top:0}
 }
+
+/* Tablet and desktop record editor: centered, focused workspace. */
+@media(min-width:521px){
+  .drawerShade{
+    align-items:center;
+    justify-content:center;
+    padding:clamp(24px,4vw,48px);
+    background:rgba(43,41,38,.27);
+    -webkit-backdrop-filter:blur(5px);
+    backdrop-filter:blur(5px);
+  }
+
+  .addDrawer{
+    width:min(820px,calc(100vw - 48px));
+    height:min(900px,calc(100dvh - 56px));
+    max-height:90dvh;
+    border:1px solid rgba(95,91,85,.14);
+    border-radius:22px;
+    box-shadow:0 24px 80px rgba(42,39,35,.2);
+    overscroll-behavior:contain;
+  }
+
+  .addDrawer>header{
+    border-radius:22px 22px 0 0;
+  }
+}

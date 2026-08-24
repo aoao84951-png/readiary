@@ -1801,7 +1801,7 @@ export default function FeedPage() {
         </div>
       )}
       {adding && (
-        <div className="drawerShade" onMouseDown={() => setAdding(false)}>
+        <div className="drawerShade">
           <aside ref={drawerRef} className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
             <header>
               <button
