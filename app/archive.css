@@ -1907,7 +1907,10 @@ html { scrollbar-gutter: stable; }
   box-shadow: none;
   animation: none;
 }
-.recordModal.imageExporting .recordModalHead { position: static; }
+.recordModal.imageExporting .recordModalHead {
+  position: static;
+  border-radius: 10px 10px 0 0;
+}
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
 .calendarPage.imageExporting {
   position: relative;
