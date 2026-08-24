@@ -184,9 +184,9 @@ const demo: Book[] = [
 const empty: BookRecord = {
   title: "",
   author: "",
-  total_count: 1,
+  total_count: 0,
   count_unit: "권",
-  category: "문학",
+  category: "",
   status: "책바구니",
   purchase_date: null,
   platform: "",
@@ -1800,7 +1800,10 @@ export default function FeedPage() {
                   />
                   <button>{searching ? "…" : "검색"}</button>
                 </form>
-                <button className="manual" onClick={() => setStep("book")}>
+                <button className="manual" onClick={() => {
+                  setForm((current) => ({ ...current, total_count: 0, category: "" }));
+                  setStep("book");
+                }}>
                   검색 없이 직접 입력
                 </button>
                 {message && <p className="formMessage">{message}</p>}
@@ -1887,11 +1890,12 @@ export default function FeedPage() {
                   <div className="bookMetaFields full">
                     <label className="countField">
                       {form.count_unit === "화" ? "총 화수" : "총 권수"}
-                      <span><input type="number" min="1" value={form.total_count} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
+                      <span><input type="number" min="1" placeholder="비어 있음" value={form.total_count || ""} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
                     </label>
-                    <label>
+                    <label className={form.category ? "" : "emptySelectProperty"}>
                       카테고리
                       <select value={form.category} onChange={(e) => field("category", e.target.value)}>
+                        <option value="">비어 있음</option>
                         <option>BL</option><option>로맨스</option><option>로맨스판타지</option><option>문학</option><option>기타</option>
                       </select>
                     </label>
@@ -1919,6 +1923,7 @@ export default function FeedPage() {
                     <input
                       type="date"
                       value={form.finished_date || ""}
+                      onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
                       onChange={(e) =>
                         field("finished_date", e.target.value || null)
                       }
@@ -1927,12 +1932,12 @@ export default function FeedPage() {
                   <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
                     읽은 날
                     <span className="dateAdder">
-                      <input type="date" value={readingDate} onChange={(e) => setReadingDate(e.target.value)} />
-                      <button type="button" onClick={() => {
-                        if (!readingDate || form.reading_dates?.includes(readingDate)) return;
-                        field("reading_dates", [...(form.reading_dates || []), readingDate].sort());
+                      <input type="date" value={readingDate} onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
+                        const date = e.target.value;
+                        if (!date) return;
+                        if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
                         setReadingDate("");
-                      }}>추가</button>
+                      }} />
                     </span>
                     <span className="dateChips">
                       {(form.reading_dates || []).map(date => (
@@ -1967,6 +1972,7 @@ export default function FeedPage() {
                     <input
                       type="date"
                       value={form.purchase_date || ""}
+                      onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
                       onChange={(e) =>
                         field("purchase_date", e.target.value || null)
                       }

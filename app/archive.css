@@ -194,6 +194,7 @@
   .bookFacts > div:last-child { padding-right: 0; }
   .bookFacts b { font-size: 8.5px; }
 }
+
 .recordHighlights small {
   color: #aaa;
   font-size: 7.5px;
@@ -846,19 +847,6 @@
   color: #9a9691;
   transition: background-color .16s ease;
 }
-.recordForm .wizardPage > label:hover,
-.recordForm .wizardPage > label:focus-within,
-.wizardBookPage .bookMetaFields > label:hover,
-.wizardBookPage .bookMetaFields > label:focus-within,
-.wizardBookPage .bookMetaFields > .editableSelect:hover,
-.wizardBookPage .bookMetaFields > .editableSelect:focus-within,
-.purchaseEntryComposer > label:hover,
-.purchaseEntryComposer > label:focus-within,
-.purchaseMethodProperty:hover,
-.purchaseMethodProperty:focus-within {
-  border-radius: 4px;
-  background: #f7f7f5;
-}
 .recordForm .wizardPage > label input:not([type="file"]),
 .recordForm .wizardPage > label select,
 .wizardBookPage .bookMetaFields input,
@@ -911,13 +899,8 @@
   padding-top: 4px;
 }
 .recordForm .wizardReadingPage .dateAdder { margin: 0; }
-.recordForm .wizardReadingPage .dateAdder { position: relative; align-items: center; }
+.recordForm .wizardReadingPage .dateAdder { position: relative; grid-template-columns: minmax(0, 1fr); align-items: center; }
 .recordForm .wizardReadingPage .dateAdder input { height: 32px; min-height: 32px; margin: 0; padding-top: 0; padding-bottom: 0; line-height: 32px; }
-.recordForm .wizardReadingPage .dateAdder > button {
-  height: 29px;
-  border-radius: 8px;
-  background: #ecece8;
-}
 .recordForm .wizardReadingPage .dateChips { grid-column: 2; margin-top: 2px; }
 .recordForm .wizardPage .notionDateProperty { position: relative; }
 .recordForm .wizardPage .notionDateProperty input[type="date"] {
@@ -936,16 +919,19 @@
   text-align: left;
 }
 .recordForm .wizardPage input[type="date"]::-webkit-calendar-picker-indicator {
+  width: 0;
+  height: 0;
   align-self: center;
   margin: 0;
-  padding: 6px 0 6px 8px;
+  padding: 0;
+  opacity: 0;
   outline: 0;
 }
 .recordForm .wizardPage .notionDateProperty.isEmpty::after {
   content: "비어 있음";
   position: absolute;
   left: 94px;
-  right: 34px;
+  right: 0;
   top: 50%;
   z-index: 1;
   transform: translateY(-50%);
@@ -959,7 +945,7 @@
   content: "비어 있음";
   position: absolute;
   left: 0;
-  right: 42px;
+  right: 0;
   top: 50%;
   z-index: 1;
   transform: translateY(-50%);
@@ -974,9 +960,9 @@
   margin-top: 0;
   border-bottom: 0;
 }
-.recordForm .wizardPurchasePage { gap: 8px; }
+.recordForm .wizardPurchasePage { gap: 1px; }
 .recordForm .wizardPurchasePage > label { grid-column: 1 / -1; }
-.recordForm .wizardPurchasePage .volumePurchases { margin-top: 2px; }
+.recordForm .wizardPurchasePage .volumePurchases { margin-top: 0; }
 .recordForm .wizardNotesPage { gap: 10px; }
 .recordForm .wizardNotesPage .noteEditor,
 .recordForm .wizardNotesPage .basketNoteEditor {
@@ -2061,3 +2047,32 @@ html { scrollbar-gutter: stable; }
   .statsSplit .statsSection > header small { white-space: nowrap; }
   .statsSplit .statsSection > header small { font-size: 6.5px; }
 }
+
+/* Final wizard overrides: keep Notion-like property rows borderless and flat. */
+.recordForm .wizardPage > label,
+.recordForm .wizardPage > label:hover,
+.recordForm .wizardPage > label:focus-within,
+.wizardBookPage .bookMetaFields > label,
+.wizardBookPage .bookMetaFields > label:hover,
+.wizardBookPage .bookMetaFields > label:focus-within,
+.wizardBookPage .bookMetaFields > .editableSelect,
+.wizardBookPage .bookMetaFields > .editableSelect:hover,
+.wizardBookPage .bookMetaFields > .editableSelect:focus-within,
+.purchaseEntryComposer > label,
+.purchaseEntryComposer > label:hover,
+.purchaseEntryComposer > label:focus-within,
+.purchaseMethodProperty,
+.purchaseMethodProperty:hover,
+.purchaseMethodProperty:focus-within {
+  border-radius: 0;
+  background: transparent;
+}
+.recordForm .wizardBookPage .editableSelect > select {
+  min-height: 28px;
+  margin-top: 0;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-bottom: 0;
+}
+.recordForm .wizardBookPage .emptySelectProperty select { color: #b7b4b0; }
+.recordForm .wizardPage input[type="date"] { width: 100%; cursor: pointer; }
