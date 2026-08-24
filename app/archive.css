@@ -880,6 +880,28 @@
 .recordForm .formSectionTitle + label + label {
   margin-top: 1px;
 }
+/* Selects and date controls have different native metrics on desktop browsers.
+   Give the paired reading fields one shared control box so their rules align. */
+.recordForm .readingTitle + label select,
+.recordForm .readingTitle + label + label input[type="date"] {
+  height: 36px;
+  min-height: 36px;
+  margin-top: 5px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 36px;
+}
+.recordForm .readingTitle + label + label input[type="date"]::-webkit-date-and-time-value {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+.recordForm .readingTitle + label + label input[type="date"]::-webkit-datetime-edit {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
 .recordForm .notesTitle ~ label textarea {
   min-height: 76px;
 }
