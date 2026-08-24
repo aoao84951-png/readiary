@@ -79,10 +79,13 @@
 .recordForm .statusProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .countField>.propertyLabel,.recordForm .countField>.countValue,.recordForm .countField>.countValue>input,.recordForm .countField>.countValue>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .countField>.propertyLabel{display:flex!important;grid-template-columns:none!important;gap:0!important;align-items:center!important}
-.recordForm .countField>.countValue{align-items:center!important}
+.recordForm .countField>.countValue{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:4px!important}
+.recordForm .countField>.countValue>input{flex:0 0 72px!important;width:72px!important;min-width:0!important;padding-right:0!important}
+.recordForm .countField>.countValue>select{flex:0 0 42px!important;width:42px!important;min-width:42px!important;padding-right:12px!important;text-align:center!important}
 .recordForm .categoryProperty>.propertyLabel,.recordForm .categoryProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .categoryProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
+.recordForm .wizardPurchasePage>.notionDateProperty{grid-column:1/-1!important}
 .recordForm .wizardPurchasePage .purchaseEntryComposer>label>span,.recordForm .wizardPurchasePage .purchaseEntryComposer>label>input,.recordForm .wizardPurchasePage .purchaseMethodProperty>span,.recordForm .wizardPurchasePage .purchaseMethodProperty summary{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .wizardPurchasePage .purchaseEntryComposer>label>span,.recordForm .wizardPurchasePage .purchaseMethodProperty>span{display:flex!important;align-items:center!important}
 
@@ -146,6 +149,36 @@
   .recordForm .wizardPage .ratingControl{position:relative;top:0}
   .recordForm .flexDateTrigger{min-height:38px}
   .recordForm .flexDatePopover{position:fixed!important;left:16px!important;right:16px!important;top:50%!important;transform:translateY(-50%);width:auto!important;max-height:calc(100dvh - 48px);overflow:auto}
+}
+
+/* Long volume labels keep their own space and never collide with prices. */
+.recordForm .savedPurchaseItem>div:first-child{
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:start!important;
+  column-gap:16px!important;
+}
+.recordForm .savedPurchaseItem>div:first-child>b{
+  min-width:0;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+  word-break:keep-all;
+}
+.recordForm .savedPurchaseItem>div:first-child>span{
+  display:grid!important;
+  grid-template-columns:auto minmax(68px,auto);
+  align-items:baseline!important;
+  gap:16px!important;
+  white-space:nowrap;
+}
+.recordForm .savedPurchaseItem p{margin-left:0!important}
+@media(max-width:420px){
+  .recordForm .savedPurchaseItem>div:first-child{
+    grid-template-columns:minmax(0,1fr)!important;
+    row-gap:5px!important;
+  }
+  .recordForm .savedPurchaseItem>div:first-child>span{
+    justify-content:start;
+  }
 }
 
 /* Date-picker controls share the same geometry on desktop and mobile. */
