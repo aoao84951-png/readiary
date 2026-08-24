@@ -1819,7 +1819,7 @@ export default function FeedPage() {
                     <input
                       type="number"
                       min="0"
-                      value={form.read_count}
+                      value={form.read_count || ""}
                       onChange={(e) => field("read_count", +e.target.value)}
                     />
                   </label>
@@ -1839,8 +1839,8 @@ export default function FeedPage() {
                     {(form.purchase_items || []).map((item, index) => (
                       <div className="volumePurchaseRow" key={index}>
                         <input aria-label={`${index + 1}번째 ${form.count_unit || "권"} 이름`} value={item.label} onChange={(e) => updatePurchaseItem(index, "label", e.target.value)} />
-                        <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
-                        <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
+                        <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price || ""} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
+                        <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price || ""} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
                         <button type="button" aria-label={`${item.label} 가격 행 삭제`} onClick={() => setPurchaseItems((form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index))}><X size={12} /></button>
                         <MultiEditableSelect values={item.methods || []} options={purchaseMethodOptions} onChange={(values) => updatePurchaseItem(index, "methods", values)} onAdd={(value) => addOption("purchase_methods", value)} />
                       </div>

@@ -1499,11 +1499,55 @@ html { scrollbar-gutter: stable; }
 @media (max-width: 520px) {
   .dockLayout { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
   .compactTopBar { height: 43px; padding-inline: 10px; }
+  .addDrawer .recordForm label,
+  .addDrawer .editableSelect {
+    font-size: 10px;
+  }
   .addDrawer .recordForm input,
   .addDrawer .recordForm select,
-  .addDrawer .recordForm textarea,
   .addDrawer .editableSelect > select {
+    height: 40px;
+    min-height: 40px;
+    margin-top: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
+    color: #55514e;
+    font-size: 13.5px;
     font-weight: 500;
+    line-height: 40px;
+  }
+  .addDrawer .recordForm textarea {
+    margin-top: 5px;
+    padding: 8px 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+  .addDrawer .recordForm input[type="date"] {
+    text-align: left;
+  }
+  .addDrawer .recordForm input[type="date"]::-webkit-date-and-time-value {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    text-align: left;
+  }
+  .addDrawer .recordForm input[type="date"]::-webkit-datetime-edit {
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+  .addDrawer .recordForm .countField > span input,
+  .addDrawer .recordForm .countField > span select {
+    margin-top: 4px;
+  }
+  .addDrawer .volumePurchaseHead {
+    font-size: 9px;
+  }
+  .addDrawer .volumePurchaseRow input,
+  .addDrawer .multiEditableSelect summary {
+    font-size: 12.5px;
   }
   .bottomDock {
     bottom: 0;
@@ -1532,6 +1576,15 @@ html { scrollbar-gutter: stable; }
     transform: translateY(-17px);
   }
   .dockLayout > .filterPanel { top: auto; }
+  .dockLayout > .filterPanel {
+    bottom: calc(50px + env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 24px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Installed iPhone apps use the same flush navigation treatment. */
