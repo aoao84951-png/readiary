@@ -1,7 +1,6 @@
 "use client";
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
-import { toPng } from "html-to-image";
-import { renderFeedExport } from "@/lib/feed-export";
+import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -51,20 +50,13 @@ async function downloadImage(dataUrl: string, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 }
 
-function downloadBlob(blob: Blob, filename: string) {
-  const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
-  const objectUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.download = safeFilename;
-  link.href = objectUrl;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
-}
-
 async function imageUrlToDataUrl(url: string) {
-  const response = await fetch(`/api/image?url=${encodeURIComponent(url)}`, { cache: "no-store" });
+  if (!url || url.startsWith("data:")) return url;
+  const absoluteUrl = new URL(url, window.location.href).href;
+  const requestUrl = absoluteUrl.startsWith(window.location.origin)
+    ? absoluteUrl
+    : `/api/image?url=${encodeURIComponent(absoluteUrl)}`;
+  const response = await fetch(requestUrl, { cache: "no-store" });
   if (!response.ok) throw new Error("표지 이미지를 불러오지 못했어요");
   const blob = await response.blob();
   return await new Promise<string>((resolve, reject) => {
@@ -75,8 +67,41 @@ async function imageUrlToDataUrl(url: string) {
   });
 }
 
+async function inlineExportResources(source: HTMLElement, clone: HTMLElement) {
+  const sourceNodes = [source, ...Array.from(source.querySelectorAll<HTMLElement>("*"))];
+  const cloneNodes = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
+
+  await Promise.all(cloneNodes.map(async (cloneNode, index) => {
+    const sourceNode = sourceNodes[index];
+    if (!sourceNode) return;
+
+    if (cloneNode instanceof HTMLImageElement && sourceNode instanceof HTMLImageElement) {
+      const url = sourceNode.currentSrc || sourceNode.src || sourceNode.getAttribute("src") || "";
+      if (url) cloneNode.src = await imageUrlToDataUrl(url);
+    }
+
+    const background = getComputedStyle(sourceNode).backgroundImage;
+    if (background && background !== "none") {
+      const match = background.match(/url\(["']?(.+?)["']?\)/);
+      if (match?.[1]) cloneNode.style.backgroundImage = `url("${await imageUrlToDataUrl(match[1])}")`;
+    }
+  }));
+
+  const images = Array.from(clone.querySelectorAll<HTMLImageElement>("img"));
+  await Promise.all(images.map(async (image) => {
+    try {
+      if (!image.complete) await new Promise<void>((resolve) => {
+        image.addEventListener("load", () => resolve(), { once: true });
+        image.addEventListener("error", () => resolve(), { once: true });
+      });
+      if (image.naturalWidth > 0 && typeof image.decode === "function") await image.decode().catch(() => undefined);
+    } catch { /* 캡처 가능한 나머지 요소는 계속 저장한다. */ }
+  }));
+}
+
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
+  const fontEmbedCSS = await getFontEmbedCSS(element);
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
   const staging = document.createElement("div");
   Object.assign(staging.style, {
@@ -106,30 +131,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   staging.appendChild(exportElement);
   document.body.appendChild(staging);
   try {
-    const images = Array.from(exportElement.querySelectorAll("img"));
-    await Promise.all(images.map(async (image) => {
-      const original = image.getAttribute("src") || "";
-      if (!/^https:\/\//.test(original)) return;
-      image.setAttribute("src", await imageUrlToDataUrl(original));
-    }));
-    const backgrounds = Array.from(exportElement.querySelectorAll<HTMLElement>("[style*='background-image']"));
-    await Promise.all(backgrounds.map(async (background) => {
-      const original = background.style.backgroundImage;
-      const match = original.match(/url\(["']?(https:\/\/[^"')]+)["']?\)/);
-      if (!match) return;
-      background.style.backgroundImage = `url("${await imageUrlToDataUrl(match[1])}")`;
-    }));
-    const transparentPixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-    await Promise.all(images.map((image) => new Promise<void>((resolve) => {
-      const finish = () => resolve();
-      const fallback = () => { image.onload = finish; image.onerror = finish; image.src = transparentPixel; };
-      if (image.complete) {
-        if (image.naturalWidth > 0) finish(); else fallback();
-      } else {
-        image.onload = finish;
-        image.onerror = fallback;
-      }
-    })));
+    await inlineExportResources(element, exportElement);
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
     const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
@@ -138,6 +140,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       includeQueryParams: true,
       backgroundColor: "#ffffff",
       pixelRatio: 4,
+      fontEmbedCSS,
       width,
       height,
       style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
@@ -164,12 +167,7 @@ function ImageShareButton({ getTarget, targetId, bookId, filename, compact = fal
     setSavingImage(true);
     setFailed("");
     try {
-      if (target.classList.contains("post")) {
-        const pages = await renderFeedExport(target);
-        pages.forEach((page, index) => downloadBlob(page, pages.length === 1 ? targetFilename : `${targetFilename}-${String(index + 1).padStart(2, "0")}`));
-      } else {
-        await saveElementAsImage(target, targetFilename);
-      }
+      await saveElementAsImage(target, targetFilename);
     }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
