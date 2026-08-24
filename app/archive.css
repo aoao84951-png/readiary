@@ -2076,3 +2076,33 @@ html { scrollbar-gutter: stable; }
 }
 .recordForm .wizardBookPage .emptySelectProperty select { color: #b7b4b0; }
 .recordForm .wizardPage input[type="date"] { width: 100%; cursor: pointer; }
+.recordForm .wizardReadingPage,
+.recordForm .wizardPurchasePage {
+  gap: 3px;
+}
+.recordForm .wizardReadingPage > label,
+.recordForm .wizardPurchasePage > label,
+.recordForm .purchaseEntryComposer > label,
+.recordForm .purchaseMethodProperty {
+  min-height: 43px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.recordForm .wizardReadingPage > .readingDatesField { min-height: 43px; }
+.recordForm .wizardPurchasePage .volumePurchases,
+.recordForm .wizardPurchasePage .purchaseEntryComposer {
+  gap: 3px;
+  padding-top: 0;
+}
+.recordForm select,
+.recordForm .editableSelect > select {
+  padding-right: 0;
+  background-image: none;
+}
+.recordForm .multiEditableSelect summary::after { display: none; }
+.recordForm input[type="number"]::-webkit-inner-spin-button,
+.recordForm input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.recordForm input[type="number"] { appearance: textfield; -moz-appearance: textfield; }

@@ -1890,7 +1890,7 @@ export default function FeedPage() {
                   <div className="bookMetaFields full">
                     <label className="countField">
                       {form.count_unit === "화" ? "총 화수" : "총 권수"}
-                      <span><input type="number" min="1" placeholder="비어 있음" value={form.total_count || ""} onChange={(e) => field("total_count", +e.target.value)} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
+                      <span><input type="text" inputMode="numeric" placeholder="비어 있음" value={form.total_count || ""} onChange={(e) => field("total_count", Number(e.target.value.replace(/\D/g, "")))} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
                     </label>
                     <label className={form.category ? "" : "emptySelectProperty"}>
                       카테고리
@@ -1957,11 +1957,11 @@ export default function FeedPage() {
                   <label>
                     독서량
                     <input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="비어 있음"
                       value={form.read_count || ""}
-                      onChange={(e) => field("read_count", +e.target.value)}
+                      onChange={(e) => field("read_count", Number(e.target.value.replace(/\D/g, "")))}
                     />
                   </label>
                 </div>}
@@ -1981,8 +1981,8 @@ export default function FeedPage() {
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
-                      <label><span>판매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: +event.target.value }))} placeholder="비어 있음" /></label>
-                      <label><span>실구매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: +event.target.value }))} placeholder="비어 있음" /></label>
+                      <label><span>판매가</span><input type="text" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
+                      <label><span>실구매가</span><input type="text" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
                       <div className="purchaseEntryActions">
                         {editingPurchaseIndex !== null && <button type="button" onClick={() => resetPurchaseDraft()}>취소</button>}
