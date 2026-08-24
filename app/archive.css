@@ -815,7 +815,35 @@
 .wizardProgress span.done i,
 .wizardProgress span.active i { background: #efd7df; color: #a86f83; }
 .wizardProgress span.active b { color: #a86f83; }
-.wizardPage { align-content: start; }
+.wizardPage {
+  align-content: start;
+  padding: 18px;
+  border-radius: 17px;
+  background: #faf9f7;
+  box-shadow: inset 0 0 0 1px rgba(91, 84, 79, .035);
+}
+.wizardBookPage { background: #faf9f7; }
+.wizardReadingPage { background: #f8fafc; }
+.wizardPurchasePage { background: #fcf9f8; }
+.wizardNotesPage { background: #fdf9fb; }
+.recordForm .wizardPage .formTopTitle,
+.recordForm .wizardPage .formSectionTitle {
+  margin: 0 0 17px;
+  padding: 0;
+}
+.recordForm .wizardPage input:not([type="file"]),
+.recordForm .wizardPage select,
+.recordForm .wizardPage textarea {
+  border-bottom-color: rgba(104, 98, 93, .12);
+}
+.recordForm .wizardPage label {
+  color: #98938e;
+}
+.recordForm .wizardPage label input,
+.recordForm .wizardPage label select,
+.recordForm .wizardPage label textarea {
+  color: #514f4c;
+}
 .wizardActions {
   position: sticky;
   z-index: 2;

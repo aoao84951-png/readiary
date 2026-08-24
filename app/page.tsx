@@ -1814,7 +1814,7 @@ export default function FeedPage() {
                     </span>
                   ))}
                 </div>
-                {step === "book" && <>
+                {step === "book" && <div className="wizardPage wizardBookPage">
                 <h3 className="formTopTitle">BOOK</h3>
                 <div className="selectedBook">
                   <div className="selectedBookCover">
@@ -1865,8 +1865,8 @@ export default function FeedPage() {
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                   </div>
                 </div>
-                </>}
-                {step === "reading" && <div className="fields wizardPage">
+                </div>}
+                {step === "reading" && <div className="fields wizardPage wizardReadingPage">
                   <h3 className="formSectionTitle readingTitle">READING</h3>
                   <label>
                     상태
@@ -1926,7 +1926,7 @@ export default function FeedPage() {
                     />
                   </label>
                 </div>}
-                {step === "purchase" && <div className="fields wizardPage">
+                {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
                   <label>
                     구매일
@@ -1957,7 +1957,7 @@ export default function FeedPage() {
                     </div>
                   </div>
                 </div>}
-                {step === "notes" && <div className="fields wizardPage">
+                {step === "notes" && <div className="fields wizardPage wizardNotesPage">
                   <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
                   {form.status === "책바구니" ? (
                     <>
