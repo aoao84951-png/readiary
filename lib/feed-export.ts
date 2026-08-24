@@ -15,7 +15,10 @@ type FeedExportData = {
 const LOGICAL_WIDTH = 520;
 const OUTPUT_WIDTH = 2080;
 const MAX_LOGICAL_HEIGHT = 2500;
-const FONT_FAMILY = "ReadDiaryExport";
+const FONT_FAMILY = "Pretendard";
+const MONO_FONT_FAMILY = "Courier Prime";
+const NOTE_FONT_SIZE = 8;
+const NOTE_LINE_HEIGHT = 13;
 
 let rendererReady: Promise<typeof import("@resvg/resvg-wasm")> | null = null;
 let fontBuffers: Promise<Uint8Array[]> | null = null;
@@ -103,7 +106,7 @@ function readFeedData(element: HTMLElement): FeedExportData {
     const kind: NoteKind = group.classList.contains("liked") ? "liked" : "disliked";
     for (const paragraph of group.querySelectorAll<HTMLParagraphElement>(".reviewNote p")) {
       const text = paragraph.textContent?.trim() || "";
-      if (text) notes.push({ kind, text, lines: wrapText(text, 395, 10.5) });
+      if (text) notes.push({ kind, text, lines: wrapText(text, 395, NOTE_FONT_SIZE) });
     }
   }
   const tags = Array.from(element.querySelectorAll<HTMLElement>(".genreText,.statusText")).map((tag) => ({
@@ -118,14 +121,14 @@ function readFeedData(element: HTMLElement): FeedExportData {
     profile: element.querySelector<HTMLImageElement>(".profileCover img")?.currentSrc || element.querySelector<HTMLImageElement>(".profileCover img")?.src || "",
     cover: backgroundImageUrl(coverElement) || element.querySelector<HTMLImageElement>(".coverBackdrop")?.currentSrc || "",
     tags,
-    rating: element.querySelector<HTMLElement>(".feedRating b")?.textContent?.trim() || "0",
-    ratingMax: element.querySelector<HTMLElement>(".feedRating small")?.textContent?.trim() || "/ 5",
+    rating: element.querySelector<HTMLElement>(".classicRating b")?.textContent?.trim() || "–",
+    ratingMax: element.querySelector<HTMLElement>(".classicRating small")?.textContent?.trim() || "/ 5",
     notes,
   };
 }
 
 function noteHeight(note: ExportNote) {
-  return Math.max(1, note.lines.length) * 17 + 16;
+  return Math.max(1, note.lines.length) * NOTE_LINE_HEIGHT + 9;
 }
 
 function splitNotes(notes: ExportNote[]) {
@@ -139,7 +142,7 @@ function splitNotes(notes: ExportNote[]) {
     while (remaining.length) {
       const capacity = pages.length ? continuationCapacity : firstCapacity;
       const labelSpace = !current.some((item) => item.kind === note.kind) ? 35 : 0;
-      const availableLines = Math.floor((capacity - used - labelSpace - 16) / 17);
+      const availableLines = Math.floor((capacity - used - labelSpace - 9) / NOTE_LINE_HEIGHT);
       if (availableLines <= 0 && current.length) {
         pages.push(current);
         current = [];
@@ -148,7 +151,7 @@ function splitNotes(notes: ExportNote[]) {
       }
       const selected = remaining.splice(0, Math.max(1, availableLines));
       current.push({ ...note, lines: selected });
-      used += labelSpace + selected.length * 17 + 16;
+      used += labelSpace + selected.length * NOTE_LINE_HEIGHT + 9;
       if (remaining.length) {
         pages.push(current);
         current = [];
@@ -160,24 +163,15 @@ function splitNotes(notes: ExportNote[]) {
   return pages;
 }
 
-function heartPath(x: number, y: number, color: string) {
-  return `<path d="M${x + 7} ${y + 13}C${x + 5} ${y + 10} ${x} ${y + 8} ${x} ${y + 4.5}C${x} ${y + 1.8} ${x + 2.2} ${y} ${x + 4.8} ${y}C${x + 6.2} ${y} ${x + 7.4} ${y + .8} ${x + 8} ${y + 2}C${x + 8.7} ${y + .8} ${x + 9.9} ${y} ${x + 11.3} ${y}C${x + 14} ${y} ${x + 16} ${y + 1.8} ${x + 16} ${y + 4.5}C${x + 16} ${y + 8} ${x + 11} ${y + 10} ${x + 8} ${y + 13}Z" fill="${color}"/>`;
-}
-
-function starPath(cx: number, cy: number, radius: number) {
-  const points = Array.from({ length: 10 }, (_, index) => {
-    const angle = -Math.PI / 2 + index * Math.PI / 5;
-    const distance = index % 2 ? radius * .45 : radius;
-    return `${cx + Math.cos(angle) * distance},${cy + Math.sin(angle) * distance}`;
-  }).join(" ");
-  return `<polygon points="${points}" fill="#ffbd32"/>`;
+function starIcon(x: number, y: number) {
+  return `<svg x="${x}" y="${y}" width="17" height="17" viewBox="0 0 24 24" fill="#ffbd32" stroke="#ffbd32" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`;
 }
 
 function textLines(lines: string[], x: number, firstBaseline: number, options: { size: number; weight: number; color: string; lineHeight: number }) {
   return lines.map((line, index) => `<text x="${x}" y="${firstBaseline + index * options.lineHeight}" font-family="${FONT_FAMILY}" font-size="${options.size}" font-weight="${options.weight}" fill="${options.color}">${escapeXml(line || " ")}</text>`).join("");
 }
 
-function noteSection(notes: ExportNote[], startY: number) {
+function noteSection(notes: ExportNote[], startY: number, hearts: Record<NoteKind, string>) {
   let y = startY;
   let previousKind: NoteKind | null = null;
   let svg = "";
@@ -187,25 +181,25 @@ function noteSection(notes: ExportNote[], startY: number) {
       const label = note.kind === "liked" ? "LOVE NOTES" : "NOPE NOTES";
       const count = notes.filter((item) => item.kind === note.kind).length.toString().padStart(2, "0");
       const color = note.kind === "liked" ? "#cf849f" : "#789fc7";
-      svg += `<text x="54" y="${y}" font-family="Courier New" font-size="8" font-weight="700" letter-spacing="1.2" fill="${color}">${label}</text>`;
-      svg += `<text x="125" y="${y}" font-family="Courier New" font-size="7" font-weight="700" letter-spacing="1" fill="#b8b8b3">${count}</text>`;
+      svg += `<text x="54" y="${y}" font-family="${MONO_FONT_FAMILY}" font-size="8" font-weight="700" letter-spacing="1.2" fill="${color}">${label}</text>`;
+      svg += `<text x="125" y="${y}" font-family="${MONO_FONT_FAMILY}" font-size="7" font-weight="700" letter-spacing="1" fill="#b8b8b3">${count}</text>`;
       y += 25;
       previousKind = note.kind;
     }
-    svg += heartPath(54, y - 10, note.kind === "liked" ? "#f1a8c1" : "#86add3");
-    svg += textLines(note.lines, 76, y, { size: 10.5, weight: 600, color: "#555551", lineHeight: 17 });
+    svg += `<image href="${escapeXml(hearts[note.kind])}" x="54" y="${y - 8}" width="10" height="10"/>`;
+    svg += textLines(note.lines, 76, y, { size: NOTE_FONT_SIZE, weight: 500, color: "#555551", lineHeight: NOTE_LINE_HEIGHT });
     y += noteHeight(note);
   }
   return { svg, endY: y };
 }
 
-function renderFirstPage(data: FeedExportData, notes: ExportNote[], profile: string, cover: string, pageNumber: number, pageCount: number) {
-  const noteRender = noteSection(notes, 590);
+function renderFirstPage(data: FeedExportData, notes: ExportNote[], profile: string, cover: string, hearts: Record<NoteKind, string>, pageNumber: number, pageCount: number) {
+  const noteRender = noteSection(notes, 590, hearts);
   const height = Math.max(807, Math.ceil(noteRender.endY + 48));
   let tagX = 54;
   const tags = data.tags.map((tag) => {
-    const node = `<text x="${tagX}" y="557" font-family="${FONT_FAMILY}" font-size="10" font-weight="700" fill="${escapeXml(tag.color)}">#${escapeXml(tag.text)}</text>`;
-    tagX += 14 + graphemes(tag.text).length * 9;
+    const node = `<text x="${tagX}" y="557" font-family="${FONT_FAMILY}" font-size="8" font-weight="600" fill="${escapeXml(tag.color)}">${escapeXml(tag.text)}</text>`;
+    tagX += 8 + graphemes(tag.text).length * 7;
     return node;
   }).join("");
   const continuation = pageCount > 1 ? `<text x="456" y="73" font-family="Courier New" font-size="7" fill="#aaa9a4">${pageNumber}/${pageCount}</text>` : "";
@@ -230,15 +224,15 @@ function renderFirstPage(data: FeedExportData, notes: ExportNote[], profile: str
       ${cover ? `<image href="${escapeXml(cover)}" x="22" y="73" width="476" height="476" preserveAspectRatio="xMidYMid slice" filter="url(#coverBlur)" opacity=".56"/><rect x="42" y="93" width="436" height="436" fill="#fff" opacity=".42"/><image href="${escapeXml(cover)}" x="42" y="93" width="436" height="436" preserveAspectRatio="xMidYMid meet"/>` : ""}
     </g>
     ${tags}
-    ${starPath(430, 551, 11)}
+    ${starIcon(420, 543)}
     <text x="445" y="557" font-family="${FONT_FAMILY}" font-size="11" font-weight="800" fill="#5d5d58">${escapeXml(data.rating)}</text>
     <text x="461" y="557" font-family="${FONT_FAMILY}" font-size="8" font-weight="600" fill="#aaa9a4">${escapeXml(data.ratingMax)}</text>
     ${noteRender.svg}
   </svg>`;
 }
 
-function renderContinuationPage(data: FeedExportData, notes: ExportNote[], profile: string, pageNumber: number, pageCount: number) {
-  const noteRender = noteSection(notes, 122);
+function renderContinuationPage(data: FeedExportData, notes: ExportNote[], profile: string, hearts: Record<NoteKind, string>, pageNumber: number, pageCount: number) {
+  const noteRender = noteSection(notes, 122, hearts);
   const height = Math.max(420, Math.ceil(noteRender.endY + 48));
   return `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="${height}" viewBox="0 0 520 ${height}">
     <defs><filter id="cardShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#2d2d28" flood-opacity=".09"/></filter><clipPath id="profileClip"><circle cx="73" cy="63" r="17"/></clipPath><linearGradient id="profileRing" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ffd33d"/><stop offset=".5" stop-color="#ff334f"/><stop offset="1" stop-color="#a62cdb"/></linearGradient></defs>
@@ -264,8 +258,10 @@ async function getFonts() {
   if (!fontBuffers) {
     fontBuffers = Promise.all([
       "/fonts/Pretendard-Regular.ttf",
+      "/fonts/Pretendard-Medium.ttf",
       "/fonts/Pretendard-SemiBold.ttf",
       "/fonts/Pretendard-ExtraBold.ttf",
+      "/fonts/CourierPrime-Bold.ttf",
     ].map(async (url) => new Uint8Array(await (await fetch(url, { cache: "force-cache" })).arrayBuffer())));
   }
   return fontBuffers;
@@ -273,17 +269,20 @@ async function getFonts() {
 
 export async function renderFeedExport(element: HTMLElement) {
   const data = readFeedData(element);
-  const [profile, cover, renderer, fonts] = await Promise.all([
+  const [profile, cover, likedHeart, dislikedHeart, renderer, fonts] = await Promise.all([
     toEmbeddedImage(data.profile),
     toEmbeddedImage(data.cover),
+    toEmbeddedImage("/note-heart-pink.png"),
+    toEmbeddedImage("/note-heart-blue.png"),
     getRenderer(),
     getFonts(),
   ]);
+  const hearts = { liked: likedHeart, disliked: dislikedHeart };
   const pages = splitNotes(data.notes);
   return pages.map((notes, index) => {
     const svg = index === 0
-      ? renderFirstPage(data, notes, profile, cover, index + 1, pages.length)
-      : renderContinuationPage(data, notes, profile, index + 1, pages.length);
+      ? renderFirstPage(data, notes, profile, cover, hearts, index + 1, pages.length)
+      : renderContinuationPage(data, notes, profile, hearts, index + 1, pages.length);
     const resvg = new renderer.Resvg(svg, {
       fitTo: { mode: "width", value: OUTPUT_WIDTH },
       background: "#ffffff",
