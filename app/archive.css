@@ -826,6 +826,7 @@
 .wizardProgress span.active b { color: #a86f83; }
 .wizardPage {
   align-content: start;
+  margin-top: 20px;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -992,6 +993,7 @@
   .wizardProgress span { gap: 7px; font-size: 7.5px; }
   .wizardProgress span::before { top: 10px; }
   .wizardProgress i { width: 21px; height: 21px; font-size: 8px; }
+  .wizardPage { margin-top: 16px; }
   .recordForm .wizardPage > label,
   .wizardBookPage .bookMetaFields > label,
   .wizardBookPage .bookMetaFields > .editableSelect {
