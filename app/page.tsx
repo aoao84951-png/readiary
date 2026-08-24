@@ -507,7 +507,13 @@ function FlexibleDatePicker({
         {compact ? <Plus size={15} strokeWidth={1.8} /> : displayDate(value)}
       </button>
       {open && (
-        <span className="flexDatePopover" role="dialog" aria-label={`${ariaLabel} 선택`}>
+        <span
+          className="flexDatePopover"
+          role="dialog"
+          aria-label={`${ariaLabel} 선택`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+        >
           <span className="flexDateHeader">
             <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달"><ChevronLeft size={17} /></button>
             <span className="flexDateJumps">
@@ -2156,8 +2162,8 @@ export default function FeedPage() {
                       <option>하차</option>
                     </select>
                   </label>
-                  <label className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
-                    {form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
+                  <div className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
+                    <span className="propertyLabel">{form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}</span>
                     <span className={`datePropertyValue ${form.finished_date ? "hasValue" : ""}`}>
                       <FlexibleDatePicker
                         ariaLabel={form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
@@ -2171,7 +2177,7 @@ export default function FeedPage() {
                       />
                       {form.finished_date && <button type="button" className="dateClear" aria-label="완독 또는 하차일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("finished_date", null); }}><X size={13} /></button>}
                     </span>
-                  </label>
+                  </div>
                   <div className={`full readingDatesField ${(form.reading_dates || []).length ? "hasDates" : "dateIsEmpty"}`}>
                     <span className="propertyLabel">읽은 날</span>
                     <span className="readingDatesValue">
@@ -2223,8 +2229,8 @@ export default function FeedPage() {
                 </div>}
                 {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
-                  <label className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
-                    구매일
+                  <div className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
+                    <span className="propertyLabel">구매일</span>
                     <span className={`datePropertyValue ${form.purchase_date ? "hasValue" : ""}`}>
                       <FlexibleDatePicker
                         ariaLabel="구매일"
@@ -2235,7 +2241,7 @@ export default function FeedPage() {
                       />
                       {form.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("purchase_date", null); }}><X size={13} /></button>}
                     </span>
-                  </label>
+                  </div>
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>

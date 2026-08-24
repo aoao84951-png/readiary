@@ -57,8 +57,9 @@
 .addDrawer{overflow-x:hidden!important}
 .recordForm.wizardForm,.recordForm .wizardPage,.recordForm .wizardPage>*{min-width:0;max-width:100%}
 .recordForm .wizardPage{width:100%;overflow:visible}
-.recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty,.recordForm .wizardPage .purchaseEntryComposer>label{align-items:center!important}
-.recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:92px minmax(0,1fr)!important}
+.recordForm .wizardPage>label,.recordForm .wizardPage>.notionDateProperty,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty,.recordForm .wizardPage .purchaseEntryComposer>label{align-items:center!important}
+.recordForm .wizardPage>label,.recordForm .wizardPage>.notionDateProperty,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:92px minmax(0,1fr)!important}
+.recordForm .wizardPage>.notionDateProperty{min-width:0;min-height:43px;display:grid;margin:0;padding:4px 2px;color:var(--property-label);font-size:var(--property-font);font-weight:600;line-height:1.35}
 .recordForm .wizardPage>label>span:first-child,.recordForm .wizardPage .editableSelect>span:first-child,.recordForm .wizardPage .purchaseMethodProperty>span:first-child{align-self:center!important;margin:0!important;white-space:nowrap}
 .recordForm .datePropertyValue,.recordForm .dateAdder{position:relative!important;min-height:32px;display:flex!important;align-items:center!important;width:100%!important;overflow:visible}
 .recordForm .dateDisplay{display:flex;align-items:center;width:100%;min-height:32px;color:#53514e;font-size:var(--property-font);font-weight:600;line-height:1.35;white-space:nowrap}
@@ -66,7 +67,7 @@
 .recordForm .datePropertyValue>input[type=date],.recordForm .dateAdder>input[type=date]{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;cursor:pointer!important}
 .recordForm .notionDateProperty.isEmpty:after,.recordForm .readingDatesField.dateIsEmpty:after,.recordForm .readingDatesField.dateIsEmpty .dateAdder:after{content:none!important;display:none!important}
 .recordForm .dateClear{z-index:4!important}
-.recordForm .readingDatesField{display:grid!important;grid-template-columns:92px minmax(0,1fr)!important;align-items:center!important}
+.recordForm .readingDatesField{display:grid!important;grid-template-columns:92px minmax(0,1fr)!important;align-items:center!important;margin:0!important;padding:4px 2px!important}
 .recordForm .readingDatesField>.propertyLabel{height:32px;display:flex;align-items:center;margin:0!important;color:var(--property-label);font-size:var(--property-font);font-weight:600;line-height:32px;white-space:nowrap}
 .recordForm .readingDatesValue{min-width:0;min-height:32px;display:flex;align-items:center;gap:6px}
 .recordForm .readingDatesValue>.dateAdder{flex:1 1 auto;align-self:center!important}
@@ -100,7 +101,7 @@
 .recordForm .flexDateTrigger.isEmpty{color:var(--property-muted);font-weight:500}
 .recordForm .datePropertyValue.hasValue .flexDateTrigger{padding-right:25px}
 .recordForm .flexDatePopover{position:absolute;z-index:120;top:calc(100% + 8px);left:0;width:min(310px,calc(100vw - 32px));padding:12px;border:1px solid #dedbd7;border-radius:14px;background:#fff;box-shadow:0 14px 38px rgba(55,50,45,.18);color:#4e4b47}
-.recordForm .notionDateProperty .flexDatePopover{left:auto;right:0}
+.recordForm .notionDateProperty .flexDatePopover{left:0;right:auto}
 .recordForm .flexDateHeader{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:6px}
 .recordForm .flexDateHeader>button{appearance:none;border:0;background:transparent;width:32px;height:32px;display:grid;place-items:center;color:#77716c;cursor:pointer}
 .recordForm .flexDateJumps{display:grid;grid-template-columns:1.25fr .75fr;gap:6px}
@@ -131,7 +132,7 @@
 @media(max-width:520px){
   .recordForm.wizardForm{width:100%!important;overflow-x:hidden!important}
   .recordForm .wizardPage{padding-right:0!important;padding-left:0!important}
-  .recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .bookMetaFields>label,.recordForm .wizardPage .purchaseEntryComposer>label,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
+  .recordForm .wizardPage>label,.recordForm .wizardPage>.notionDateProperty,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .bookMetaFields>label,.recordForm .wizardPage .purchaseEntryComposer>label,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
   .recordForm .datePropertyValue,.recordForm .dateAdder,.recordForm .dateDisplay{min-height:38px}
   .recordForm .readingDatesField{grid-template-columns:112px minmax(0,1fr)!important}
   .recordForm .readingDatesField>.propertyLabel{height:38px;line-height:38px}
@@ -151,9 +152,9 @@
 .recordForm .readingDateAdd{
   display:grid!important;
   place-items:center!important;
-  flex-basis:28px!important;
-  width:28px!important;
-  height:28px!important;
+  flex-basis:23px!important;
+  width:23px!important;
+  height:23px!important;
   padding:0!important;
 }
 .recordForm .readingDateAdd .flexDatePicker,
@@ -220,6 +221,13 @@
 .recordForm .flexDateYearEditor>span{
   font-size:14px;
   font-weight:650;
+}
+@media(max-width:520px){
+  .recordForm .readingDateAdd{
+    flex-basis:28px!important;
+    width:28px!important;
+    height:28px!important;
+  }
 }
 
 /* Tablet and desktop record editor: centered, focused workspace. */
