@@ -64,22 +64,30 @@ async function imageUrlToDataUrl(url: string) {
 
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
-  element.classList.add("imageExporting");
-  const imageRestores: Array<() => void> = [];
+  const exportElement = element.cloneNode(true) as HTMLElement;
+  exportElement.removeAttribute("id");
+  exportElement.classList.add("imageExporting");
+  Object.assign(exportElement.style, {
+    position: "fixed",
+    left: "-100000px",
+    top: "0",
+    margin: "0",
+    transform: "none",
+    pointerEvents: "none",
+  });
+  document.body.appendChild(exportElement);
   try {
-    const images = Array.from(element.querySelectorAll("img"));
+    const images = Array.from(exportElement.querySelectorAll("img"));
     for (const image of images) {
       const original = image.getAttribute("src") || "";
       if (!/^https:\/\//.test(original)) continue;
-      imageRestores.push(() => image.setAttribute("src", original));
       image.setAttribute("src", await imageUrlToDataUrl(original));
     }
-    const backgrounds = Array.from(element.querySelectorAll<HTMLElement>("[style*='background-image']"));
+    const backgrounds = Array.from(exportElement.querySelectorAll<HTMLElement>("[style*='background-image']"));
     for (const background of backgrounds) {
       const original = background.style.backgroundImage;
       const match = original.match(/url\(["']?(https:\/\/[^"')]+)["']?\)/);
       if (!match) continue;
-      imageRestores.push(() => { background.style.backgroundImage = original; });
       background.style.backgroundImage = `url("${await imageUrlToDataUrl(match[1])}")`;
     }
     const transparentPixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
@@ -94,9 +102,9 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       }
     })));
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
-    const width = Math.max(element.scrollWidth, element.offsetWidth);
-    const height = Math.max(element.scrollHeight, element.offsetHeight);
-    const dataUrl = await toPng(element, {
+    const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
+    const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
+    const dataUrl = await toPng(exportElement, {
       cacheBust: true,
       backgroundColor: "#ffffff",
       pixelRatio: 4,
@@ -107,8 +115,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     });
     await downloadImage(dataUrl, filename);
   } finally {
-    imageRestores.reverse().forEach((restore) => restore());
-    element.classList.remove("imageExporting");
+    exportElement.remove();
   }
 }
 
