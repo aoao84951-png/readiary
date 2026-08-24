@@ -1186,7 +1186,7 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
-  const [step, setStep] = useState<"search" | "form">("search");
+  const [step, setStep] = useState<"search" | "book" | "reading" | "purchase" | "notes">("search");
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<SearchBook[]>([]);
   const [searching, setSearching] = useState(false);
@@ -1200,6 +1200,7 @@ export default function FeedPage() {
   const [profileImage, setProfileImage] = useState("");
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
+  const [resumeDraft, setResumeDraft] = useState<{ form: BookRecord; step: "book" | "reading" | "purchase" | "notes"; readingDate: string } | null>(null);
   const scrollRef = useRef(0);
   const drawerRef = useRef<HTMLElement | null>(null);
   const coverScrollRef = useRef(0);
@@ -1233,6 +1234,20 @@ export default function FeedPage() {
       setProfileImage(data.profile_image || localProfile);
     }).catch(() => undefined);
   }, []);
+  useEffect(() => {
+    if (!adding || editingId || step === "search") return;
+    const meaningful = Boolean(form.title.trim() || form.author.trim() || form.cover_url || step !== "book");
+    if (!meaningful) return;
+    const timer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem("readiary-record-draft", JSON.stringify({ form, step, readingDate, savedAt: Date.now() }));
+      } catch {
+        // Large local images can exceed browser draft storage. The live form is
+        // still kept intact, so drafting simply pauses until it becomes smaller.
+      }
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [adding, editingId, form, readingDate, step]);
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return books.filter((book) => {
@@ -1268,6 +1283,19 @@ export default function FeedPage() {
   function openAdd() {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const storedDraft = window.localStorage.getItem("readiary-record-draft");
+    if (storedDraft) {
+      try {
+        const draft = JSON.parse(storedDraft) as { form?: BookRecord; step?: "book" | "reading" | "purchase" | "notes"; readingDate?: string };
+        if (draft.form?.title) {
+          setResumeDraft({ form: { ...empty, ...draft.form }, step: draft.step || "book", readingDate: draft.readingDate || "" });
+          return;
+        }
+      } catch {
+        // An outdated draft is discarded below.
+      }
+      window.localStorage.removeItem("readiary-record-draft");
+    }
     setAdding(true);
     setEditingId(null);
     setStep("search");
@@ -1276,6 +1304,32 @@ export default function FeedPage() {
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
+  }
+  function continueDraft() {
+    if (!resumeDraft) return;
+    setEditingId(null);
+    setForm(resumeDraft.form);
+    setStep(resumeDraft.step);
+    setReadingDate(resumeDraft.readingDate);
+    setSearch("");
+    setResults([]);
+    setMessage("");
+    setResumeDraft(null);
+    setAdding(true);
+  }
+  function discardDraft() {
+    window.localStorage.removeItem("readiary-record-draft");
+    setResumeDraft(null);
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    setEditingId(null);
+    setStep("search");
+    setSearch("");
+    setResults([]);
+    setMessage("");
+    setForm({ ...empty, reading_dates: [todayKey] });
+    setReadingDate("");
+    setAdding(true);
   }
   function openEdit(book: Book) {
     const { id, ...record } = book;
@@ -1290,7 +1344,7 @@ export default function FeedPage() {
     });
     setReadingDate("");
     setMessage("");
-    setStep("form");
+    setStep("book");
     setDetailBook(null);
     setAdding(true);
   }
@@ -1339,7 +1393,27 @@ export default function FeedPage() {
       source_url: book.url,
       reading_dates: [todayKey],
     });
-    setStep("form");
+    setStep("book");
+  }
+  const wizardSteps = ["book", "reading", "purchase", "notes"] as const;
+  function moveWizard(next: typeof wizardSteps[number]) {
+    setMessage("");
+    setStep(next);
+    requestAnimationFrame(() => drawerRef.current?.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+  function nextWizardStep() {
+    const index = wizardSteps.indexOf(step as typeof wizardSteps[number]);
+    if (step === "book" && !form.title.trim()) {
+      setMessage("책 제목을 입력해주세요.");
+      drawerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    if (index >= 0 && index < wizardSteps.length - 1) moveWizard(wizardSteps[index + 1]);
+  }
+  function previousWizardStep() {
+    const index = wizardSteps.indexOf(step as typeof wizardSteps[number]);
+    if (index > 0) moveWizard(wizardSteps[index - 1]);
+    else if (!editingId) setStep("search");
   }
   const field = <K extends keyof BookRecord>(key: K, value: BookRecord[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -1423,6 +1497,7 @@ export default function FeedPage() {
         : [data.item, ...prev]);
       setAdding(false);
       setEditingId(null);
+      window.localStorage.removeItem("readiary-record-draft");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "저장하지 못했어요.");
     } finally {
@@ -1658,14 +1733,27 @@ export default function FeedPage() {
         <button className={currentSection === "record" ? "active" : ""} onClick={() => navigateSection("record")} aria-label="기록"><span className="curledHeartIcon" aria-hidden="true" /></button>
         <button className={`dockProfile ${currentSection === "stats" ? "active" : ""}`} onClick={() => navigateSection("stats")} aria-label="프로필과 독서 통계"><span className="dockProfileRing">{profileImage ? <img src={profileImage} alt="" /> : <i>R</i>}</span></button>
       </nav>
+      {resumeDraft && (
+        <div className="draftResumeShade" role="presentation">
+          <section className="draftResumeDialog" role="dialog" aria-modal="true" aria-label="작성 중인 기록 이어쓰기">
+            <small>SAVED DRAFT</small>
+            <h2>작성 중인 기록이 있어요</h2>
+            <p>‘{resumeDraft.form.title}’ 기록을 {resumeDraft.step.toUpperCase()} 단계부터 이어서 작성할까요?</p>
+            <div>
+              <button type="button" onClick={discardDraft}>새로 작성</button>
+              <button type="button" className="primary" onClick={continueDraft}>이어서 작성</button>
+            </div>
+          </section>
+        </div>
+      )}
       {adding && (
         <div className="drawerShade" onMouseDown={() => setAdding(false)}>
           <aside ref={drawerRef} className="addDrawer" onMouseDown={(e) => e.stopPropagation()}>
             <header>
               <button
-                onClick={() => editingId ? setAdding(false) : step === "form" ? setStep("search") : setAdding(false)}
+                onClick={() => editingId && step === "book" ? setAdding(false) : step === "search" ? setAdding(false) : previousWizardStep()}
               >
-                {editingId ? "×" : step === "form" ? "←" : "×"}
+                {step === "search" || (editingId && step === "book") ? "×" : "←"}
               </button>
               <b>{editingId ? "기록 수정" : step === "search" ? "책 추가" : "독서 기록"}</b>
               <span />
@@ -1681,7 +1769,7 @@ export default function FeedPage() {
                   />
                   <button>{searching ? "…" : "검색"}</button>
                 </form>
-                <button className="manual" onClick={() => setStep("form")}>
+                <button className="manual" onClick={() => setStep("book")}>
                   검색 없이 직접 입력
                 </button>
                 {message && <p className="formMessage">{message}</p>}
@@ -1715,7 +1803,18 @@ export default function FeedPage() {
                 )}
               </div>
             ) : (
-              <form className="recordForm" onSubmit={save}>
+              <form className="recordForm wizardForm" onSubmit={(e) => {
+                if (step === "notes") void save(e);
+                else { e.preventDefault(); nextWizardStep(); }
+              }}>
+                <div className="wizardProgress" aria-label="기록 작성 단계">
+                  {wizardSteps.map((item, index) => (
+                    <span className={`${item === step ? "active" : ""} ${wizardSteps.indexOf(step as typeof wizardSteps[number]) > index ? "done" : ""}`} key={item}>
+                      <i>{index + 1}</i><b>{item.toUpperCase()}</b>
+                    </span>
+                  ))}
+                </div>
+                {step === "book" && <>
                 <h3 className="formTopTitle">BOOK</h3>
                 <div className="selectedBook">
                   <div className="selectedBookCover">
@@ -1765,6 +1864,9 @@ export default function FeedPage() {
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                   </div>
+                </div>
+                </>}
+                {step === "reading" && <div className="fields wizardPage">
                   <h3 className="formSectionTitle readingTitle">READING</h3>
                   <label>
                     상태
@@ -1823,6 +1925,8 @@ export default function FeedPage() {
                       onChange={(e) => field("read_count", +e.target.value)}
                     />
                   </label>
+                </div>}
+                {step === "purchase" && <div className="fields wizardPage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
                   <label>
                     구매일
@@ -1852,6 +1956,8 @@ export default function FeedPage() {
                       <span><small>할인율</small><b>{discount}%</b></span>
                     </div>
                   </div>
+                </div>}
+                {step === "notes" && <div className="fields wizardPage">
                   <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
                   {form.status === "책바구니" ? (
                     <>
@@ -1863,11 +1969,16 @@ export default function FeedPage() {
                       <NoteEditor label="싫었던 점" notes={form.disliked_notes} kind="disliked" onChange={(notes) => field("disliked_notes", notes)} />
                     </>
                   )}
-                </div>
+                </div>}
                 {message && <p className="formMessage">{message}</p>}
-                <button className="save" disabled={saving}>
-                  {saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}
-                </button>
+                <div className="wizardActions">
+                  <button type="button" className="wizardPrevious" onClick={previousWizardStep}>{step === "book" && !editingId ? "검색으로" : "이전"}</button>
+                  {step === "notes" ? (
+                    <button className="save" disabled={saving}>{saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}</button>
+                  ) : (
+                    <button className="wizardNext">다음</button>
+                  )}
+                </div>
               </form>
             )}
           </aside>
