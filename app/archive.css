@@ -771,7 +771,7 @@
 }
 
 /* Entry form sections mirror the quiet hierarchy of the record detail. */
-.wizardForm { min-height: calc(100dvh - 54px); }
+.wizardForm { min-height: 0; }
 .wizardProgress {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -825,7 +825,7 @@
   gap: 8px;
   margin: 22px -16px -16px;
   padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid #efedea;
+  border-top: 0;
   background: rgba(255,255,255,.96);
   backdrop-filter: blur(12px);
 }
@@ -839,7 +839,7 @@
 }
 .wizardPrevious { background: #f5f3f1; color: #85817d; }
 .wizardNext { background: #5d5d58; color: #fff; }
-.wizardActions .save { height: 43px; margin: 0; }
+.recordForm .wizardActions .save { height: 43px; margin: 0; }
 .draftResumeShade {
   position: fixed;
   z-index: 70;
@@ -1664,6 +1664,20 @@ html { scrollbar-gutter: stable; }
   .addDrawer .volumePurchaseRow input,
   .addDrawer .multiEditableSelect summary {
     font-size: 12.5px;
+  }
+  .addDrawer .recordForm .savedNote {
+    align-items: start;
+  }
+  .addDrawer .recordForm .savedNote textarea {
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.42;
+    transform: none;
+  }
+  .addDrawer .recordForm .savedNote .noteHeart {
+    margin-top: 3px;
   }
   .bottomDock {
     bottom: 0;
