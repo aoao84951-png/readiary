@@ -1895,11 +1895,11 @@ html { scrollbar-gutter: stable; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .imageShareButton { color: #ad7288; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
 .recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
-.recordModal.imageExporting { position: relative; max-height: none !important; height: auto !important; overflow: visible !important; border: 0; border-radius: 0; background: #fff; box-shadow: none; animation: none; }
+.recordModal.imageExporting { position: relative; max-height: none !important; height: auto !important; overflow: visible !important; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; animation: none; }
 .recordModal.imageExporting .recordModalHead { position: static; }
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
-.calendarPage.imageExporting { position: relative; padding: 20px 20px 24px; border: 0; border-radius: 0; background: #fff; box-shadow: none; }
-.post.imageExporting { position: relative; width: 520px; padding: 20px 18px 26px; border: 0; border-radius: 0; background: #fff; box-shadow: none; }
+.calendarPage.imageExporting { position: relative; padding: 20px 20px 24px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
+.post.imageExporting { position: relative; width: 520px; padding: 20px 18px 26px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
 .recordModal.imageExporting::before,
 .calendarPage.imageExporting::before,
 .post.imageExporting::before {
@@ -1909,7 +1909,7 @@ html { scrollbar-gutter: stable; }
   inset: 0;
   border: 1px solid #e7e5e3;
   border-radius: 10px;
-  box-shadow: none;
+  box-shadow: 0 2px 5px rgba(58, 52, 48, .055), 0 9px 24px rgba(58, 52, 48, .09);
   pointer-events: none;
 }
 .recordModal.imageExporting .noteHeart,

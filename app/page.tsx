@@ -109,13 +109,17 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   }
 }
 
-function ImageShareButton({ getTarget, filename, compact = false }: { getTarget: (button: HTMLButtonElement) => HTMLElement | null; filename: string; compact?: boolean }) {
+function ImageShareButton({ getTarget, targetId, bookId, filename, compact = false }: { getTarget?: (button: HTMLButtonElement) => HTMLElement | null; targetId?: string; bookId?: string; filename: string; compact?: boolean }) {
   const [savingImage, setSavingImage] = useState(false);
   const [failed, setFailed] = useState("");
   return <button type="button" className={`imageShareButton ${compact ? "compact" : ""}`} title={failed || "이미지로 멋지게 공유"} aria-label="이미지로 멋지게 공유" disabled={savingImage} onClick={async (event) => {
     event.stopPropagation();
-    const target = getTarget(event.currentTarget);
+    const target = targetId ? document.getElementById(targetId) : getTarget?.(event.currentTarget);
     if (!target) return;
+    if (bookId && target.dataset.exportBookId !== bookId) {
+      setFailed("선택한 책의 이미지를 찾지 못했어요");
+      return;
+    }
     const targetFilename = target.dataset.exportFilename || filename;
     setSavingImage(true);
     setFailed("");
@@ -1244,7 +1248,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
             >
               <section
                 key={book.id}
+                id={`record-modal-${book.id}`}
                 className="recordModal"
+                data-export-book-id={book.id}
                 data-export-filename={`readiary-${book.title}-detail`}
                 role="dialog"
                 aria-modal="true"
@@ -1270,7 +1276,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideLi
                     <details className="recordActionMenu">
                       <summary aria-label="상세 기록 메뉴"><Ellipsis size={17} /></summary>
                       <div className="recordActionMenuPanel">
-                        <ImageShareButton key={book.id} filename={`readiary-${book.title}-detail`} getTarget={(button) => button.closest(".recordModal") as HTMLElement | null} />
+                        <ImageShareButton key={book.id} filename={`readiary-${book.title}-detail`} targetId={`record-modal-${book.id}`} bookId={book.id} />
                         {onEdit && <button className="editRecordButton" onClick={() => { closeSelected(); onEdit(book); }}><Pencil size={13} /><span>기록 수정</span></button>}
                         {onDelete && <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)}><Trash2 size={13} /><span>기록 삭제</span></button>}
                       </div>
@@ -1965,6 +1971,7 @@ export default function FeedPage() {
             <article
               id={`post-${book.id || index}`}
               className="post"
+              data-export-book-id={book.id}
               data-export-filename={`readiary-${book.title}-feed`}
               key={book.id}
             >
@@ -1980,7 +1987,7 @@ export default function FeedPage() {
                   <b>{book.title}</b>
                   <small>{book.author || "저자 미상"}</small>
                 </span>
-                <span className="postHeadTools"><ImageShareButton compact filename={`readiary-${book.title}-feed`} getTarget={(button) => button.closest(".post") as HTMLElement | null} /><span className="postNumber">{String(index + 1).padStart(2, "0")}</span></span>
+                <span className="postHeadTools"><ImageShareButton key={book.id} compact filename={`readiary-${book.title}-feed`} targetId={`post-${book.id || index}`} bookId={book.id} /><span className="postNumber">{String(index + 1).padStart(2, "0")}</span></span>
               </header>
               <button className="feedCover" onClick={() => setDetailBook(book)} aria-label={`${book.title} 상세 기록 열기`}>
                 {book.cover_url && (
