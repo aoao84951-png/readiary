@@ -828,11 +828,10 @@
 }
 .recordForm .wizardPage .formTopTitle,
 .recordForm .wizardPage .formSectionTitle {
-  margin: 0 0 15px;
-  padding: 0;
+  margin: 16px 0 15px;
+  padding: 13px 0 0;
 }
 .recordForm .wizardPage > label,
-.wizardBookPage .selectedBook > div:last-child > label,
 .wizardBookPage .bookMetaFields > label,
 .wizardBookPage .bookMetaFields > .editableSelect {
   min-width: 0;
@@ -845,10 +844,23 @@
   border-radius: 0;
   background: transparent;
   color: #9a9691;
+  transition: background-color .16s ease;
+}
+.recordForm .wizardPage > label:hover,
+.recordForm .wizardPage > label:focus-within,
+.wizardBookPage .bookMetaFields > label:hover,
+.wizardBookPage .bookMetaFields > label:focus-within,
+.wizardBookPage .bookMetaFields > .editableSelect:hover,
+.wizardBookPage .bookMetaFields > .editableSelect:focus-within,
+.purchaseEntryComposer > label:hover,
+.purchaseEntryComposer > label:focus-within,
+.purchaseMethodProperty:hover,
+.purchaseMethodProperty:focus-within {
+  border-radius: 4px;
+  background: #f7f7f5;
 }
 .recordForm .wizardPage > label input:not([type="file"]),
 .recordForm .wizardPage > label select,
-.wizardBookPage .selectedBook > div:last-child input,
 .wizardBookPage .bookMetaFields input,
 .wizardBookPage .bookMetaFields select,
 .wizardBookPage .editableSelect > select {
@@ -859,9 +871,37 @@
   background-color: transparent;
   color: #514f4c;
 }
+.recordForm .wizardPage input::placeholder,
+.wizardBookPage input::placeholder,
+.purchaseEntryComposer input::placeholder,
+.editableSelect.isEmpty select,
+.multiEditableSelect summary.isEmpty {
+  color: #b7b4b0;
+  font-weight: 500;
+  opacity: 1;
+}
 .wizardBookPage .selectedBook > div:last-child {
   align-content: start;
-  gap: 1px;
+  gap: 11px;
+}
+.wizardBookPage .selectedBook > div:last-child > label {
+  min-width: 0;
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: #999590;
+}
+.wizardBookPage .selectedBook > div:last-child > label input {
+  width: 100%;
+  min-height: 34px;
+  display: block;
+  margin: 4px 0 0;
+  padding: 5px 0 7px;
+  border: 0;
+  border-bottom: 1px solid #e4e4e0;
+  border-radius: 0;
+  background: transparent;
+  color: #514f4c;
 }
 .wizardBookPage .bookMetaFields { grid-template-columns: 1fr; gap: 1px; }
 .wizardBookPage .editableSelect > span { min-width: 0; }
@@ -871,13 +911,69 @@
   padding-top: 4px;
 }
 .recordForm .wizardReadingPage .dateAdder { margin: 0; }
-.recordForm .wizardReadingPage .dateAdder input { margin: 0; }
+.recordForm .wizardReadingPage .dateAdder { position: relative; align-items: center; }
+.recordForm .wizardReadingPage .dateAdder input { height: 32px; min-height: 32px; margin: 0; padding-top: 0; padding-bottom: 0; line-height: 32px; }
 .recordForm .wizardReadingPage .dateAdder > button {
   height: 29px;
   border-radius: 8px;
   background: #ecece8;
 }
 .recordForm .wizardReadingPage .dateChips { grid-column: 2; margin-top: 2px; }
+.recordForm .wizardPage .notionDateProperty { position: relative; }
+.recordForm .wizardPage .notionDateProperty input[type="date"] {
+  height: 32px;
+  min-height: 32px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 32px;
+  outline: 0;
+}
+.recordForm .wizardPage input[type="date"]::-webkit-date-and-time-value {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  text-align: left;
+}
+.recordForm .wizardPage input[type="date"]::-webkit-calendar-picker-indicator {
+  align-self: center;
+  margin: 0;
+  padding: 6px 0 6px 8px;
+  outline: 0;
+}
+.recordForm .wizardPage .notionDateProperty.isEmpty::after {
+  content: "비어 있음";
+  position: absolute;
+  left: 94px;
+  right: 34px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: #b7b4b0;
+  pointer-events: none;
+}
+.recordForm .wizardPage .notionDateProperty.isEmpty:focus-within::after { display: none; }
+.recordForm .wizardPage .notionDateProperty.isEmpty input[type="date"] { color: transparent; }
+.recordForm .wizardPage .notionDateProperty.isEmpty:focus-within input[type="date"] { color: #514f4c; }
+.recordForm .wizardPage .readingDatesField.dateIsEmpty .dateAdder::after {
+  content: "비어 있음";
+  position: absolute;
+  left: 0;
+  right: 42px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: #b7b4b0;
+  pointer-events: none;
+}
+.recordForm .wizardPage .readingDatesField.dateIsEmpty .dateAdder:focus-within::after { display: none; }
+.recordForm .wizardPage .readingDatesField.dateIsEmpty .dateAdder input[type="date"] { color: transparent; }
+.recordForm .wizardPage .readingDatesField.dateIsEmpty .dateAdder:focus-within input[type="date"] { color: #514f4c; }
+.recordForm .wizardReadingPage .ratingControl,
+.recordForm .wizardReadingPage .ratingControl:focus-within {
+  margin-top: 0;
+  border-bottom: 0;
+}
 .recordForm .wizardPurchasePage { gap: 8px; }
 .recordForm .wizardPurchasePage > label { grid-column: 1 / -1; }
 .recordForm .wizardPurchasePage .volumePurchases { margin-top: 2px; }
@@ -896,11 +992,11 @@
 }
 @media (max-width: 520px) {
   .recordForm .wizardPage > label,
-  .wizardBookPage .selectedBook > div:last-child > label,
   .wizardBookPage .bookMetaFields > label,
   .wizardBookPage .bookMetaFields > .editableSelect {
     grid-template-columns: 78px minmax(0, 1fr);
   }
+  .recordForm .wizardPage .notionDateProperty.isEmpty::after { left: 80px; }
 }
 .wizardActions {
   position: sticky;

@@ -307,7 +307,7 @@ function EditableSelect({ label, value, options, onChange, onAdd }: { label: str
     }
   }
   return (
-    <div className="editableSelect">
+    <div className={`editableSelect ${value ? "" : "isEmpty"}`}>
       <span>{label}</span>
       {creating ? (
         <span className="newOptionField">
@@ -317,7 +317,7 @@ function EditableSelect({ label, value, options, onChange, onAdd }: { label: str
         </span>
       ) : (
         <select value={value} onChange={(event) => { if (event.target.value === "__new__") setCreating(true); else onChange(event.target.value); }}>
-          <option value="">선택</option>
+          <option value="">비어 있음</option>
           {all.map((option) => <option key={option}>{option}</option>)}
           <option value="__new__">＋ 새 선택지 추가</option>
         </select>
@@ -346,7 +346,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
   }
   return (
     <details className="multiEditableSelect">
-      <summary><span>{values.length ? values.join(" + ") : "구매방법 선택"}</span>{values.length > 0 && <small>{values.length}개</small>}</summary>
+      <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span>{values.length > 0 && <small>{values.length}개</small>}</summary>
       <div className="multiOptionMenu">
         {all.map((option) => (
           <label key={option}>
@@ -1868,6 +1868,7 @@ export default function FeedPage() {
                       제목
                       <input
                         required
+                        placeholder="비어 있음"
                         value={form.title}
                         onChange={(e) => field("title", e.target.value)}
                       />
@@ -1875,6 +1876,7 @@ export default function FeedPage() {
                     <label>
                       저자
                       <input
+                        placeholder="비어 있음"
                         value={form.author}
                         onChange={(e) => field("author", e.target.value)}
                       />
@@ -1912,7 +1914,7 @@ export default function FeedPage() {
                       <option>하차</option>
                     </select>
                   </label>
-                  <label>
+                  <label className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
                     완독 / 하차일
                     <input
                       type="date"
@@ -1922,7 +1924,7 @@ export default function FeedPage() {
                       }
                     />
                   </label>
-                  <label className="full readingDatesField">
+                  <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
                     읽은 날
                     <span className="dateAdder">
                       <input type="date" value={readingDate} onChange={(e) => setReadingDate(e.target.value)} />
@@ -1952,6 +1954,7 @@ export default function FeedPage() {
                     <input
                       type="number"
                       min="0"
+                      placeholder="비어 있음"
                       value={form.read_count || ""}
                       onChange={(e) => field("read_count", +e.target.value)}
                     />
@@ -1959,7 +1962,7 @@ export default function FeedPage() {
                 </div>}
                 {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
-                  <label>
+                  <label className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
                     구매일
                     <input
                       type="date"
@@ -1972,8 +1975,8 @@ export default function FeedPage() {
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
-                      <label><span>판매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: +event.target.value }))} placeholder="금액 입력" /></label>
-                      <label><span>실구매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: +event.target.value }))} placeholder="금액 입력" /></label>
+                      <label><span>판매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: +event.target.value }))} placeholder="비어 있음" /></label>
+                      <label><span>실구매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: +event.target.value }))} placeholder="비어 있음" /></label>
                       <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
                       <div className="purchaseEntryActions">
                         {editingPurchaseIndex !== null && <button type="button" onClick={() => resetPurchaseDraft()}>취소</button>}
