@@ -1924,9 +1924,13 @@ export default function FeedPage() {
                       type="date"
                       value={form.finished_date || ""}
                       onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
-                      onChange={(e) =>
-                        field("finished_date", e.target.value || null)
-                      }
+                      onChange={(e) => {
+                        const date = e.target.value;
+                        field("finished_date", date || null);
+                        if (date && !form.reading_dates?.includes(date)) {
+                          field("reading_dates", [...(form.reading_dates || []), date].sort());
+                        }
+                      }}
                     />
                   </label>
                   <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
