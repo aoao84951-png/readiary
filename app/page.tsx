@@ -346,7 +346,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
   }
   return (
     <details className="multiEditableSelect">
-      <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span>{values.length > 0 && <small>{values.length}개</small>}</summary>
+      <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span></summary>
       <div className="multiOptionMenu">
         {all.map((option) => (
           <label key={option}>
@@ -1920,18 +1920,21 @@ export default function FeedPage() {
                   </label>
                   <label className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
                     완독 / 하차일
-                    <input
-                      type="date"
-                      value={form.finished_date || ""}
-                      onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
-                      onChange={(e) => {
-                        const date = e.target.value;
-                        field("finished_date", date || null);
-                        if (date && !form.reading_dates?.includes(date)) {
-                          field("reading_dates", [...(form.reading_dates || []), date].sort());
-                        }
-                      }}
-                    />
+                    <span className={`datePropertyValue ${form.finished_date ? "hasValue" : ""}`}>
+                      <input
+                        type="date"
+                        value={form.finished_date || ""}
+                        onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
+                        onChange={(e) => {
+                          const date = e.target.value;
+                          field("finished_date", date || null);
+                          if (date && !form.reading_dates?.includes(date)) {
+                            field("reading_dates", [...(form.reading_dates || []), date].sort());
+                          }
+                        }}
+                      />
+                      {form.finished_date && <button type="button" className="dateClear" aria-label="완독 또는 하차일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("finished_date", null); }}><X size={13} /></button>}
+                    </span>
                   </label>
                   <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
                     읽은 날
@@ -1945,7 +1948,7 @@ export default function FeedPage() {
                     </span>
                     <span className="dateChips">
                       {(form.reading_dates || []).map(date => (
-                        <button type="button" key={date} onClick={() => field("reading_dates", (form.reading_dates || []).filter(item => item !== date))}>
+                        <button type="button" key={date} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("reading_dates", (form.reading_dates || []).filter(item => item !== date)); }}>
                           {date.replaceAll("-", ".")} <X size={10} />
                         </button>
                       ))}
@@ -1973,14 +1976,17 @@ export default function FeedPage() {
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
                   <label className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
                     구매일
-                    <input
-                      type="date"
-                      value={form.purchase_date || ""}
-                      onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
-                      onChange={(e) =>
-                        field("purchase_date", e.target.value || null)
-                      }
-                    />
+                    <span className={`datePropertyValue ${form.purchase_date ? "hasValue" : ""}`}>
+                      <input
+                        type="date"
+                        value={form.purchase_date || ""}
+                        onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
+                        onChange={(e) =>
+                          field("purchase_date", e.target.value || null)
+                        }
+                      />
+                      {form.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("purchase_date", null); }}><X size={13} /></button>}
+                    </span>
                   </label>
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
