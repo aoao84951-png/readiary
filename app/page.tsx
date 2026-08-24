@@ -349,10 +349,14 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
       <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span></summary>
       <div className="multiOptionMenu">
         {all.map((option) => (
-          <label key={option}>
-            <input type="checkbox" checked={values.includes(option)} onChange={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])} />
-            <span>{option}</span>
-          </label>
+          <button
+            type="button"
+            className={values.includes(option) ? "selected" : ""}
+            key={option}
+            onClick={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])}
+          >
+            <span>{option}</span><i aria-hidden="true" />
+          </button>
         ))}
         {creating ? (
           <span className="newMultiOption">
@@ -365,6 +369,12 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
       </div>
     </details>
   );
+}
+
+function displayDate(value: string) {
+  if (!value) return "비어 있음";
+  const [year, month, day] = value.split("-");
+  return `${year}. ${Number(month)}. ${Number(day)}.`;
 }
 
 function StarScale({
@@ -1410,14 +1420,15 @@ export default function FeedPage() {
   const wizardSteps = ["book", "reading", "purchase", "notes"] as const;
   function moveWizard(next: typeof wizardSteps[number]) {
     setMessage("");
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     setStep(next);
-    requestAnimationFrame(() => drawerRef.current?.scrollTo({ top: 0, behavior: "smooth" }));
+    requestAnimationFrame(() => { if (drawerRef.current) drawerRef.current.scrollTop = 0; });
   }
   function nextWizardStep() {
     const index = wizardSteps.indexOf(step as typeof wizardSteps[number]);
     if (step === "book" && !form.title.trim()) {
       setMessage("책 제목을 입력해주세요.");
-      drawerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      if (drawerRef.current) drawerRef.current.scrollTop = 0;
       return;
     }
     if (index >= 0 && index < wizardSteps.length - 1) moveWizard(wizardSteps[index + 1]);
@@ -1919,10 +1930,12 @@ export default function FeedPage() {
                     </select>
                   </label>
                   <label className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
-                    완독 / 하차일
+                    {form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
                     <span className={`datePropertyValue ${form.finished_date ? "hasValue" : ""}`}>
+                      <span className="dateDisplay">{displayDate(form.finished_date || "")}</span>
                       <input
                         type="date"
+                        aria-label={form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
                         value={form.finished_date || ""}
                         onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
                         onChange={(e) => {
@@ -1939,6 +1952,7 @@ export default function FeedPage() {
                   <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
                     읽은 날
                     <span className="dateAdder">
+                      <span className="dateDisplay">비어 있음</span>
                       <input type="date" value={readingDate} onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
                         const date = e.target.value;
                         if (!date) return;
@@ -1977,8 +1991,10 @@ export default function FeedPage() {
                   <label className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
                     구매일
                     <span className={`datePropertyValue ${form.purchase_date ? "hasValue" : ""}`}>
+                      <span className="dateDisplay">{displayDate(form.purchase_date || "")}</span>
                       <input
                         type="date"
+                        aria-label="구매일"
                         value={form.purchase_date || ""}
                         onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
                         onChange={(e) =>

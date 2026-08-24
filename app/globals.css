@@ -37,6 +37,7 @@
 .recordForm .dateChips button{font-size:9px!important}
 .recordForm .purchaseMethodProperty .multiEditableSelect{width:100%!important}
 .recordForm .purchaseMethodProperty .multiEditableSelect summary{min-height:30px!important;display:flex!important;align-items:center!important;margin:0!important;padding:4px 0!important;border:0!important;background:transparent!important;list-style:none!important}
+.recordForm .purchaseMethodProperty .multiEditableSelect summary:focus,.recordForm .purchaseMethodProperty .multiEditableSelect summary:focus-visible{outline:0!important;box-shadow:none!important}
 .recordForm .purchaseMethodProperty .multiEditableSelect summary::-webkit-details-marker{display:none!important}
 .recordForm .purchaseMethodProperty .multiEditableSelect summary:after{display:none!important}
 .recordForm .purchaseMethodProperty .multiEditableSelect summary.isEmpty{color:var(--property-muted)!important;font-weight:500!important}
@@ -50,4 +51,37 @@
   .recordForm .selectedBook>div:last-child>label{min-height:58px!important}
   .recordForm .dateChips button{font-size:12px!important}
   .recordForm .dateClear{width:28px;height:28px}
+}
+
+/* Stable, aligned property editor */
+.addDrawer{overflow-x:hidden!important}
+.recordForm.wizardForm,.recordForm .wizardPage,.recordForm .wizardPage>*{min-width:0;max-width:100%}
+.recordForm .wizardPage{width:100%;overflow:visible}
+.recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty,.recordForm .wizardPage .purchaseEntryComposer>label{align-items:center!important}
+.recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:92px minmax(0,1fr)!important}
+.recordForm .wizardPage>label>span:first-child,.recordForm .wizardPage .editableSelect>span:first-child,.recordForm .wizardPage .purchaseMethodProperty>span:first-child{align-self:center!important;margin:0!important;white-space:nowrap}
+.recordForm .datePropertyValue,.recordForm .dateAdder{position:relative!important;min-height:32px;display:flex!important;align-items:center!important;width:100%!important;overflow:visible}
+.recordForm .dateDisplay{display:flex;align-items:center;width:100%;min-height:32px;color:#53514e;font-size:var(--property-font);font-weight:600;line-height:1.35;white-space:nowrap}
+.recordForm .isEmpty .dateDisplay,.recordForm .dateIsEmpty .dateDisplay{color:var(--property-muted);font-weight:500}
+.recordForm .datePropertyValue>input[type=date],.recordForm .dateAdder>input[type=date]{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;cursor:pointer!important}
+.recordForm .notionDateProperty.isEmpty:after,.recordForm .readingDatesField.dateIsEmpty:after{content:none!important;display:none!important}
+.recordForm .dateClear{z-index:4!important}
+.recordForm .readingDatesField{align-items:start!important}
+.recordForm .readingDatesField>.dateAdder{align-self:center!important}
+
+.recordForm .multiEditableSelect{position:relative;width:100%}
+.recordForm .multiOptionMenu{z-index:20!important;min-width:100%!important;width:min(330px,calc(100vw - 48px))!important;padding:5px!important;border:1px solid #e6e3df!important;border-radius:10px!important;background:#fff!important;box-shadow:0 10px 28px rgba(50,48,44,.12)!important}
+.recordForm .multiOptionMenu>button:not(.openNewMultiOption){width:100%;min-height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border:0;border-radius:7px;background:transparent;color:#575550;font-size:var(--property-font);font-weight:500;text-align:left}
+.recordForm .multiOptionMenu>button:not(.openNewMultiOption):hover{background:#f6f4f2}
+.recordForm .multiOptionMenu>button.selected{background:#faf2f5;color:#9f687c;font-weight:650}
+.recordForm .multiOptionMenu>button i{width:7px;height:7px;border-radius:50%;background:transparent}
+.recordForm .multiOptionMenu>button.selected i{background:#cf8fa7}
+.recordForm .multiOptionMenu label{display:none!important}
+
+@media(max-width:520px){
+  .recordForm.wizardForm{width:100%!important;overflow-x:hidden!important}
+  .recordForm .wizardPage{padding-right:0!important;padding-left:0!important}
+  .recordForm .wizardPage>label,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
+  .recordForm .datePropertyValue,.recordForm .dateAdder,.recordForm .dateDisplay{min-height:38px}
+  .recordForm .multiOptionMenu{position:absolute!important;left:0!important;right:auto!important;max-height:min(45vh,340px)!important;overflow-y:auto!important}
 }
