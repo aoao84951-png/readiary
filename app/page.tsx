@@ -406,7 +406,10 @@ function FlexibleDatePicker({
   const [pickerPanel, setPickerPanel] = useState<"calendar" | "year" | "month">("calendar");
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
   const [viewMonth, setViewMonth] = useState(parsed.getMonth());
+  const [yearDraft, setYearDraft] = useState(String(parsed.getFullYear()));
   const rootRef = useRef<HTMLSpanElement>(null);
+  const selectedYearRef = useRef<HTMLButtonElement>(null);
+  const yearInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -432,8 +435,20 @@ function FlexibleDatePicker({
     if (!value) return;
     const next = new Date(`${value}T00:00:00`);
     setViewYear(next.getFullYear());
+    setYearDraft(String(next.getFullYear()));
     setViewMonth(next.getMonth());
   }, [value]);
+
+  useEffect(() => {
+    if (!open || pickerPanel !== "year") return;
+    setYearDraft(String(viewYear));
+    const frame = requestAnimationFrame(() => {
+      yearInputRef.current?.focus();
+      yearInputRef.current?.select();
+      selectedYearRef.current?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, pickerPanel, viewYear]);
 
   const selected = value ? new Date(`${value}T00:00:00`) : null;
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
@@ -445,10 +460,22 @@ function FlexibleDatePicker({
     if (day > daysInMonth) return { day: day - daysInMonth, offset: 1 };
     return { day, offset: 0 };
   });
+  const lastYear = Math.max(today.getFullYear() + 100, viewYear + 50);
+  const firstYear = Math.min(1900, viewYear - 50);
   const years = Array.from(
-    { length: today.getFullYear() + 10 - 1900 + 1 },
-    (_, index) => 1900 + index,
+    { length: lastYear - firstYear + 1 },
+    (_, index) => firstYear + index,
   );
+  const commitYearDraft = () => {
+    const nextYear = Number.parseInt(yearDraft, 10);
+    if (!Number.isFinite(nextYear) || nextYear < 1 || nextYear > 9999) {
+      setYearDraft(String(viewYear));
+      return;
+    }
+    setViewYear(nextYear);
+    setYearDraft(String(nextYear));
+    setPickerPanel("calendar");
+  };
   const moveMonth = (amount: number) => {
     const next = new Date(viewYear, viewMonth + amount, 1);
     setViewYear(next.getFullYear());
@@ -484,15 +511,35 @@ function FlexibleDatePicker({
           <span className="flexDateHeader">
             <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달"><ChevronLeft size={17} /></button>
             <span className="flexDateJumps">
-              <button
-                type="button"
-                className={pickerPanel === "year" ? "active" : ""}
-                aria-label="연도 목록 열기"
-                aria-expanded={pickerPanel === "year"}
-                onClick={() => setPickerPanel((panel) => panel === "year" ? "calendar" : "year")}
-              >
-                {viewYear}년 <span aria-hidden="true">⌄</span>
-              </button>
+              {pickerPanel === "year" ? (
+                <span className="flexDateYearEditor">
+                  <input
+                    ref={yearInputRef}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={4}
+                    value={yearDraft}
+                    aria-label="연도 직접 입력"
+                    onChange={(event) => setYearDraft(event.target.value.replace(/\D/g, ""))}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        commitYearDraft();
+                      }
+                    }}
+                  />
+                  <span>년</span>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  aria-label="연도 선택 및 직접 입력"
+                  aria-expanded={false}
+                  onClick={() => setPickerPanel("year")}
+                >
+                  {viewYear}년
+                </button>
+              )}
               <button
                 type="button"
                 className={pickerPanel === "month" ? "active" : ""}
@@ -500,7 +547,7 @@ function FlexibleDatePicker({
                 aria-expanded={pickerPanel === "month"}
                 onClick={() => setPickerPanel((panel) => panel === "month" ? "calendar" : "month")}
               >
-                {viewMonth + 1}월 <span aria-hidden="true">⌄</span>
+                {viewMonth + 1}월
               </button>
             </span>
             <button type="button" onClick={() => moveMonth(1)} aria-label="다음 달"><ChevronRight size={17} /></button>
@@ -511,8 +558,9 @@ function FlexibleDatePicker({
                 <button
                   type="button"
                   key={year}
+                  ref={year === viewYear ? selectedYearRef : undefined}
                   className={year === viewYear ? "selected" : ""}
-                  onClick={() => { setViewYear(year); setPickerPanel("calendar"); }}
+                  onClick={() => { setViewYear(year); setYearDraft(String(year)); setPickerPanel("calendar"); }}
                 >{year}</button>
               ))}
             </span>

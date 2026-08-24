@@ -147,6 +147,81 @@
   .recordForm .flexDatePopover{position:fixed!important;left:16px!important;right:16px!important;top:50%!important;transform:translateY(-50%);width:auto!important;max-height:calc(100dvh - 48px);overflow:auto}
 }
 
+/* Date-picker controls share the same geometry on desktop and mobile. */
+.recordForm .readingDateAdd{
+  display:grid!important;
+  place-items:center!important;
+  flex-basis:28px!important;
+  width:28px!important;
+  height:28px!important;
+  padding:0!important;
+}
+.recordForm .readingDateAdd .flexDatePicker,
+.recordForm .readingDateAdd .flexDateTrigger{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:0!important;
+}
+.recordForm .readingDateAdd .flexDateTrigger{
+  display:grid!important;
+  place-items:center!important;
+  line-height:1!important;
+}
+.recordForm .readingDateAdd .flexDateTrigger svg{
+  display:block!important;
+  width:13px!important;
+  height:13px!important;
+  margin:0!important;
+  transform:none!important;
+}
+.recordForm .flexDateJumps>button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  line-height:1;
+}
+.recordForm .flexDateYearEditor{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  padding:0 8px;
+  border:1px solid #d9a7b6;
+  border-radius:9px;
+  background:#fbf2f5;
+  color:#a26579;
+  box-sizing:border-box;
+}
+.recordForm .flexDateYearEditor input{
+  display:block!important;
+  flex:0 0 72px;
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
+  height:32px;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  color:inherit;
+  background:transparent;
+  box-shadow:none!important;
+  font:inherit;
+  font-size:14px;
+  font-weight:650;
+  line-height:32px!important;
+  letter-spacing:.02em;
+  text-align:center;
+  box-sizing:border-box;
+}
+.recordForm .flexDateYearEditor>span{
+  font-size:14px;
+  font-weight:650;
+}
+
 /* Tablet and desktop record editor: centered, focused workspace. */
 @media(min-width:521px){
   .drawerShade{
