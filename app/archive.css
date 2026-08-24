@@ -1909,7 +1909,7 @@ html { scrollbar-gutter: stable; }
   inset: 0;
   border: 1px solid #e7e5e3;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(58, 52, 48, .055), 0 9px 24px rgba(58, 52, 48, .09);
+  box-shadow: none;
   pointer-events: none;
 }
 .recordModal.imageExporting .noteHeart,
