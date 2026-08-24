@@ -1916,8 +1916,8 @@ export default function FeedPage() {
                 </div>}
                 {step === "reading" && <div className="fields wizardPage wizardReadingPage">
                   <h3 className="formSectionTitle readingTitle">READING</h3>
-                  <label>
-                    상태
+                  <label className="statusProperty">
+                    <span className="propertyLabel">상태</span>
                     <select
                       value={form.status}
                       onChange={(e) => field("status", e.target.value)}
