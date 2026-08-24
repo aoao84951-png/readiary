@@ -103,12 +103,13 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const fontEmbedCSS = await getFontEmbedCSS(element);
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
+  const exportWidth = element.classList.contains("calendarPage") ? 635 : sourceWidth;
   const staging = document.createElement("div");
   Object.assign(staging.style, {
     position: "fixed",
     left: "0",
     top: "0",
-    width: `${sourceWidth}px`,
+    width: `${exportWidth}px`,
     height: "0",
     overflow: "hidden",
     pointerEvents: "none",
@@ -126,7 +127,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     pointerEvents: "none",
   });
   if (exportElement.classList.contains("recordModal") || exportElement.classList.contains("calendarPage")) {
-    exportElement.style.width = `${sourceWidth}px`;
+    exportElement.style.width = `${exportWidth}px`;
   }
   staging.appendChild(exportElement);
   document.body.appendChild(staging);
