@@ -1915,8 +1915,8 @@ export default function FeedPage() {
                       <span className="propertyLabel">{form.count_unit === "화" ? "총 화수" : "총 권수"}</span>
                       <span className="countValue"><input type="text" inputMode="numeric" placeholder="비어 있음" value={form.total_count || ""} onChange={(e) => field("total_count", Number(e.target.value.replace(/\D/g, "")))} /><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span>
                     </label>
-                    <label className={form.category ? "" : "emptySelectProperty"}>
-                      카테고리
+                    <label className={`categoryProperty ${form.category ? "" : "emptySelectProperty"}`}>
+                      <span className="propertyLabel">카테고리</span>
                       <select value={form.category} onChange={(e) => field("category", e.target.value)}>
                         <option value="">비어 있음</option>
                         <option>BL</option><option>로맨스</option><option>로맨스판타지</option><option>문학</option><option>기타</option>
