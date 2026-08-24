@@ -37,6 +37,31 @@ type SearchBook = {
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
 
+async function shareOrDownloadImage(dataUrl: string, filename: string) {
+  const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
+  const blob = await (await fetch(dataUrl)).blob();
+  const file = new File([blob], safeFilename, { type: "image/png" });
+
+  if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+    try {
+      await navigator.share({ files: [file], title: safeFilename });
+      return;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      // If file sharing fails, retain the normal browser download fallback.
+    }
+  }
+
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = safeFilename;
+  link.href = objectUrl;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+}
+
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   element.classList.add("imageExporting");
@@ -79,10 +104,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
       filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
     });
-    const link = document.createElement("a");
-    link.download = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
-    link.href = dataUrl;
-    link.click();
+    await shareOrDownloadImage(dataUrl, filename);
   } finally {
     imageRestores.reverse().forEach((restore) => restore());
     element.classList.remove("imageExporting");
