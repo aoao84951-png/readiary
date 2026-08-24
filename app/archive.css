@@ -3,6 +3,52 @@
   margin: 0 auto;
   padding: 22px 12px 60px;
 }
+
+/* Give tablet and desktop layouts more presence without stretching reading text. */
+@media (min-width: 768px) {
+  .feedPage {
+    width: min(100%, 980px);
+  }
+
+  .feedPage > .feedList {
+    width: min(100%, 620px);
+  }
+
+  .feedPage > .archiveList {
+    width: min(100%, 760px);
+  }
+
+  .feedPage > .bookGrid {
+    width: min(100%, 900px);
+    margin-inline: auto;
+  }
+
+  .feedPage > .calendarPage,
+  .feedPage > .statsPage {
+    width: min(100%, 900px);
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1280px) {
+  .feedPage {
+    width: min(100%, 1080px);
+  }
+
+  .feedPage > .feedList {
+    width: min(100%, 660px);
+  }
+
+  .feedPage > .archiveList {
+    width: min(100%, 860px);
+  }
+
+  .feedPage > .bookGrid,
+  .feedPage > .calendarPage,
+  .feedPage > .statsPage {
+    width: min(100%, 960px);
+  }
+}
 .archiveList + .feedList {
   display: none;
 }
