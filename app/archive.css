@@ -1896,20 +1896,7 @@ html { scrollbar-gutter: stable; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
 .recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
 .recordModal.imageExporting { position: relative; max-height: none !important; height: auto !important; overflow: visible !important; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; animation: none; }
-.recordModal.imageExporting .recordModalHead {
-  position: relative;
-  border-bottom: 0;
-}
-.recordModal.imageExporting .recordModalHead::after {
-  content: "";
-  position: absolute;
-  right: 6px;
-  bottom: 0;
-  left: 6px;
-  height: 1px;
-  background: #e8e8e5;
-  pointer-events: none;
-}
+.recordModal.imageExporting .recordModalHead { position: static; }
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
 .calendarPage.imageExporting { position: relative; padding: 20px 20px 24px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
 .post.imageExporting { position: relative; width: 520px; padding: 20px 18px 26px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
@@ -1919,10 +1906,10 @@ html { scrollbar-gutter: stable; }
   content: "";
   position: absolute;
   z-index: 2;
-  inset: 6px;
+  inset: 0;
   border: 1px solid #e7e5e3;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(58, 52, 48, .05), 0 7px 16px rgba(58, 52, 48, .085);
+  box-shadow: 0 2px 5px rgba(58, 52, 48, .055), 0 9px 24px rgba(58, 52, 48, .09);
   pointer-events: none;
 }
 .recordModal.imageExporting .noteHeart,
