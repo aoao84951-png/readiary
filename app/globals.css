@@ -64,7 +64,7 @@
 .recordForm .dateDisplay{display:flex;align-items:center;width:100%;min-height:32px;color:#53514e;font-size:var(--property-font);font-weight:600;line-height:1.35;white-space:nowrap}
 .recordForm .isEmpty .dateDisplay,.recordForm .dateIsEmpty .dateDisplay{color:var(--property-muted);font-weight:500}
 .recordForm .datePropertyValue>input[type=date],.recordForm .dateAdder>input[type=date]{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;cursor:pointer!important}
-.recordForm .notionDateProperty.isEmpty:after,.recordForm .readingDatesField.dateIsEmpty:after{content:none!important;display:none!important}
+.recordForm .notionDateProperty.isEmpty:after,.recordForm .readingDatesField.dateIsEmpty:after,.recordForm .readingDatesField.dateIsEmpty .dateAdder:after{content:none!important;display:none!important}
 .recordForm .dateClear{z-index:4!important}
 .recordForm .readingDatesField{align-items:start!important}
 .recordForm .readingDatesField>.dateAdder{align-self:center!important}
