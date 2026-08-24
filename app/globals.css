@@ -108,5 +108,5 @@
   .recordForm .wizardPage select,
   .recordForm .wizardPage .dateDisplay,
   .recordForm .wizardPage .multiEditableSelect summary,
-  .recordForm .wizardPage .ratingControl{position:relative;top:-1px}
+  .recordForm .wizardPage .ratingControl{position:relative;top:0}
 }
