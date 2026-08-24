@@ -103,5 +103,10 @@
   .recordForm .readingDatesField>.propertyLabel{height:38px;line-height:38px}
   .recordForm .readingDatesValue{min-height:38px}
   .recordForm .readingDateAdd{flex-basis:32px;width:32px;height:32px}
-  .recordForm .multiOptionMenu{position:absolute!important;left:0!important;right:auto!important;max-height:min(45vh,340px)!important;overflow-y:auto!important}
+  .recordForm .multiOptionMenu{position:absolute!important;left:auto!important;right:0!important;width:min(330px,calc(100vw - 40px))!important;max-width:calc(100vw - 40px)!important;max-height:min(42vh,320px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+  .recordForm .wizardPage input:not([type=file]):not([type=date]),
+  .recordForm .wizardPage select,
+  .recordForm .wizardPage .dateDisplay,
+  .recordForm .wizardPage .multiEditableSelect summary,
+  .recordForm .wizardPage .ratingControl{position:relative;top:-1px}
 }

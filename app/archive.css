@@ -833,8 +833,9 @@
 }
 .recordForm .wizardPage .formTopTitle,
 .recordForm .wizardPage .formSectionTitle {
-  margin: 5px 0 12px;
-  padding: 4px 0 0;
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 .recordForm .wizardPage > label,
 .wizardBookPage .bookMetaFields > label,
