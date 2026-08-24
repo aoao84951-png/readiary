@@ -1961,25 +1961,41 @@ export default function FeedPage() {
                       {form.finished_date && <button type="button" className="dateClear" aria-label="완독 또는 하차일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("finished_date", null); }}><X size={13} /></button>}
                     </span>
                   </label>
-                  <label className={`full readingDatesField ${readingDate ? "" : "dateIsEmpty"}`}>
-                    읽은 날
-                    <span className="dateAdder">
-                      <span className="dateDisplay">비어 있음</span>
-                      <input type="date" value={readingDate} onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
-                        const date = e.target.value;
-                        if (!date) return;
-                        if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
-                        setReadingDate("");
-                      }} />
+                  <div className={`full readingDatesField ${(form.reading_dates || []).length ? "hasDates" : "dateIsEmpty"}`}>
+                    <span className="propertyLabel">읽은 날</span>
+                    <span className="readingDatesValue">
+                      {(form.reading_dates || []).length === 0 ? (
+                        <span className="dateAdder">
+                          <span className="dateDisplay">비어 있음</span>
+                          <input type="date" value={readingDate} aria-label="읽은 날 추가" onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
+                            const date = e.target.value;
+                            if (!date) return;
+                            if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
+                            setReadingDate("");
+                          }} />
+                        </span>
+                      ) : (
+                        <>
+                          <span className="dateChips">
+                            {(form.reading_dates || []).map(date => (
+                              <button type="button" key={date} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("reading_dates", (form.reading_dates || []).filter(item => item !== date)); }}>
+                                {date.replaceAll("-", ".")} <X size={10} />
+                              </button>
+                            ))}
+                          </span>
+                          <span className="readingDateAdd" aria-label="읽은 날 더 추가">
+                            <Plus size={15} strokeWidth={1.8} />
+                            <input type="date" value={readingDate} onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
+                              const date = e.target.value;
+                              if (!date) return;
+                              if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
+                              setReadingDate("");
+                            }} />
+                          </span>
+                        </>
+                      )}
                     </span>
-                    <span className="dateChips">
-                      {(form.reading_dates || []).map(date => (
-                        <button type="button" key={date} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("reading_dates", (form.reading_dates || []).filter(item => item !== date)); }}>
-                          {date.replaceAll("-", ".")} <X size={10} />
-                        </button>
-                      ))}
-                    </span>
-                  </label>
+                  </div>
                   <label>
                     평점
                     <InteractiveRating
