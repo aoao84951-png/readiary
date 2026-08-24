@@ -836,12 +836,12 @@
 .wizardBookPage .bookMetaFields > label,
 .wizardBookPage .bookMetaFields > .editableSelect {
   min-width: 0;
-  min-height: 55px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  min-height: 43px;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
   margin: 0;
-  padding: 7px 2px 9px;
+  padding: 4px 2px;
   border-radius: 0;
   background: transparent;
   color: #9a9691;
@@ -853,29 +853,31 @@
 .wizardBookPage .bookMetaFields select,
 .wizardBookPage .editableSelect > select {
   min-height: 28px;
-  margin: 3px 0 0;
-  padding: 3px 0 0;
+  margin: 0;
+  padding: 3px 22px 3px 0;
   border-bottom: 0;
   background-color: transparent;
   color: #514f4c;
 }
 .wizardBookPage .selectedBook > div:last-child {
   align-content: start;
-  gap: 8px;
+  gap: 1px;
 }
-.wizardBookPage .bookMetaFields { gap: 8px; }
-.recordForm .wizardReadingPage { gap: 8px; }
+.wizardBookPage .bookMetaFields { grid-template-columns: 1fr; gap: 1px; }
+.wizardBookPage .editableSelect > span { min-width: 0; }
+.recordForm .wizardReadingPage { grid-template-columns: 1fr; gap: 1px; }
 .recordForm .wizardReadingPage > .readingDatesField {
-  min-height: 78px;
-  padding-top: 8px;
+  min-height: 50px;
+  padding-top: 4px;
 }
-.recordForm .wizardReadingPage .dateAdder { margin-top: 2px; }
+.recordForm .wizardReadingPage .dateAdder { margin: 0; }
 .recordForm .wizardReadingPage .dateAdder input { margin: 0; }
 .recordForm .wizardReadingPage .dateAdder > button {
   height: 29px;
   border-radius: 8px;
   background: #ecece8;
 }
+.recordForm .wizardReadingPage .dateChips { grid-column: 2; margin-top: 2px; }
 .recordForm .wizardPurchasePage { gap: 8px; }
 .recordForm .wizardPurchasePage > label { grid-column: 1 / -1; }
 .recordForm .wizardPurchasePage .volumePurchases { margin-top: 2px; }
@@ -891,6 +893,14 @@
 .recordForm .wizardNotesPage .basketNoteEditor textarea {
   padding: 7px 0;
   border-bottom: 0;
+}
+@media (max-width: 520px) {
+  .recordForm .wizardPage > label,
+  .wizardBookPage .selectedBook > div:last-child > label,
+  .wizardBookPage .bookMetaFields > label,
+  .wizardBookPage .bookMetaFields > .editableSelect {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
 }
 .wizardActions {
   position: sticky;
@@ -1088,7 +1098,103 @@
 }
 .volumePurchases {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+}
+.purchaseEntryComposer {
+  display: grid;
+  gap: 1px;
+  padding: 2px 0 8px;
+}
+.purchaseEntryComposer > label,
+.purchaseMethodProperty {
+  min-height: 43px;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  padding: 4px 2px;
+  color: #99958f;
+  font-size: 8.5px;
+  font-weight: 700;
+}
+.recordForm .purchaseEntryComposer > label input {
+  min-width: 0;
+  min-height: 28px;
+  margin: 0;
+  padding: 3px 0;
+  border: 0;
+  text-align: left;
+}
+.purchaseMethodProperty > .multiEditableSelect {
+  grid-column: 2;
+  margin: 0;
+  padding: 0;
+}
+.purchaseMethodProperty .multiEditableSelect summary {
+  min-height: 28px;
+  padding: 3px 18px 3px 0;
+  color: #514f4c;
+  font-size: 10px;
+}
+.purchaseEntryActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 7px;
+}
+.purchaseEntryActions button {
+  min-width: 54px;
+  height: 29px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2f0ee;
+  color: #8c8681;
+  font-size: 8px;
+  font-weight: 750;
+}
+.purchaseEntryActions button.primary { background: #676762; color: #fff; }
+.savedPurchaseList {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  border-top: 1px solid #efedea;
+  border-bottom: 1px solid #efedea;
+}
+.savedPurchaseItem {
+  position: relative;
+  min-height: 48px;
+  display: grid;
+  align-content: center;
+  padding: 7px 58px 7px 2px;
+}
+.savedPurchaseItem > div:first-child {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+}
+.savedPurchaseItem b { color: #5a5753; font-size: 9.5px; }
+.savedPurchaseItem > div:first-child > span { min-width: 0; display: flex; align-items: center; gap: 12px; }
+.savedPurchaseItem small { color: #aaa49e; font-size: 8px; }
+.savedPurchaseItem strong { color: #5b5754; font-size: 9.5px; }
+.savedPurchaseItem p { margin: 4px 0 0 92px; color: #9d8882; font-size: 7.5px; line-height: 1.45; }
+.savedPurchaseActions {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: flex;
+  transform: translateY(-50%);
+}
+.savedPurchaseActions button {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #b8b2ad;
 }
 .volumePurchaseHead,
 .volumePurchaseRow {
@@ -1369,7 +1475,14 @@
   padding-top: 3px;
   border-top: 0;
 }
+.wizardPurchasePage .purchaseMethodProperty > .multiEditableSelect { margin: 0; padding: 0; }
 .wizardPurchasePage .multiEditableSelect summary { min-height: 23px; padding-bottom: 0; }
+@media (max-width: 520px) {
+  .purchaseEntryComposer > label,
+  .purchaseMethodProperty,
+  .savedPurchaseItem > div:first-child { grid-template-columns: 78px minmax(0, 1fr); }
+  .savedPurchaseItem p { margin-left: 78px; }
+}
 .multiEditableSelect summary {
   min-height: 25px;
   display: flex;

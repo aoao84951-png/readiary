@@ -197,7 +197,7 @@ const empty: BookRecord = {
   list_price: 0,
   paid_price: 0,
   purchase_method: "",
-  purchase_items: [{ label: "1권", list_price: 0, paid_price: 0, methods: [] }],
+  purchase_items: [],
   liked_notes: [],
   disliked_notes: [],
   basket_reason: "",
@@ -1193,6 +1193,8 @@ export default function FeedPage() {
   const [form, setForm] = useState<BookRecord>(empty);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [readingDate, setReadingDate] = useState("");
+  const [purchaseDraft, setPurchaseDraft] = useState<VolumePurchase>({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+  const [editingPurchaseIndex, setEditingPurchaseIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [coverProcessing, setCoverProcessing] = useState(false);
   const [platformOptions, setPlatformOptions] = useState(defaultPlatforms);
@@ -1304,6 +1306,8 @@ export default function FeedPage() {
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
+    setPurchaseDraft({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
   }
   function continueDraft() {
     if (!resumeDraft) return;
@@ -1311,6 +1315,8 @@ export default function FeedPage() {
     setForm(resumeDraft.form);
     setStep(resumeDraft.step);
     setReadingDate(resumeDraft.readingDate);
+    setPurchaseDraft({ label: `${(resumeDraft.form.purchase_items?.length || 0) + 1}${resumeDraft.form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
     setSearch("");
     setResults([]);
     setMessage("");
@@ -1329,6 +1335,8 @@ export default function FeedPage() {
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
+    setPurchaseDraft({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
     setAdding(true);
   }
   function openEdit(book: Book) {
@@ -1343,6 +1351,8 @@ export default function FeedPage() {
       purchase_items: purchaseItems,
     });
     setReadingDate("");
+    setPurchaseDraft({ label: `${purchaseItems.length + 1}${record.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
     setMessage("");
     setStep("book");
     setDetailBook(null);
@@ -1386,13 +1396,15 @@ export default function FeedPage() {
       author: book.author,
       total_count: book.totalCount || 1,
       count_unit: unit,
-      purchase_items: [{ label: `1${unit}`, list_price: 0, paid_price: 0, methods: [] }],
+      purchase_items: [],
       category: book.category,
       platform: book.platform,
       cover_url: book.cover,
       source_url: book.url,
       reading_dates: [todayKey],
     });
+    setPurchaseDraft({ label: `1${unit}`, list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
     setStep("book");
   }
   const wizardSteps = ["book", "reading", "purchase", "notes"] as const;
@@ -1423,10 +1435,28 @@ export default function FeedPage() {
     const methods = [...new Set(items.flatMap((item) => item.methods || []))];
     setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
   }
-  function updatePurchaseItem<K extends keyof VolumePurchase>(index: number, key: K, value: VolumePurchase[K]) {
+  function resetPurchaseDraft(items = form.purchase_items || []) {
+    setPurchaseDraft({ label: `${items.length + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setEditingPurchaseIndex(null);
+  }
+  function commitPurchaseDraft() {
+    const clean: VolumePurchase = {
+      label: purchaseDraft.label.trim() || `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`,
+      list_price: Number(purchaseDraft.list_price) || 0,
+      paid_price: Number(purchaseDraft.paid_price) || 0,
+      methods: purchaseDraft.methods || [],
+    };
     const items = [...(form.purchase_items || [])];
-    items[index] = { ...items[index], [key]: value };
+    if (editingPurchaseIndex === null) items.push(clean);
+    else items[editingPurchaseIndex] = clean;
     setPurchaseItems(items);
+    resetPurchaseDraft(items);
+  }
+  function editPurchaseItem(index: number) {
+    const item = form.purchase_items?.[index];
+    if (!item) return;
+    setPurchaseDraft({ ...item, methods: item.methods || [] });
+    setEditingPurchaseIndex(index);
   }
   function changeCountUnit(unit: "권" | "화") {
     setForm((prev) => ({
@@ -1437,6 +1467,7 @@ export default function FeedPage() {
         label: /^\d+[권화]$/.test(item.label) ? `${index + 1}${unit}` : item.label,
       })),
     }));
+    setPurchaseDraft((prev) => ({ ...prev, label: /^\d+[권화]$/.test(prev.label) ? `${(form.purchase_items?.length || 0) + 1}${unit}` : prev.label }));
   }
   async function changeCover(file?: File) {
     if (!file) return;
@@ -1939,17 +1970,25 @@ export default function FeedPage() {
                     />
                   </label>
                   <div className="volumePurchases full">
-                    <div className="volumePurchaseHead"><span>{form.count_unit || "권"}별 가격</span><span>판매가</span><span>실구매가</span><span /></div>
+                    <div className="purchaseEntryComposer">
+                      <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
+                      <label><span>판매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: +event.target.value }))} placeholder="금액 입력" /></label>
+                      <label><span>실구매가</span><input type="number" min="0" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: +event.target.value }))} placeholder="금액 입력" /></label>
+                      <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
+                      <div className="purchaseEntryActions">
+                        {editingPurchaseIndex !== null && <button type="button" onClick={() => resetPurchaseDraft()}>취소</button>}
+                        <button type="button" className="primary" onClick={commitPurchaseDraft}>{editingPurchaseIndex === null ? `${form.count_unit || "권"} 기록` : "수정 완료"}</button>
+                      </div>
+                    </div>
+                    {!!form.purchase_items?.length && <div className="savedPurchaseList">
                     {(form.purchase_items || []).map((item, index) => (
-                      <div className="volumePurchaseRow" key={index}>
-                        <input aria-label={`${index + 1}번째 ${form.count_unit || "권"} 이름`} value={item.label} onChange={(e) => updatePurchaseItem(index, "label", e.target.value)} />
-                        <input aria-label={`${item.label} 판매가`} type="number" min="0" inputMode="numeric" value={item.list_price || ""} onChange={(e) => updatePurchaseItem(index, "list_price", +e.target.value)} />
-                        <input aria-label={`${item.label} 실구매가`} type="number" min="0" inputMode="numeric" value={item.paid_price || ""} onChange={(e) => updatePurchaseItem(index, "paid_price", +e.target.value)} />
-                        <button type="button" aria-label={`${item.label} 가격 행 삭제`} onClick={() => setPurchaseItems((form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index))}><X size={12} /></button>
-                        <MultiEditableSelect values={item.methods || []} options={purchaseMethodOptions} onChange={(values) => updatePurchaseItem(index, "methods", values)} onAdd={(value) => addOption("purchase_methods", value)} />
+                      <div className="savedPurchaseItem" key={`${item.label}-${index}`}>
+                        <div><b>{item.label}</b><span><small>판매가 {item.list_price.toLocaleString()}원</small><strong>{item.paid_price.toLocaleString()}원</strong></span></div>
+                        {!!item.methods?.length && <p>{item.methods.join(" · ")}</p>}
+                        <span className="savedPurchaseActions"><button type="button" aria-label={`${item.label} 수정`} onClick={() => editPurchaseItem(index)}><Pencil size={11} /></button><button type="button" aria-label={`${item.label} 삭제`} onClick={() => { const next = (form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index); setPurchaseItems(next); resetPurchaseDraft(next); }}><X size={12} /></button></span>
                       </div>
                     ))}
-                    <button className="addVolumePrice" type="button" onClick={() => setPurchaseItems([...(form.purchase_items || []), { label: `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] }])}><Plus size={12} /> {form.count_unit || "권"} 추가</button>
+                    </div>}
                     <div className="purchaseTotals">
                       <span><small>총 판매가</small><b>{form.list_price.toLocaleString()}원</b></span>
                       <span><small>총 실구매가</small><b>{form.paid_price.toLocaleString()}원</b></span>
