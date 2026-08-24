@@ -1601,7 +1601,7 @@ export default function FeedPage() {
   }
   return (
     <main className="feedPage dockLayout" onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
-      <header className="compactTopBar">
+      <header className={`compactTopBar ${currentSection === "grid" ? "gridTopBar" : ""}`}>
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
           onClick={() => {
