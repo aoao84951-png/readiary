@@ -1896,7 +1896,20 @@ html { scrollbar-gutter: stable; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
 .recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
 .recordModal.imageExporting { position: relative; max-height: none !important; height: auto !important; overflow: visible !important; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; animation: none; }
-.recordModal.imageExporting .recordModalHead { position: static; }
+.recordModal.imageExporting .recordModalHead {
+  position: relative;
+  border-bottom: 0;
+}
+.recordModal.imageExporting .recordModalHead::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  bottom: 0;
+  left: 6px;
+  height: 1px;
+  background: #e8e8e5;
+  pointer-events: none;
+}
 .recordModal.imageExporting .recordModalBody { overflow: visible; }
 .calendarPage.imageExporting { position: relative; padding: 20px 20px 24px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
 .post.imageExporting { position: relative; width: 520px; padding: 20px 18px 26px; border: 24px solid #fff; border-radius: 0; background: #fff; box-shadow: none; }
