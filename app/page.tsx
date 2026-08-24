@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
+import html2canvas from "html2canvas";
 import {
   ChevronLeft,
   ChevronRight,
@@ -62,6 +63,11 @@ async function imageUrlToDataUrl(url: string) {
   });
 }
 
+function isSafariBrowser() {
+  const userAgent = navigator.userAgent;
+  return /Safari/i.test(userAgent) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/i.test(userAgent);
+}
+
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
@@ -120,16 +126,33 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
     const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
-    const dataUrl = await toPng(exportElement, {
-      cacheBust: true,
-      includeQueryParams: true,
-      backgroundColor: "#ffffff",
-      pixelRatio: 4,
-      width,
-      height,
-      style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
-      filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
-    });
+    let dataUrl: string;
+    if (isSafariBrowser()) {
+      Object.assign(exportElement.style, { maxHeight: "none", height: `${height}px`, overflow: "visible" });
+      const canvas = await html2canvas(exportElement, {
+        backgroundColor: "#ffffff",
+        scale: 4,
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height,
+        logging: false,
+        useCORS: true,
+        ignoreElements: (node) => node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude")),
+      });
+      dataUrl = canvas.toDataURL("image/png");
+    } else {
+      dataUrl = await toPng(exportElement, {
+        cacheBust: true,
+        includeQueryParams: true,
+        backgroundColor: "#ffffff",
+        pixelRatio: 4,
+        width,
+        height,
+        style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
+        filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
+      });
+    }
     await downloadImage(dataUrl, filename);
   } finally {
     staging.remove();
