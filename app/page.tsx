@@ -37,21 +37,9 @@ type SearchBook = {
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
 
-async function shareOrDownloadImage(dataUrl: string, filename: string) {
+async function downloadImage(dataUrl: string, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const blob = await (await fetch(dataUrl)).blob();
-  const file = new File([blob], safeFilename, { type: "image/png" });
-
-  if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-    try {
-      await navigator.share({ files: [file], title: safeFilename });
-      return;
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      // If file sharing fails, retain the normal browser download fallback.
-    }
-  }
-
   const objectUrl = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.download = safeFilename;
@@ -67,6 +55,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   element.classList.add("imageExporting");
   const imageRestores: Array<() => void> = [];
   try {
+    const backgroundImageUrls: string[] = [];
     const images = Array.from(element.querySelectorAll("img"));
     for (const image of images) {
       const original = image.getAttribute("src") || "";
@@ -80,7 +69,9 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       const match = original.match(/url\(["']?(https:\/\/[^"')]+)["']?\)/);
       if (!match) continue;
       imageRestores.push(() => { background.style.backgroundImage = original; });
-      background.style.backgroundImage = `url("/api/image?url=${encodeURIComponent(match[1])}")`;
+      const proxiedUrl = `/api/image?url=${encodeURIComponent(match[1])}`;
+      background.style.backgroundImage = `url("${proxiedUrl}")`;
+      backgroundImageUrls.push(proxiedUrl);
     }
     const transparentPixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
     await Promise.all(images.map((image) => new Promise<void>((resolve) => {
@@ -93,6 +84,13 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
         image.onerror = fallback;
       }
     })));
+    await Promise.all(backgroundImageUrls.map((url) => new Promise<void>((resolve) => {
+      const preload = new Image();
+      preload.onload = () => resolve();
+      preload.onerror = () => resolve();
+      preload.src = url;
+    })));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     const width = Math.max(element.scrollWidth, element.offsetWidth);
     const height = Math.max(element.scrollHeight, element.offsetHeight);
     const dataUrl = await toPng(element, {
@@ -104,7 +102,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
       style: { maxHeight: "none", height: `${height}px`, overflow: "visible" },
       filter: (node) => !(node instanceof HTMLElement && (node.classList.contains("imageShareButton") || node.classList.contains("imageExportExclude"))),
     });
-    await shareOrDownloadImage(dataUrl, filename);
+    await downloadImage(dataUrl, filename);
   } finally {
     imageRestores.reverse().forEach((restore) => restore());
     element.classList.remove("imageExporting");
