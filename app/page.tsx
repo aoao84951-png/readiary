@@ -103,6 +103,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
   const fontEmbedCSS = await getFontEmbedCSS(element);
   const isCalendarExport = element.classList.contains("calendarPage");
+  const isCardExport = isCalendarExport || element.classList.contains("post") || element.classList.contains("recordModal");
   const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
   const exportWidth = isCalendarExport ? 635 : sourceWidth;
   const staging = document.createElement("div");
@@ -140,7 +141,7 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     const dataUrl = await toPng(exportElement, {
       cacheBust: true,
       includeQueryParams: true,
-      backgroundColor: isCalendarExport ? undefined : "#ffffff",
+      backgroundColor: isCardExport ? undefined : "#ffffff",
       pixelRatio: 4,
       fontEmbedCSS,
       width,
