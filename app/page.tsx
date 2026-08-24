@@ -64,12 +64,13 @@ async function imageUrlToDataUrl(url: string) {
 
 async function saveElementAsImage(element: HTMLElement, filename: string) {
   await document.fonts.ready;
+  const sourceWidth = Math.max(1, Math.ceil(element.getBoundingClientRect().width));
   const staging = document.createElement("div");
   Object.assign(staging.style, {
     position: "fixed",
     left: "0",
     top: "0",
-    width: "0",
+    width: `${sourceWidth}px`,
     height: "0",
     overflow: "hidden",
     pointerEvents: "none",
@@ -86,6 +87,9 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
     transform: "none",
     pointerEvents: "none",
   });
+  if (exportElement.classList.contains("recordModal") || exportElement.classList.contains("calendarPage")) {
+    exportElement.style.width = `${sourceWidth}px`;
+  }
   staging.appendChild(exportElement);
   document.body.appendChild(staging);
   try {
