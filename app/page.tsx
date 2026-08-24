@@ -389,6 +389,173 @@ function displayDate(value: string) {
   return `${year}. ${Number(month)}. ${Number(day)}.`;
 }
 
+function FlexibleDatePicker({
+  value,
+  onChange,
+  ariaLabel,
+  compact = false,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabel: string;
+  compact?: boolean;
+}) {
+  const today = new Date();
+  const parsed = value ? new Date(`${value}T00:00:00`) : today;
+  const [open, setOpen] = useState(false);
+  const [pickerPanel, setPickerPanel] = useState<"calendar" | "year" | "month">("calendar");
+  const [viewYear, setViewYear] = useState(parsed.getFullYear());
+  const [viewMonth, setViewMonth] = useState(parsed.getMonth());
+  const rootRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) setPickerPanel("calendar");
+  }, [open]);
+
+  useEffect(() => {
+    if (!value) return;
+    const next = new Date(`${value}T00:00:00`);
+    setViewYear(next.getFullYear());
+    setViewMonth(next.getMonth());
+  }, [value]);
+
+  const selected = value ? new Date(`${value}T00:00:00`) : null;
+  const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const previousMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+  const cells = Array.from({ length: 42 }, (_, index) => {
+    const day = index - firstWeekday + 1;
+    if (day < 1) return { day: previousMonthDays + day, offset: -1 };
+    if (day > daysInMonth) return { day: day - daysInMonth, offset: 1 };
+    return { day, offset: 0 };
+  });
+  const years = Array.from(
+    { length: today.getFullYear() + 10 - 1900 + 1 },
+    (_, index) => 1900 + index,
+  );
+  const moveMonth = (amount: number) => {
+    const next = new Date(viewYear, viewMonth + amount, 1);
+    setViewYear(next.getFullYear());
+    setViewMonth(next.getMonth());
+  };
+  const pickDay = (day: number, offset: number) => {
+    const next = new Date(viewYear, viewMonth + offset, day);
+    const key = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-${String(next.getDate()).padStart(2, "0")}`;
+    onChange(key);
+    setOpen(false);
+  };
+  const pickToday = () => {
+    const key = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+    onChange(key);
+    setOpen(false);
+  };
+
+  return (
+    <span className={`flexDatePicker ${compact ? "compact" : ""}`} ref={rootRef}>
+      <button
+        type="button"
+        className={`flexDateTrigger ${value ? "" : "isEmpty"}`}
+        aria-label={ariaLabel}
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        {compact ? <Plus size={15} strokeWidth={1.8} /> : displayDate(value)}
+      </button>
+      {open && (
+        <span className="flexDatePopover" role="dialog" aria-label={`${ariaLabel} 선택`}>
+          <span className="flexDateHeader">
+            <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달"><ChevronLeft size={17} /></button>
+            <span className="flexDateJumps">
+              <button
+                type="button"
+                className={pickerPanel === "year" ? "active" : ""}
+                aria-label="연도 목록 열기"
+                aria-expanded={pickerPanel === "year"}
+                onClick={() => setPickerPanel((panel) => panel === "year" ? "calendar" : "year")}
+              >
+                {viewYear}년 <span aria-hidden="true">⌄</span>
+              </button>
+              <button
+                type="button"
+                className={pickerPanel === "month" ? "active" : ""}
+                aria-label="월 목록 열기"
+                aria-expanded={pickerPanel === "month"}
+                onClick={() => setPickerPanel((panel) => panel === "month" ? "calendar" : "month")}
+              >
+                {viewMonth + 1}월 <span aria-hidden="true">⌄</span>
+              </button>
+            </span>
+            <button type="button" onClick={() => moveMonth(1)} aria-label="다음 달"><ChevronRight size={17} /></button>
+          </span>
+          {pickerPanel === "year" ? (
+            <span className="flexDateYearGrid" aria-label="연도 선택">
+              {years.map((year) => (
+                <button
+                  type="button"
+                  key={year}
+                  className={year === viewYear ? "selected" : ""}
+                  onClick={() => { setViewYear(year); setPickerPanel("calendar"); }}
+                >{year}</button>
+              ))}
+            </span>
+          ) : pickerPanel === "month" ? (
+            <span className="flexDateMonthGrid" aria-label="월 선택">
+              {Array.from({ length: 12 }, (_, month) => (
+                <button
+                  type="button"
+                  key={month}
+                  className={month === viewMonth ? "selected" : ""}
+                  onClick={() => { setViewMonth(month); setPickerPanel("calendar"); }}
+                >{month + 1}월</button>
+              ))}
+            </span>
+          ) : (
+            <>
+              <span className="flexDateWeekdays">
+                {["일", "월", "화", "수", "목", "금", "토"].map((day) => <span key={day}>{day}</span>)}
+              </span>
+              <span className="flexDateDays">
+                {cells.map(({ day, offset }, index) => {
+                  const date = new Date(viewYear, viewMonth + offset, day);
+                  const isSelected = !!selected && selected.getFullYear() === date.getFullYear() && selected.getMonth() === date.getMonth() && selected.getDate() === date.getDate();
+                  const isToday = today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth() && today.getDate() === date.getDate();
+                  return (
+                    <button type="button" key={`${offset}-${day}-${index}`} className={`${offset ? "muted" : ""} ${isSelected ? "selected" : ""} ${isToday ? "today" : ""}`} onClick={() => pickDay(day, offset)}>
+                      {day}
+                    </button>
+                  );
+                })}
+              </span>
+            </>
+          )}
+          <span className="flexDateFooter">
+            <button type="button" disabled={!value} onClick={() => { onChange(""); setOpen(false); }}>날짜 지우기</button>
+            <button type="button" onClick={pickToday}>오늘</button>
+          </span>
+        </span>
+      )}
+    </span>
+  );
+}
+
 function StarScale({
   value,
   interactive = false,
@@ -1944,14 +2111,10 @@ export default function FeedPage() {
                   <label className={`notionDateProperty ${form.finished_date ? "" : "isEmpty"}`}>
                     {form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
                     <span className={`datePropertyValue ${form.finished_date ? "hasValue" : ""}`}>
-                      <span className="dateDisplay">{displayDate(form.finished_date || "")}</span>
-                      <input
-                        type="date"
-                        aria-label={form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
+                      <FlexibleDatePicker
+                        ariaLabel={form.status === "완독" ? "완독일" : form.status === "하차" ? "하차일" : "종료일"}
                         value={form.finished_date || ""}
-                        onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
-                        onChange={(e) => {
-                          const date = e.target.value;
+                        onChange={(date) => {
                           field("finished_date", date || null);
                           if (date && !form.reading_dates?.includes(date)) {
                             field("reading_dates", [...(form.reading_dates || []), date].sort());
@@ -1966,9 +2129,7 @@ export default function FeedPage() {
                     <span className="readingDatesValue">
                       {(form.reading_dates || []).length === 0 ? (
                         <span className="dateAdder">
-                          <span className="dateDisplay">비어 있음</span>
-                          <input type="date" value={readingDate} aria-label="읽은 날 추가" onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
-                            const date = e.target.value;
+                          <FlexibleDatePicker value={readingDate} ariaLabel="읽은 날 추가" onChange={(date) => {
                             if (!date) return;
                             if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
                             setReadingDate("");
@@ -1984,9 +2145,7 @@ export default function FeedPage() {
                             ))}
                           </span>
                           <span className="readingDateAdd" aria-label="읽은 날 더 추가">
-                            <Plus size={15} strokeWidth={1.8} />
-                            <input type="date" value={readingDate} onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }} onChange={(e) => {
-                              const date = e.target.value;
+                            <FlexibleDatePicker compact value={readingDate} ariaLabel="읽은 날 더 추가" onChange={(date) => {
                               if (!date) return;
                               if (!form.reading_dates?.includes(date)) field("reading_dates", [...(form.reading_dates || []), date].sort());
                               setReadingDate("");
@@ -2019,14 +2178,11 @@ export default function FeedPage() {
                   <label className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
                     구매일
                     <span className={`datePropertyValue ${form.purchase_date ? "hasValue" : ""}`}>
-                      <span className="dateDisplay">{displayDate(form.purchase_date || "")}</span>
-                      <input
-                        type="date"
-                        aria-label="구매일"
+                      <FlexibleDatePicker
+                        ariaLabel="구매일"
                         value={form.purchase_date || ""}
-                        onClick={(e) => { try { e.currentTarget.showPicker(); } catch {} }}
-                        onChange={(e) =>
-                          field("purchase_date", e.target.value || null)
+                        onChange={(date) =>
+                          field("purchase_date", date || null)
                         }
                       />
                       {form.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("purchase_date", null); }}><X size={13} /></button>}
