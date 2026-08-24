@@ -268,37 +268,34 @@
     height:28px!important;
   }
 
-  /* Give iOS one dedicated scrolling surface for long editor pages. */
+  /* iOS: the fixed overlay itself is the only scrolling surface. */
   .drawerShade{
-    height:100dvh;
-    overflow:hidden;
-  }
-  .addDrawer{
-    height:100dvh!important;
-    max-height:100dvh!important;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden!important;
-  }
-  .addDrawer>header{
-    position:relative;
-    top:auto;
-    flex:0 0 54px;
-  }
-  .addDrawer>.recordForm,
-  .addDrawer>.drawerBody{
-    flex:1 1 auto;
-    min-height:0!important;
-    height:auto!important;
+    height:auto;
+    align-items:flex-start;
     overflow-x:hidden;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:auto;
     touch-action:pan-y;
-    scroll-padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+  .addDrawer{
+    height:auto!important;
+    min-height:100%!important;
+    max-height:none!important;
+    display:block;
+    overflow:visible!important;
+  }
+  .addDrawer>header{
+    position:sticky;
+    top:0;
+  }
+  .addDrawer>.recordForm,
+  .addDrawer>.drawerBody{
+    height:auto!important;
+    overflow:visible!important;
   }
   .addDrawer>.recordForm.wizardForm{
-    min-height:0!important;
+    min-height:calc(100svh - 54px)!important;
   }
   .addDrawer .wizardActions{
     position:relative!important;
