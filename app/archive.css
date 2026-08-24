@@ -1906,10 +1906,10 @@ html { scrollbar-gutter: stable; }
   content: "";
   position: absolute;
   z-index: 2;
-  inset: 0;
+  inset: 6px;
   border: 1px solid #e7e5e3;
   border-radius: 10px;
-  box-shadow: none;
+  box-shadow: 0 2px 5px rgba(58, 52, 48, .05), 0 7px 16px rgba(58, 52, 48, .085);
   pointer-events: none;
 }
 .recordModal.imageExporting .noteHeart,

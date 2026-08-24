@@ -50,16 +50,8 @@ async function downloadImage(dataUrl: string, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 }
 
-async function imageUrlToDataUrl(url: string) {
-  const response = await fetch(`/api/image?url=${encodeURIComponent(url)}`, { cache: "no-store" });
-  if (!response.ok) throw new Error("표지 이미지를 불러오지 못했어요");
-  const blob = await response.blob();
-  return await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("표지 이미지를 변환하지 못했어요"));
-    reader.readAsDataURL(blob);
-  });
+function proxyImageUrl(url: string) {
+  return `/api/image?url=${encodeURIComponent(url)}`;
 }
 
 function normalizeExportFonts(element: HTMLElement) {
@@ -104,18 +96,21 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
   document.body.appendChild(staging);
   try {
     normalizeExportFonts(exportElement);
+    const backgroundImageUrls: string[] = [];
     const images = Array.from(exportElement.querySelectorAll("img"));
     for (const image of images) {
       const original = image.getAttribute("src") || "";
       if (!/^https:\/\//.test(original)) continue;
-      image.setAttribute("src", await imageUrlToDataUrl(original));
+      image.setAttribute("src", proxyImageUrl(original));
     }
     const backgrounds = Array.from(exportElement.querySelectorAll<HTMLElement>("[style*='background-image']"));
     for (const background of backgrounds) {
       const original = background.style.backgroundImage;
       const match = original.match(/url\(["']?(https:\/\/[^"')]+)["']?\)/);
       if (!match) continue;
-      background.style.backgroundImage = `url("${await imageUrlToDataUrl(match[1])}")`;
+      const proxiedUrl = proxyImageUrl(match[1]);
+      background.style.backgroundImage = `url("${proxiedUrl}")`;
+      backgroundImageUrls.push(proxiedUrl);
     }
     const transparentPixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
     await Promise.all(images.map((image) => new Promise<void>((resolve) => {
@@ -128,11 +123,18 @@ async function saveElementAsImage(element: HTMLElement, filename: string) {
         image.onerror = fallback;
       }
     })));
+    await Promise.all(backgroundImageUrls.map((url) => new Promise<void>((resolve) => {
+      const preload = new Image();
+      preload.onload = () => resolve();
+      preload.onerror = () => resolve();
+      preload.src = url;
+    })));
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     const width = Math.max(exportElement.scrollWidth, exportElement.offsetWidth);
     const height = Math.max(exportElement.scrollHeight, exportElement.offsetHeight);
     const dataUrl = await toPng(exportElement, {
       cacheBust: true,
+      includeQueryParams: true,
       backgroundColor: "#ffffff",
       pixelRatio: 4,
       width,
