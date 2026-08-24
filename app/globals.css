@@ -79,9 +79,9 @@
 .recordForm .statusProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .countField>.propertyLabel,.recordForm .countField>.countValue,.recordForm .countField>.countValue>input,.recordForm .countField>.countValue>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .countField>.propertyLabel{display:flex!important;grid-template-columns:none!important;gap:0!important;align-items:center!important}
-.recordForm .countField>.countValue{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:4px!important}
-.recordForm .countField>.countValue>input{flex:0 0 72px!important;width:72px!important;min-width:0!important;padding-right:0!important}
-.recordForm .countField>.countValue>select{flex:0 0 42px!important;width:42px!important;min-width:42px!important;padding-right:12px!important;text-align:center!important}
+.recordForm .countField>.countValue{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:0!important}
+.recordForm .countField>.countValue>input{flex:0 0 36px!important;width:36px!important;min-width:0!important;padding-right:2px!important;text-align:right!important}
+.recordForm .countField>.countValue>select{flex:0 0 30px!important;width:30px!important;min-width:30px!important;padding:0!important;text-align:left!important}
 .recordForm .categoryProperty>.propertyLabel,.recordForm .categoryProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .categoryProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
