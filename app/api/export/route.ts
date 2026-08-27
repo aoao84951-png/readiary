@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { firebaseConfigured, getDocument, setDocument } from "@/lib/firebase";
 
 type ExportKind = "feed" | "detail" | "calendar";
-type ExportRequest = { html?: string; css?: string; kind?: ExportKind };
+type ExportRequest = { html?: string; css?: string; kind?: ExportKind; filename?: string };
 
 const widths: Record<ExportKind, number> = { feed: 700, detail: 760, calendar: 720 };
 const maxPayloadLength = 12_000_000;
@@ -59,7 +59,17 @@ export async function POST(request: NextRequest) {
   }
 
   let input: ExportRequest;
-  try { input = await request.json() as ExportRequest; }
+  try {
+    if (request.headers.get("content-type")?.includes("multipart/form-data")) {
+      const form = await request.formData();
+      input = {
+        html: String(form.get("html") || ""),
+        css: String(form.get("css") || ""),
+        kind: String(form.get("kind") || "") as ExportKind,
+        filename: String(form.get("filename") || ""),
+      };
+    } else input = await request.json() as ExportRequest;
+  }
   catch { return NextResponse.json({ error: "내보낼 기록을 읽지 못했어요" }, { status: 400 }); }
   const kind = input.kind;
   if (!kind || !Object.hasOwn(widths, kind) || !input.html || input.html.length > maxPayloadLength) {
@@ -119,6 +129,7 @@ export async function POST(request: NextRequest) {
   return new Response(image, {
     headers: {
       "Content-Type": "image/png",
+      "Content-Disposition": `attachment; filename="readiary-export.png"; filename*=UTF-8''${encodeURIComponent(`${(input.filename || "readiary-export").replace(/[\\/:*?"<>|]/g, "-")}.png`)}`,
       "Cache-Control": "no-store",
       "X-Browser-Ms-Used": String(browserMsUsed),
     },

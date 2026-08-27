@@ -87,6 +87,38 @@ function isDesktopChrome() {
   return chrome && !mobile && !narrowViewport && !forceServerExport;
 }
 
+function isDesktopSafari() {
+  const userAgent = navigator.userAgent;
+  return /Safari\//.test(userAgent) && !/(Chrome|Chromium|CriOS|Edg|OPR|FxiOS)\//.test(userAgent) && !isMobileDevice();
+}
+
+async function submitSafariExport(input: { html: string; css: string; kind: string; filename: string }) {
+  const frameName = "readiary-safari-export-frame";
+  let frame = document.querySelector<HTMLIFrameElement>(`iframe[name="${frameName}"]`);
+  if (!frame) {
+    frame = document.createElement("iframe");
+    frame.name = frameName;
+    frame.hidden = true;
+    document.body.appendChild(frame);
+  }
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "/api/export";
+  form.enctype = "multipart/form-data";
+  form.target = frameName;
+  form.hidden = true;
+  for (const [name, value] of Object.entries(input)) {
+    const field = document.createElement("textarea");
+    field.name = name;
+    field.value = value;
+    form.appendChild(field);
+  }
+  document.body.appendChild(form);
+  form.submit();
+  form.remove();
+  await new Promise<void>((resolve) => window.setTimeout(resolve, 20_000));
+}
+
 async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
   const usageResponse = await fetch("/api/export", { cache: "no-store" });
   if (usageResponse.ok) {
@@ -120,10 +152,14 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
     try { return Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n"); }
     catch { return ""; }
   }).join("\n");
+  if (isDesktopSafari()) {
+    await submitSafariExport({ html: clone.outerHTML, css, kind, filename });
+    return;
+  }
   const response = await fetch("/api/export", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ html: clone.outerHTML, css, kind }),
+    body: JSON.stringify({ html: clone.outerHTML, css, kind, filename }),
   });
   if (!response.ok) {
     const result = await response.json().catch(() => ({})) as { code?: string; error?: string };
