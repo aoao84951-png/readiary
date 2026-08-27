@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 type ExportKind = "feed" | "detail" | "calendar";
-type ExportRequest = { html?: string; stylesheets?: string[]; kind?: ExportKind };
+type ExportRequest = { html?: string; css?: string; kind?: ExportKind };
 
 const widths: Record<ExportKind, number> = { feed: 700, detail: 760, calendar: 720 };
-const maxPayloadLength = 2_000_000;
+const maxPayloadLength = 12_000_000;
 
 function escapeAttribute(value: string) {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -31,14 +31,23 @@ export async function POST(request: NextRequest) {
   }
 
   const allowedOrigin = request.nextUrl.origin;
-  const stylesheets = (input.stylesheets || [])
-    .filter((href) => {
-      try { return new URL(href).origin === allowedOrigin; }
-      catch { return false; }
-    })
-    .map((href) => `<link rel="stylesheet" href="${escapeAttribute(href)}">`)
-    .join("");
-  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/">${stylesheets}<style>html,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}</style></head><body>${input.html}</body></html>`;
+  const safeCss = (input.css || "").replace(/<\/style/gi, "<\\/style");
+  const fontCss = `
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Regular.ttf') format('truetype');font-weight:400}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Medium.ttf') format('truetype');font-weight:500}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-SemiBold.ttf') format('truetype');font-weight:600 700}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-ExtraBold.ttf') format('truetype');font-weight:800 900}
+    @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700}
+  `;
+  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}</style></head><body>${input.html}</body></html>`;
+
+  const accessCookie = request.cookies.get("CF_Authorization")?.value;
+  const cookies = accessCookie ? [{
+    name: "CF_Authorization",
+    value: accessCookie,
+    domain: request.nextUrl.hostname,
+    path: "/",
+  }] : undefined;
 
   const cloudflareResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/browser-rendering/screenshot`, {
     method: "POST",
@@ -48,6 +57,7 @@ export async function POST(request: NextRequest) {
       selector: "#export-root",
       viewport: { width: widths[kind], height: 1200, deviceScaleFactor: 4 },
       screenshotOptions: { type: "png", omitBackground: true, captureBeyondViewport: true },
+      ...(cookies ? { cookies } : {}),
     }),
   });
   if (!cloudflareResponse.ok) {

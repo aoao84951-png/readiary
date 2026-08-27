@@ -76,7 +76,8 @@ function isDesktopChrome() {
   const chrome = /(Chrome|Chromium)\//.test(userAgent) && !/(Edg|OPR|CriOS)\//.test(userAgent);
   const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
     || Boolean((navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile);
-  return chrome && !mobile;
+  const narrowViewport = window.innerWidth <= 520;
+  return chrome && !mobile && !narrowViewport;
 }
 
 async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
@@ -92,13 +93,15 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
   if (kind === "calendar") clone.style.width = "635px";
   if (kind === "detail") clone.style.width = `${Math.max(560, Math.ceil(element.getBoundingClientRect().width))}px`;
 
-  const stylesheets = Array.from(document.styleSheets)
-    .map((sheet) => sheet.href)
-    .filter((href): href is string => Boolean(href && href.startsWith(window.location.origin)));
+  await inlineExportResources(element, clone);
+  const css = Array.from(document.styleSheets).map((sheet) => {
+    try { return Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n"); }
+    catch { return ""; }
+  }).join("\n");
   const response = await fetch("/api/export", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ html: clone.outerHTML, stylesheets, kind }),
+    body: JSON.stringify({ html: clone.outerHTML, css, kind }),
   });
   if (!response.ok) {
     const result = await response.json().catch(() => ({})) as { error?: string };
