@@ -1525,7 +1525,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} />
       </div>
       <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
-      {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><div className="yearTabs">{purchaseYears.map(year => <button className={activePurchaseYear === year ? "on" : ""} key={year} onClick={() => setPurchaseYear(year)}>{year}</button>)}</div></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
+      {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><label className="purchaseYearSelect"><span>연도 선택</span><select aria-label="구매 로그 연도 선택" value={activePurchaseYear} onChange={(event) => setPurchaseYear(event.target.value)}>{purchaseYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
         const month = String(index + 1).padStart(2, "0");
         const item = months.find(value => value.name === `${activePurchaseYear}-${month}`);
         const monthBooks = books.filter(book => book.purchase_date?.startsWith(`${activePurchaseYear}-${month}`));
