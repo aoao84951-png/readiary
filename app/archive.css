@@ -690,16 +690,23 @@
     gap: 7px;
   }
   .recordModalShade {
-    padding: 10px;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
   }
   .recordModal {
-    max-height: calc(100dvh - 20px);
+    max-height: calc(100dvh - max(20px, env(safe-area-inset-top)) - max(20px, env(safe-area-inset-bottom)));
     border-radius: 15px;
   }
   .recordModalBody {
-    padding: 16px 13px 28px;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 16px 13px calc(28px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
   }
   .recordModalHead {
+    flex: 0 0 auto;
     position: sticky;
     top: 0;
     z-index: 2;
