@@ -77,7 +77,8 @@ function isDesktopChrome() {
   const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
     || Boolean((navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile);
   const narrowViewport = window.innerWidth <= 520;
-  return chrome && !mobile && !narrowViewport;
+  const forceServerExport = new URLSearchParams(window.location.search).has("serverExport");
+  return chrome && !mobile && !narrowViewport && !forceServerExport;
 }
 
 async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
