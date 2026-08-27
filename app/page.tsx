@@ -53,7 +53,7 @@ async function downloadImage(dataUrl: string, filename: string) {
 async function shareOrDownloadBlob(blob: Blob, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const file = new File([blob], safeFilename, { type: "image/png" });
-  if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+  if (isMobileDevice() && typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
       await navigator.share({ files: [file], title: safeFilename });
       return;
@@ -71,11 +71,17 @@ async function shareOrDownloadBlob(blob: Blob, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 }
 
+function isMobileDevice() {
+  const userAgent = navigator.userAgent;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
+    || Boolean((navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile)
+    || (/Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
+}
+
 function isDesktopChrome() {
   const userAgent = navigator.userAgent;
   const chrome = /(Chrome|Chromium)\//.test(userAgent) && !/(Edg|OPR|CriOS)\//.test(userAgent);
-  const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
-    || Boolean((navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile);
+  const mobile = isMobileDevice();
   const narrowViewport = window.innerWidth <= 520;
   const forceServerExport = new URLSearchParams(window.location.search).has("serverExport");
   return chrome && !mobile && !narrowViewport && !forceServerExport;
