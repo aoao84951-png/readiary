@@ -1468,7 +1468,6 @@ function HallOfFame({ books, onEdit, onDelete }: { books: Book[]; onEdit: (book:
       <header className="hallHero">
         <small>HALL OF FAME</small>
         <h1>명예의 전당</h1>
-        <p>오래 기억하고 싶은 다섯 개의 별</p>
         <span aria-label="별점 5점"><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></span>
       </header>
       {favorites.length ? (
