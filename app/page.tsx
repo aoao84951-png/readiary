@@ -1466,7 +1466,6 @@ function HallOfFame({ books, onEdit, onDelete }: { books: Book[]; onEdit: (book:
   return (
     <section className="hallPage">
       <header className="hallHero">
-        <small>HALL OF FAME</small>
         <h1>명예의 전당</h1>
         <span aria-label="별점 5점"><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></span>
       </header>

@@ -61,6 +61,32 @@
   .recordForm .dateClear{width:28px;height:28px}
 }
 
+/* Keep the hall glow local to its title instead of tinting the page edge. */
+.hallPage {
+  padding-top: 0;
+  background: #fff;
+}
+.hallHero {
+  padding: 22px 12px 34px;
+  background: radial-gradient(ellipse 175px 66px at 50% 43%, rgba(249, 232, 237, .72), transparent 100%);
+}
+.hallHero h1 {
+  margin: 0;
+}
+.hallHero > span {
+  margin-top: 16px;
+}
+@media (max-width: 520px) {
+  .hallPage {
+    padding-top: 0;
+    background: #fff;
+  }
+  .hallHero {
+    padding: 20px 8px 30px;
+    background: radial-gradient(ellipse 145px 60px at 50% 42%, rgba(249, 232, 237, .72), transparent 100%);
+  }
+}
+
 /* Stable, aligned property editor */
 .addDrawer{overflow-x:hidden!important}
 .recordForm.wizardForm,.recordForm .wizardPage,.recordForm .wizardPage>*{min-width:0;max-width:100%}
