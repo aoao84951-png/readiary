@@ -80,13 +80,14 @@
   content: "";
   position: absolute;
   z-index: -1;
-  right: -13%;
-  bottom: 1px;
-  left: -13%;
-  height: 38%;
-  border-radius: 55% 42% 52% 46%;
-  background: rgba(242, 205, 218, .7);
-  transform: rotate(-1.2deg);
+  right: -7%;
+  bottom: 2px;
+  left: -7%;
+  height: 31%;
+  clip-path: polygon(3% 8%, 100% 0, 97% 92%, 0 100%);
+  background: rgba(236, 170, 196, .34);
+  filter: blur(2.5px);
+  transform: rotate(-.7deg) skewX(-5deg);
 }
 .hallHero > span {
   margin-top: 16px;
