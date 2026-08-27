@@ -92,20 +92,16 @@ function isDesktopSafari() {
   return /Safari\//.test(userAgent) && !/(Chrome|Chromium|CriOS|Edg|OPR|FxiOS)\//.test(userAgent) && !isMobileDevice();
 }
 
-async function submitSafariExport(input: { html: string; css: string; kind: string; filename: string }) {
-  const frameName = "readiary-safari-export-frame";
-  let frame = document.querySelector<HTMLIFrameElement>(`iframe[name="${frameName}"]`);
-  if (!frame) {
-    frame = document.createElement("iframe");
-    frame.name = frameName;
-    frame.hidden = true;
-    document.body.appendChild(frame);
-  }
+async function submitSafariExport(input: { html: string; css: string; kind: string; filename: string }, downloadWindow: Window) {
+  const targetName = `readiary-safari-export-${Date.now()}`;
+  downloadWindow.name = targetName;
+  downloadWindow.document.title = "이멋공 다운로드";
+  downloadWindow.document.body.innerHTML = "<p style='font:16px -apple-system,sans-serif;padding:24px'>이미지를 만드는 중입니다. 다운로드가 시작되면 이 탭을 닫아도 됩니다.</p>";
   const form = document.createElement("form");
   form.method = "POST";
   form.action = "/api/export";
   form.enctype = "multipart/form-data";
-  form.target = frameName;
+  form.target = targetName;
   form.hidden = true;
   for (const [name, value] of Object.entries(input)) {
     const field = document.createElement("textarea");
@@ -119,19 +115,26 @@ async function submitSafariExport(input: { html: string; css: string; kind: stri
   await new Promise<void>((resolve) => window.setTimeout(resolve, 20_000));
 }
 
-async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
+async function saveElementWithServerChrome(element: HTMLElement, filename: string, safariDownloadWindow?: Window | null) {
+  if (isDesktopSafari() && !safariDownloadWindow) {
+    throw new Error("Safari에서 다운로드 탭을 열지 못했어요. 이 사이트의 팝업을 허용한 뒤 다시 시도해주세요.");
+  }
   const usageResponse = await fetch("/api/export", { cache: "no-store" });
   if (usageResponse.ok) {
     const usage = await usageResponse.json() as { usedMs?: number; averageMs?: number; remainingMs?: number; limitMs?: number; resetTime?: string };
     const remainingMs = Number(usage.remainingMs || 0);
     const averageMs = Number(usage.averageMs || 0);
     if (remainingMs <= 0 || Number(usage.usedMs || 0) >= Number(usage.limitMs || 600_000)) {
+      safariDownloadWindow?.close();
       window.alert(`오늘의 이멋공 사용량을 모두 소진했어요. 내일 오전 ${usage.resetTime || "09:00"} 이후 다시 시도해주세요.`);
       return;
     }
     if (averageMs > 0 && remainingMs < averageMs * 2) {
       const proceed = window.confirm("남은 사용시간을 계산하면 이번이 오늘의 마지막 이멋공이 될 가능성이 높아요. 오늘의 마지막 이멋공을 진행하시겠습니까?");
-      if (!proceed) return;
+      if (!proceed) {
+        safariDownloadWindow?.close();
+        return;
+      }
     }
   }
 
@@ -153,7 +156,8 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
     catch { return ""; }
   }).join("\n");
   if (isDesktopSafari()) {
-    await submitSafariExport({ html: clone.outerHTML, css, kind, filename });
+    if (!safariDownloadWindow) throw new Error("Safari에서 다운로드 탭을 열지 못했어요. 이 사이트의 팝업을 허용한 뒤 다시 시도해주세요.");
+    await submitSafariExport({ html: clone.outerHTML, css, kind, filename }, safariDownloadWindow);
     return;
   }
   const response = await fetch("/api/export", {
@@ -286,13 +290,19 @@ function ImageShareButton({ getTarget, targetId, bookId, filename, compact = fal
       return;
     }
     const targetFilename = target.dataset.exportFilename || filename;
+    const safariDownloadWindow = isDesktopSafari() ? window.open("", "_blank") : null;
     setSavingImage(true);
     setFailed("");
     try {
       if (isDesktopChrome()) await saveElementAsImage(target, targetFilename);
-      else await saveElementWithServerChrome(target, targetFilename);
+      else await saveElementWithServerChrome(target, targetFilename, safariDownloadWindow);
     }
-    catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
+    catch (error) {
+      safariDownloadWindow?.close();
+      const message = error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요");
+      setFailed(message);
+      if (isDesktopSafari()) window.alert(message);
+    }
     finally { setSavingImage(false); }
   }}><CircleArrowDown size={compact ? 15 : 16} strokeWidth={1.45} /><span>{savingImage ? "만드는 중" : "이멋공"}</span></button>;
 }
