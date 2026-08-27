@@ -86,7 +86,6 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
   clone.removeAttribute("id");
   clone.id = "export-root";
   clone.classList.add("imageExporting");
-  clone.querySelectorAll(".imageShareButton,.imageExportExclude").forEach((node) => node.remove());
 
   const kind = clone.classList.contains("calendarPage")
     ? "calendar"
@@ -95,6 +94,7 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
   if (kind === "detail") clone.style.width = `${Math.max(560, Math.ceil(element.getBoundingClientRect().width))}px`;
 
   await inlineExportResources(element, clone);
+  clone.querySelectorAll(".imageShareButton,.imageExportExclude").forEach((node) => node.remove());
   const css = Array.from(document.styleSheets).map((sheet) => {
     try { return Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n"); }
     catch { return ""; }
