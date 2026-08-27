@@ -1460,6 +1460,37 @@ function StatsListModal({ title, subtitle, books, mode, onClose }: { title: stri
   );
 }
 
+function HallOfFame({ books, onEdit, onDelete }: { books: Book[]; onEdit: (book: Book) => void; onDelete: (book: Book) => Promise<void> }) {
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const favorites = books.filter((book) => book.rating === 5);
+  return (
+    <section className="hallPage">
+      <header className="hallHero">
+        <small>HALL OF FAME</small>
+        <h1>명예의 전당</h1>
+        <p>오래 기억하고 싶은 다섯 개의 별</p>
+        <span aria-label="별점 5점"><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></span>
+      </header>
+      {favorites.length ? (
+        <div className="hallShelf">
+          {favorites.map((book, index) => (
+            <button type="button" className="hallBook" key={book.id} onClick={() => setSelectedBook(book)} aria-label={`${book.title} 상세 기록 열기`}>
+              <span className="hallCover">{book.cover_url ? <img src={book.cover_url} alt="" /> : <span>▦</span>}</span>
+              <b>{book.title}</b>
+              <small>{book.author || "저자 미상"}</small>
+              <i>{String(index + 1).padStart(2, "0")}</i>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="hallEmpty"><Star size={20} strokeWidth={1.2} /><b>첫 번째 인생책을 기다리고 있어요</b><small>별점 5점을 준 책이 이곳에 전시됩니다.</small></div>
+      )}
+      <footer className="hallCount"><span>{String(favorites.length).padStart(2, "0")} FAVORITES</span></footer>
+      {selectedBook && <ModalRecordArchive books={favorites} openBook={selectedBook} onClose={() => setSelectedBook(null)} onEdit={onEdit} onDelete={onDelete} hideList />}
+    </section>
+  );
+}
+
 function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
   const [purchaseYear, setPurchaseYear] = useState("");
   const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" } | null>(null);
@@ -1540,6 +1571,7 @@ export default function FeedPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [view, setView] = useState<ViewMode>("grid");
   const [recordView, setRecordView] = useState<"calendar" | "records">("calendar");
+  const [profileView, setProfileView] = useState<"stats" | "hall">("stats");
   const [pending, setPending] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -2022,8 +2054,15 @@ export default function FeedPage() {
           <button className={view === "records" ? "on" : ""} onClick={() => selectRecordView("records")} aria-label="기록 목록 보기">ARCHIVE</button>
         </nav>
       )}
+      {view === "stats" && (
+        <nav className="recordModeSwitch profileModeSwitch" aria-label="프로필 보기 방식">
+          <button className={profileView === "stats" ? "on" : ""} onClick={() => setProfileView("stats")}>MY STATS</button>
+          <button className={profileView === "hall" ? "on" : ""} onClick={() => setProfileView("hall")}>HALL OF FAME</button>
+        </nav>
+      )}
       {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}
-      {view === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
+      {view === "stats" && profileView === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
+      {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onDelete={deleteBook} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
       ) : view === "records" || view === "stats" ? null
