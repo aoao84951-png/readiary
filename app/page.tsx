@@ -1447,7 +1447,7 @@ function StatsListModal({ title, subtitle, books, mode, onClose }: { title: stri
                 {mode === "purchase" && <em>{book.purchase_method || "구매방법 미기록"}</em>}
               </span>
               {mode === "status" ? (
-                <span className={`archiveStatus ${statusClass(book.status)}`}>{book.status}<small>{book.read_count} / {book.total_count}{book.count_unit || "권"}</small></span>
+                <span className={`archiveStatus ${statusClass(book.status)}`}>{book.status}<small>{book.read_count}/{book.total_count}{book.count_unit || "권"}</small></span>
               ) : (
                 <span className="statsPurchaseAmount"><b>{book.paid_price.toLocaleString()}원</b><small>{book.purchase_date?.slice(8, 10) || "–"}일 · {book.platform || "플랫폼 미기록"}</small></span>
               )}
