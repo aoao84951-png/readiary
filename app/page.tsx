@@ -82,6 +82,21 @@ function isDesktopChrome() {
 }
 
 async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
+  const usageResponse = await fetch("/api/export", { cache: "no-store" });
+  if (usageResponse.ok) {
+    const usage = await usageResponse.json() as { usedMs?: number; averageMs?: number; remainingMs?: number; limitMs?: number; resetTime?: string };
+    const remainingMs = Number(usage.remainingMs || 0);
+    const averageMs = Number(usage.averageMs || 0);
+    if (remainingMs <= 0 || Number(usage.usedMs || 0) >= Number(usage.limitMs || 600_000)) {
+      window.alert(`오늘의 이멋공 사용량을 모두 소진했어요. 내일 오전 ${usage.resetTime || "09:00"} 이후 다시 시도해주세요.`);
+      return;
+    }
+    if (averageMs > 0 && remainingMs < averageMs * 2) {
+      const proceed = window.confirm("남은 사용시간을 계산하면 이번이 오늘의 마지막 이멋공이 될 가능성이 높아요. 오늘의 마지막 이멋공을 진행하시겠습니까?");
+      if (!proceed) return;
+    }
+  }
+
   const clone = element.cloneNode(true) as HTMLElement;
   clone.removeAttribute("id");
   clone.id = "export-root";
@@ -105,7 +120,8 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
     body: JSON.stringify({ html: clone.outerHTML, css, kind }),
   });
   if (!response.ok) {
-    const result = await response.json().catch(() => ({})) as { error?: string };
+    const result = await response.json().catch(() => ({})) as { code?: string; error?: string };
+    if (result.code === "DAILY_LIMIT") window.alert(result.error || "오늘의 이멋공은 더 이상 사용할 수 없어요. 내일 다시 시도해주세요.");
     throw new Error(result.error || "호환 이미지를 만들지 못했어요");
   }
   await shareOrDownloadBlob(await response.blob(), filename);

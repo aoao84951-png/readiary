@@ -1,10 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { firebaseConfigured, getDocument, setDocument } from "@/lib/firebase";
 
 type ExportKind = "feed" | "detail" | "calendar";
 type ExportRequest = { html?: string; css?: string; kind?: ExportKind };
 
 const widths: Record<ExportKind, number> = { feed: 700, detail: 760, calendar: 720 };
 const maxPayloadLength = 12_000_000;
+const dailyBrowserLimitMs = 600_000;
+
+type ExportUsage = { usedMs?: number; count?: number };
+
+function usageDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+async function readUsage() {
+  if (!firebaseConfigured()) return { usedMs: 0, count: 0 };
+  const saved = await getDocument("export_usage", usageDate()) as ExportUsage | undefined;
+  return { usedMs: Number(saved?.usedMs || 0), count: Number(saved?.count || 0) };
+}
+
+export async function GET() {
+  try {
+    const usage = await readUsage();
+    return NextResponse.json({
+      ...usage,
+      averageMs: usage.count ? Math.round(usage.usedMs / usage.count) : 0,
+      remainingMs: Math.max(0, dailyBrowserLimitMs - usage.usedMs),
+      limitMs: dailyBrowserLimitMs,
+      resetTime: "09:00",
+    });
+  } catch {
+    return NextResponse.json({ usedMs: 0, count: 0, averageMs: 0, remainingMs: dailyBrowserLimitMs, limitMs: dailyBrowserLimitMs, resetTime: "09:00" });
+  }
+}
 
 function escapeAttribute(value: string) {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -16,6 +45,13 @@ export async function POST(request: NextRequest) {
   if (!accountId || !apiToken) {
     return NextResponse.json({ error: "호환 다운로드 설정이 아직 완료되지 않았어요" }, { status: 503 });
   }
+
+  try {
+    const usage = await readUsage();
+    if (usage.usedMs >= dailyBrowserLimitMs) {
+      return NextResponse.json({ code: "DAILY_LIMIT", error: "오늘의 이멋공 사용량을 모두 소진했어요. 내일 오전 9시 이후 다시 시도해주세요." }, { status: 429 });
+    }
+  } catch { /* Cloudflare의 실제 한도 응답을 최종 기준으로 계속 진행한다. */ }
 
   const contentLength = Number(request.headers.get("content-length") || 0);
   if (contentLength > maxPayloadLength) {
@@ -63,18 +99,28 @@ export async function POST(request: NextRequest) {
   if (!cloudflareResponse.ok) {
     const detail = await cloudflareResponse.text();
     console.error("Browser Run export failed", cloudflareResponse.status, detail.slice(0, 800));
-    const message = cloudflareResponse.status === 429
-      ? "오늘의 호환 다운로드 무료 사용량을 모두 사용했어요"
+    const dailyLimitReached = cloudflareResponse.status === 429 && /time limit exceeded|daily browser limit/i.test(detail);
+    const message = dailyLimitReached
+      ? "오늘의 이멋공 사용량을 모두 소진했어요. 내일 오전 9시 이후 다시 시도해주세요."
+      : cloudflareResponse.status === 429
+        ? "요청 간격이 너무 짧아요. 10초 후 다시 시도해주세요."
       : "서버 Chrome에서 이미지를 만들지 못했어요";
-    return NextResponse.json({ error: message }, { status: cloudflareResponse.status === 429 ? 429 : 502 });
+    return NextResponse.json({ code: dailyLimitReached ? "DAILY_LIMIT" : cloudflareResponse.status === 429 ? "RATE_LIMIT" : "EXPORT_FAILED", error: message }, { status: cloudflareResponse.status === 429 ? 429 : 502 });
   }
 
   const image = await cloudflareResponse.arrayBuffer();
+  const browserMsUsed = Math.max(0, Number(cloudflareResponse.headers.get("X-Browser-Ms-Used") || 0));
+  if (browserMsUsed && firebaseConfigured()) {
+    try {
+      const usage = await readUsage();
+      await setDocument("export_usage", usageDate(), { usedMs: usage.usedMs + browserMsUsed, count: usage.count + 1 });
+    } catch (error) { console.error("Failed to save Browser Run usage", error); }
+  }
   return new Response(image, {
     headers: {
       "Content-Type": "image/png",
       "Cache-Control": "no-store",
-      "X-Browser-Ms-Used": cloudflareResponse.headers.get("X-Browser-Ms-Used") || "",
+      "X-Browser-Ms-Used": String(browserMsUsed),
     },
   });
 }
