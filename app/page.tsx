@@ -50,6 +50,63 @@ async function downloadImage(dataUrl: string, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 }
 
+async function shareOrDownloadBlob(blob: Blob, filename: string) {
+  const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
+  const file = new File([blob], safeFilename, { type: "image/png" });
+  if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+    try {
+      await navigator.share({ files: [file], title: safeFilename });
+      return;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+    }
+  }
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = safeFilename;
+  link.href = objectUrl;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+}
+
+function isDesktopChrome() {
+  const userAgent = navigator.userAgent;
+  const chrome = /(Chrome|Chromium)\//.test(userAgent) && !/(Edg|OPR|CriOS)\//.test(userAgent);
+  const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
+    || Boolean((navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile);
+  return chrome && !mobile;
+}
+
+async function saveElementWithServerChrome(element: HTMLElement, filename: string) {
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.removeAttribute("id");
+  clone.id = "export-root";
+  clone.classList.add("imageExporting");
+  clone.querySelectorAll(".imageShareButton,.imageExportExclude").forEach((node) => node.remove());
+
+  const kind = clone.classList.contains("calendarPage")
+    ? "calendar"
+    : clone.classList.contains("recordModal") ? "detail" : "feed";
+  if (kind === "calendar") clone.style.width = "635px";
+  if (kind === "detail") clone.style.width = `${Math.max(560, Math.ceil(element.getBoundingClientRect().width))}px`;
+
+  const stylesheets = Array.from(document.styleSheets)
+    .map((sheet) => sheet.href)
+    .filter((href): href is string => Boolean(href && href.startsWith(window.location.origin)));
+  const response = await fetch("/api/export", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ html: clone.outerHTML, stylesheets, kind }),
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({})) as { error?: string };
+    throw new Error(result.error || "호환 이미지를 만들지 못했어요");
+  }
+  await shareOrDownloadBlob(await response.blob(), filename);
+}
+
 async function imageUrlToDataUrl(url: string) {
   if (!url || url.startsWith("data:")) return url;
   const absoluteUrl = new URL(url, window.location.href).href;
@@ -170,7 +227,8 @@ function ImageShareButton({ getTarget, targetId, bookId, filename, compact = fal
     setSavingImage(true);
     setFailed("");
     try {
-      await saveElementAsImage(target, targetFilename);
+      if (isDesktopChrome()) await saveElementAsImage(target, targetFilename);
+      else await saveElementWithServerChrome(target, targetFilename);
     }
     catch (error) { setFailed(error instanceof Error ? error.message : String(error || "이미지를 저장하지 못했어요")); }
     finally { setSavingImage(false); }
