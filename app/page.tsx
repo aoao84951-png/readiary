@@ -175,9 +175,7 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
 
 function serverExportImageUrl(url: string) {
   if (!url || url.startsWith("data:") || url.startsWith("blob:")) return url;
-  const absoluteUrl = new URL(url, window.location.href).href;
-  if (absoluteUrl.startsWith(window.location.origin)) return absoluteUrl;
-  return `${window.location.origin}/api/image?url=${encodeURIComponent(absoluteUrl)}`;
+  return new URL(url, window.location.href).href;
 }
 
 function prepareServerExportResources(source: HTMLElement, clone: HTMLElement) {
