@@ -86,7 +86,16 @@ export async function POST(request: NextRequest) {
     @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
     @font-face{font-family:'Courier New';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
   `;
-  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}</style></head><body>${input.html}</body></html>`;
+  const exportFixCss = `
+    html,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}
+    body{display:block!important}.imageExporting{margin:0!important;animation:none!important}
+    .imageExporting .metaActions{align-items:center!important;gap:7px!important}
+    .imageExporting .genreText,.imageExporting .statusText{display:inline-flex!important;align-items:center!important;height:14px!important;font-family:Pretendard,sans-serif!important;font-size:10px!important;font-weight:700!important;line-height:14px!important;letter-spacing:0!important;vertical-align:middle!important}
+    .imageExporting .statusText{transform:translateY(-.15px)}
+    .imageExporting .noteHeart{width:16px!important;height:16px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;font-size:0!important;line-height:0!important}
+    .imageExporting .noteHeart svg{width:12px!important;height:12px!important;display:block!important;overflow:visible!important}
+  `;
+  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}${exportFixCss}</style></head><body>${input.html}</body></html>`;
 
   const accessCookie = request.cookies.get("CF_Authorization")?.value;
   const cookies = accessCookie ? [{
