@@ -149,7 +149,7 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
   if (kind === "calendar") clone.style.width = "635px";
   if (kind === "detail") clone.style.width = `${Math.max(560, Math.ceil(element.getBoundingClientRect().width))}px`;
 
-  await inlineExportResources(element, clone);
+  prepareServerExportResources(element, clone);
   clone.querySelectorAll(".imageShareButton,.imageExportExclude").forEach((node) => node.remove());
   const css = Array.from(document.styleSheets).map((sheet) => {
     try { return Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n"); }
@@ -171,6 +171,31 @@ async function saveElementWithServerChrome(element: HTMLElement, filename: strin
     throw new Error(result.error || "호환 이미지를 만들지 못했어요");
   }
   await shareOrDownloadBlob(await response.blob(), filename);
+}
+
+function serverExportImageUrl(url: string) {
+  if (!url || url.startsWith("data:") || url.startsWith("blob:")) return url;
+  const absoluteUrl = new URL(url, window.location.href).href;
+  if (absoluteUrl.startsWith(window.location.origin)) return absoluteUrl;
+  return `${window.location.origin}/api/image?url=${encodeURIComponent(absoluteUrl)}`;
+}
+
+function prepareServerExportResources(source: HTMLElement, clone: HTMLElement) {
+  const sourceNodes = [source, ...Array.from(source.querySelectorAll<HTMLElement>("*"))];
+  const cloneNodes = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
+  cloneNodes.forEach((cloneNode, index) => {
+    const sourceNode = sourceNodes[index];
+    if (!sourceNode) return;
+    if (cloneNode instanceof HTMLImageElement && sourceNode instanceof HTMLImageElement) {
+      const url = sourceNode.currentSrc || sourceNode.src || sourceNode.getAttribute("src") || "";
+      if (url) cloneNode.src = serverExportImageUrl(url);
+    }
+    const background = getComputedStyle(sourceNode).backgroundImage;
+    if (background && background !== "none") {
+      const match = background.match(/url\(["']?(.+?)["']?\)/);
+      if (match?.[1]) cloneNode.style.backgroundImage = `url("${serverExportImageUrl(match[1])}")`;
+    }
+  });
 }
 
 async function imageUrlToDataUrl(url: string) {

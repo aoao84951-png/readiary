@@ -79,13 +79,14 @@ export async function POST(request: NextRequest) {
   const allowedOrigin = request.nextUrl.origin;
   const safeCss = (input.css || "").replace(/<\/style/gi, "<\\/style");
   const fontCss = `
-    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Regular.ttf') format('truetype');font-weight:400}
-    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Medium.ttf') format('truetype');font-weight:500}
-    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-SemiBold.ttf') format('truetype');font-weight:600 700}
-    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-ExtraBold.ttf') format('truetype');font-weight:800 900}
-    @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Regular.ttf') format('truetype');font-weight:400;font-display:block}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-Medium.ttf') format('truetype');font-weight:500;font-display:block}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-SemiBold.ttf') format('truetype');font-weight:600 700;font-display:block}
+    @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-ExtraBold.ttf') format('truetype');font-weight:701 900;font-display:block}
+    @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
+    @font-face{font-family:'Courier New';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
   `;
-  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}</style></head><body>${input.html}</body></html>`;
+  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}.imageExporting,.imageExporting button,.imageExporting input,.imageExporting select,.imageExporting textarea{font-family:Pretendard,'Apple SD Gothic Neo',sans-serif}</style></head><body>${input.html}</body></html>`;
 
   const accessCookie = request.cookies.get("CF_Authorization")?.value;
   const cookies = accessCookie ? [{
@@ -103,6 +104,8 @@ export async function POST(request: NextRequest) {
       selector: "#export-root",
       viewport: { width: widths[kind], height: 1200, deviceScaleFactor: 4 },
       screenshotOptions: { type: "png", omitBackground: true, captureBeyondViewport: true },
+      gotoOptions: { waitUntil: "networkidle0", timeout: 45_000 },
+      waitForTimeout: 1_500,
       ...(cookies ? { cookies } : {}),
     }),
   });
