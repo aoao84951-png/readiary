@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
     @font-face{font-family:'Courier New';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
   `;
-  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}.imageExporting,.imageExporting button,.imageExporting input,.imageExporting select,.imageExporting textarea{font-family:Pretendard,'Apple SD Gothic Neo',sans-serif}</style></head><body>${input.html}</body></html>`;
+  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}\nhtml,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}body{display:block!important}.imageExporting{margin:0!important;animation:none!important}</style></head><body>${input.html}</body></html>`;
 
   const accessCookie = request.cookies.get("CF_Authorization")?.value;
   const cookies = accessCookie ? [{
