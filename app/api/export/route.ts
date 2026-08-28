@@ -92,8 +92,6 @@ export async function POST(request: NextRequest) {
     .imageExporting .metaActions{align-items:center!important;gap:7px!important}
     .imageExporting .genreText,.imageExporting .statusText{display:inline-flex!important;align-items:center!important;height:14px!important;font-family:Pretendard,sans-serif!important;font-size:10px!important;font-weight:700!important;line-height:14px!important;letter-spacing:0!important;vertical-align:middle!important}
     .imageExporting .statusText{transform:translateY(-.15px)}
-    .imageExporting .noteHeart{width:16px!important;height:16px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;font-size:0!important;line-height:0!important}
-    .imageExporting .noteHeart svg{width:12px!important;height:12px!important;display:block!important;overflow:visible!important}
   `;
   const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}${exportFixCss}</style></head><body>${input.html}</body></html>`;
 
