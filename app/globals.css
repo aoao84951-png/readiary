@@ -136,7 +136,9 @@
 .recordForm .countField>.countValue.digits1>input{flex:0 0 11px!important;width:11px!important}
 .recordForm .countField>.countValue.digits2>input{flex:0 0 19px!important;width:19px!important}
 .recordForm .countField>.countValue.digits3>input{flex:0 0 27px!important;width:27px!important}
-.recordForm .countField>.countValue>select{position:relative!important;top:-1px!important;flex:0 0 24px!important;width:24px!important;min-width:24px!important;margin:0!important;padding:0!important;text-align:left!important;vertical-align:middle!important}
+.recordForm .countField .countUnit{position:relative!important;top:-1px!important;flex:0 0 24px!important;width:24px!important;min-width:24px!important;height:32px!important;display:flex!important;align-items:center!important;color:#53514e!important;font-size:var(--property-font)!important;font-weight:600!important;line-height:32px!important}
+.recordForm .countField .countUnit>span{display:block!important;line-height:32px!important;white-space:nowrap!important}
+.recordForm .countField .countUnit>select{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;cursor:pointer!important}
 .recordForm .categoryProperty>.propertyLabel,.recordForm .categoryProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .categoryProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseItemDate,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
