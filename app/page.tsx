@@ -1569,7 +1569,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                         <div className="purchaseDetailHead"><span>{book.count_unit || "권"} 정보</span><span>구매일</span><span>판매가</span><span>실구매가</span><span>구매방법</span></div>
                         {(book.purchase_items?.length ? book.purchase_items : [{ label: "합계", purchase_date: book.purchase_date, list_price: book.list_price, paid_price: book.paid_price, methods: book.purchase_method ? [book.purchase_method] : [] }]).map((item, itemIndex) => <div className="purchaseDetailRow" key={`${item.label}-${itemIndex}`}>
                           <b>{item.label}</b>
-                          <span>{item.purchase_date || "–"}</span>
+                          <span>{item.purchase_date || book.purchase_date || "–"}</span>
                           <s>{item.list_price.toLocaleString()}원</s>
                           <strong>{item.paid_price.toLocaleString()}원</strong>
                           <em>{item.methods?.length ? item.methods.join(" · ") : "–"}</em>
