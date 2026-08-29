@@ -1366,7 +1366,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuickPurchase, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; onQuickPurchase?: (book: Book, item: VolumePurchase) => Promise<Book>; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuickPurchase, purchaseMethodOptions = [], onAddPurchaseMethod, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; onQuickPurchase?: (book: Book, item: VolumePurchase) => Promise<Book>; purchaseMethodOptions?: string[]; onAddPurchaseMethod?: (value: string) => Promise<void>; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -1576,11 +1576,12 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                       <div className="purchaseBreakdownList">
                         {purchases.map((item, itemIndex) => {
                           const itemDiscount = item.list_price ? Math.max(0, Math.round((1 - item.paid_price / item.list_price) * 100)) : 0;
-                          return <article key={`${item.label}-${itemIndex}`}>
-                            <header><b>{item.displayLabel}</b><time>{item.purchase_date || "날짜 미기록"}</time></header>
-                            <div><span><s>{item.list_price.toLocaleString()}원</s><strong>{item.paid_price.toLocaleString()}원</strong></span>{itemDiscount > 0 && <em>{itemDiscount}% 할인</em>}</div>
+                          return <div className="purchaseBreakdownRow" key={`${item.label}-${itemIndex}`}>
+                            <b>{item.displayLabel}</b>
+                            <span className="purchaseItemPrice"><s>{item.list_price.toLocaleString()}원</s><strong>{item.paid_price.toLocaleString()}원</strong></span>
+                            <span className="purchaseItemMeta"><time>{item.purchase_date || "날짜 미기록"}</time>{itemDiscount > 0 && <em>{itemDiscount}% 할인</em>}</span>
                             {!!item.methods?.length && <p>{item.methods.join(" · ")}</p>}
-                          </article>;
+                          </div>;
                         })}
                       </div>
                     </details>}
@@ -1591,9 +1592,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                       <div className="quickPurchaseForm">
                         <label><span>{book.count_unit || "권"} 정보</span><input value={quickPurchase.label} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 8~255${book.count_unit || "권"}`} /></label>
                         <label><span>구매일</span><input type="date" value={quickPurchase.purchase_date || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, purchase_date: event.target.value || null }))} /></label>
-                        <label><span>판매가</span><input inputMode="numeric" value={quickPurchase.list_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="0" /></label>
-                        <label><span>실구매가</span><input inputMode="numeric" value={quickPurchase.paid_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="0" /></label>
-                        <label className="wide"><span>구매방법</span><input value={(quickPurchase.methods || []).join(" · ")} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, methods: event.target.value ? [event.target.value] : [] }))} placeholder="쿠폰, 포인트 등" /></label>
+                        <label><span>판매가</span><input inputMode="numeric" value={quickPurchase.list_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
+                        <label><span>실구매가</span><input inputMode="numeric" value={quickPurchase.paid_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
+                        <div className="quickPurchaseMethod"><span>구매방법</span><MultiEditableSelect values={quickPurchase.methods || []} options={purchaseMethodOptions} onChange={(methods) => setQuickPurchase((prev) => ({ ...prev, methods }))} onAdd={onAddPurchaseMethod || (async () => undefined)} /></div>
                         {quickMessage && <p className="quickPurchaseMessage">{quickMessage}</p>}
                         <button type="button" disabled={quickSaving || !quickPurchase.label.trim()} onClick={async () => {
                           setQuickSaving(true); setQuickMessage("");
@@ -2288,7 +2289,7 @@ export default function FeedPage() {
           <button className={profileView === "hall" ? "on" : ""} onClick={() => setProfileView("hall")}>HALL OF FAME</button>
         </nav>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} purchaseMethodOptions={purchaseMethodOptions} onAddPurchaseMethod={(value) => addOption("purchase_methods", value)} />}
       {view === "stats" && profileView === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
       {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onDelete={deleteBook} />}
       {loading && books.length === 0 ? (
@@ -2391,7 +2392,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} purchaseMethodOptions={purchaseMethodOptions} onAddPurchaseMethod={(value) => addOption("purchase_methods", value)} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><Hash size={17} strokeWidth={1.55} /></button>
