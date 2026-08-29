@@ -2374,7 +2374,7 @@ export default function FeedPage() {
                       #{book.category}
                     </span>
                     <span
-                      className={`statusText ${book.status === "완독" ? "done" : book.status === "읽는 중" ? "reading" : book.status === "하차" ? "paused" : "basket"}`}
+                      className={`statusText ${book.status === "완독" ? "done" : book.status === "읽는 중" ? "reading" : book.status === "하차" ? "paused" : book.status === "읽기 전" ? "before" : "basket"}`}
                     >
                       #{book.status}
                     </span>
