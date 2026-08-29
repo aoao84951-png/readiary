@@ -5,31 +5,24 @@
 }
 .classicRating {
   display: inline-flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 4px;
   color: #ffbd32;
 }
-.classicRating svg {
-  align-self: center;
-}
 .classicRating b {
-  display: block;
   color: #5d5d58;
   font-size: 11px;
   font-weight: 800;
-  line-height: 1;
 }
 .classicRating b.empty {
   font-size: 9px;
   font-weight: 600;
 }
 .classicRating small {
-  display: block;
   margin-left: -2px;
   color: #aaa9a4;
   font-size: 8px;
   font-weight: 650;
-  line-height: 1;
 }
 .gridRating .classicRating {
   gap: 3px;
