@@ -37,6 +37,7 @@ type SearchBook = {
 };
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
+type SortDirection = "desc" | "asc";
 
 function firstPurchaseDate(book: Pick<BookRecord, "purchase_date" | "purchase_items">) {
   const itemDates = (book.purchase_items || [])
@@ -1936,6 +1937,8 @@ export default function FeedPage() {
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>("created");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [topMenuPosition, setTopMenuPosition] = useState({ top: 43, right: 12 });
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
@@ -1983,6 +1986,8 @@ export default function FeedPage() {
     load();
     const savedSort = window.localStorage.getItem("readiary-sort-mode");
     if (savedSort === "created" || savedSort === "purchase") setSortMode(savedSort);
+    const savedDirection = window.localStorage.getItem("readiary-sort-direction");
+    if (savedDirection === "desc" || savedDirection === "asc") setSortDirection(savedDirection);
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; purchase_methods_customized?: boolean; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions(data.purchase_methods_customized ? (data.purchase_methods || []) : [...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
@@ -2012,14 +2017,19 @@ export default function FeedPage() {
     }).sort((a, b) => {
       const aDate = sortMode === "purchase" ? firstPurchaseDate(a) : (a.created_at || "");
       const bDate = sortMode === "purchase" ? firstPurchaseDate(b) : (b.created_at || "");
-      if (aDate !== bDate) return bDate.localeCompare(aDate);
-      return String(b.created_at || "").localeCompare(String(a.created_at || ""));
+      if (!aDate && bDate) return 1;
+      if (aDate && !bDate) return -1;
+      const dateOrder = aDate.localeCompare(bDate);
+      const createdOrder = String(a.created_at || "").localeCompare(String(b.created_at || ""));
+      return sortDirection === "asc" ? (dateOrder || createdOrder) : -(dateOrder || createdOrder);
     });
-  }, [books, query, statusFilters, categoryFilters, sortMode]);
+  }, [books, query, statusFilters, categoryFilters, sortMode, sortDirection]);
   function selectSort(mode: SortMode) {
+    const nextDirection = sortMode === mode ? (sortDirection === "desc" ? "asc" : "desc") : "desc";
     setSortMode(mode);
+    setSortDirection(nextDirection);
     window.localStorage.setItem("readiary-sort-mode", mode);
-    setTopMenuOpen(false);
+    window.localStorage.setItem("readiary-sort-direction", nextDirection);
   }
   useEffect(() => {
     if (view === "feed" && pending)
@@ -2375,7 +2385,12 @@ export default function FeedPage() {
         </button>
         <button
           className={`topMenuToggle ${topMenuOpen || filterOpen ? "on" : ""}`}
-          onClick={() => { setTopMenuOpen((open) => !open); setSearchOpen(false); }}
+          onClick={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setTopMenuPosition({ top: rect.bottom + 5, right: window.innerWidth - rect.right });
+            setTopMenuOpen((open) => !open);
+            setSearchOpen(false);
+          }}
           aria-label="보기 메뉴"
         >
           <Ellipsis size={18} />
@@ -2385,10 +2400,10 @@ export default function FeedPage() {
       {topMenuOpen && (
         <>
           <button className="topMenuBackdrop" aria-label="보기 메뉴 닫기" onClick={() => setTopMenuOpen(false)} />
-          <div className="topToolMenu">
+          <div className="topToolMenu" style={{ top: topMenuPosition.top, right: topMenuPosition.right }}>
             <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
-            <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>선택</small>}</button>
-            <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>선택</small>}</button>
+            <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
+            <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
             <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
           </div>
         </>
