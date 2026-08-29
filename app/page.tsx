@@ -635,9 +635,11 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
   }
   function beginOptionDrag(event: React.PointerEvent<HTMLElement>, option: string) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const row = event.currentTarget;
+    const pointerId = event.pointerId;
     if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
     dragTimerRef.current = setTimeout(() => {
+      row.setPointerCapture(pointerId);
       dragOptionRef.current = option;
       dragOrderRef.current = [...orderedOptions];
       suppressOptionClickRef.current = true;
