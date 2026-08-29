@@ -1716,7 +1716,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                     </section>
                   </div>, document.body)}
                   <section className="recordGroup notesGroup">
-                    {onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={10} /><span>감상 기록</span></button></div>}
+                    {onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
                     <div className="archiveNotes">
                       <BookNotes book={book} showEmpty />
                     </div>

@@ -648,27 +648,21 @@
   gap: 16px;
   padding-top: 2px;
 }
-.notesQuickActions {
-  min-height: 24px;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 7px;
-}
+.notesGroup { position: relative; }
+.notesQuickActions { position: absolute; z-index: 1; top: -4px; right: 0; }
 .notesQuickActions button {
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 8px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: 7px;
-  background: #f7f3f4;
-  color: #a67586;
-  font-size: 7px;
-  font-weight: 700;
+  border-radius: 50%;
+  background: transparent;
+  color: #ad8291;
   cursor: pointer;
 }
-.notesQuickActions button:hover,.notesQuickActions button:focus-visible { background: #f2e9ec; outline: 0; }
+.notesQuickActions button:hover,.notesQuickActions button:focus-visible { background: #f5edef; color: #9e6e7f; outline: 0; }
 .emptyNotes {
   margin: 0;
   padding: 14px 0;
