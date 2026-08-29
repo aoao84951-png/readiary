@@ -2563,13 +2563,14 @@ export default function FeedPage() {
                       </div>
                     </div>
                     {!!form.purchase_items?.length && <div className={`savedPurchaseList ${form.purchase_items.some((item) => item.label.trim().length >= 9) ? "hasLongLabels" : ""}`}>
+                    <div className="savedPurchaseHead" aria-hidden="true"><span>{form.count_unit || "권"} 정보</span><span>구매일</span><span>판매가</span><span>실구매가</span><span>구매방법</span><span /></div>
                     {(form.purchase_items || []).map((item, index) => (
                       <div className={`savedPurchaseItem ${item.label.trim().length >= 9 ? "longLabel" : ""}`} key={`${item.label}-${index}`}>
-                        <div><b>{item.label}</b><span><small>판매가 {item.list_price.toLocaleString()}원</small><strong>{item.paid_price.toLocaleString()}원</strong></span></div>
-                        {(item.purchase_date || !!item.methods?.length) && <div className="savedPurchaseMeta">
-                          {item.purchase_date && <span><small>구매일</small><b>{item.purchase_date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, (_, year, month, day) => `${year}. ${Number(month)}. ${Number(day)}.`)}</b></span>}
-                          {!!item.methods?.length && <span><small>구매방법</small><b>{item.methods.join(" · ")}</b></span>}
-                        </div>}
+                        <b className="savedPurchaseVolume">{item.label}</b>
+                        <span className="savedPurchaseDate">{item.purchase_date ? item.purchase_date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, (_, year, month, day) => `${year}. ${Number(month)}. ${Number(day)}.`) : "–"}</span>
+                        <small className="savedPurchaseListPrice">{item.list_price.toLocaleString()}원</small>
+                        <strong className="savedPurchasePaidPrice">{item.paid_price.toLocaleString()}원</strong>
+                        <span className="savedPurchaseMethods">{item.methods?.length ? item.methods.join(" · ") : "–"}</span>
                         <span className="savedPurchaseActions"><button type="button" aria-label={`${item.label} 수정`} onClick={() => editPurchaseItem(index)}><Pencil size={11} /></button><button type="button" aria-label={`${item.label} 삭제`} onClick={() => { const next = (form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index); setPurchaseItems(next); resetPurchaseDraft(next); }}><X size={12} /></button></span>
                       </div>
                     ))}
