@@ -5,8 +5,7 @@ import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
+  GripVertical,
   Grid3X3,
   LayoutGrid,
   ImagePlus,
@@ -592,7 +591,17 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
   const [query, setQuery] = useState("");
   const [savingOption, setSavingOption] = useState(false);
   const [changingOption, setChangingOption] = useState("");
-  const all = [...new Set([...options, ...values])];
+  const [orderedOptions, setOrderedOptions] = useState(options);
+  const [draggingOption, setDraggingOption] = useState("");
+  const dragOptionRef = useRef("");
+  const dragOrderRef = useRef(options);
+  const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (dragOptionRef.current) return;
+    setOrderedOptions(options);
+    dragOrderRef.current = options;
+  }, [options]);
+  const all = [...new Set([...orderedOptions, ...values])];
   const filtered = all.filter((option) => option.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   useEffect(() => {
     function closeOnOutsidePointer(event: PointerEvent) {
@@ -624,17 +633,46 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
     try { await onOptionsChange(next); }
     finally { setChangingOption(""); }
   }
-  async function moveOption(option: string, direction: -1 | 1) {
-    const index = options.indexOf(option);
-    const target = index + direction;
-    if (index < 0 || target < 0 || target >= options.length) return;
-    const next = [...options];
-    [next[index], next[target]] = [next[target], next[index]];
-    await replaceOptions(next, option);
+  function beginOptionDrag(event: React.PointerEvent<HTMLButtonElement>, option: string) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
+    dragTimerRef.current = setTimeout(() => {
+      dragOptionRef.current = option;
+      dragOrderRef.current = [...orderedOptions];
+      setDraggingOption(option);
+    }, 220);
+  }
+  function moveOptionDrag(event: React.PointerEvent<HTMLButtonElement>) {
+    const dragged = dragOptionRef.current;
+    if (!dragged) return;
+    event.preventDefault();
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-purchase-option]")?.dataset.purchaseOption;
+    if (!target || target === dragged) return;
+    const current = [...dragOrderRef.current];
+    const from = current.indexOf(dragged);
+    const to = current.indexOf(target);
+    if (from < 0 || to < 0) return;
+    current.splice(from, 1);
+    current.splice(to, 0, dragged);
+    dragOrderRef.current = current;
+    setOrderedOptions(current);
+  }
+  function endOptionDrag() {
+    if (dragTimerRef.current) { clearTimeout(dragTimerRef.current); dragTimerRef.current = null; }
+    const dragged = dragOptionRef.current;
+    if (!dragged) return;
+    const next = [...dragOrderRef.current];
+    dragOptionRef.current = "";
+    setDraggingOption("");
+    if (next.some((item, index) => item !== options[index])) void replaceOptions(next, dragged);
   }
   async function removeOption(option: string) {
     onChange(values.filter((value) => value !== option));
-    await replaceOptions(options.filter((item) => item !== option), option);
+    const next = orderedOptions.filter((item) => item !== option);
+    setOrderedOptions(next);
+    dragOrderRef.current = next;
+    await replaceOptions(next, option);
   }
   return (
     <details ref={detailsRef} className="multiEditableSelect">
@@ -643,13 +681,12 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
         <label className="multiOptionSearch"><Search size={12} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="구매방법 검색" /></label>
         <div className="multiOptionList">
           {filtered.map((option) => {
-            const optionIndex = options.indexOf(option);
+            const optionIndex = orderedOptions.indexOf(option);
             const changing = changingOption === option;
-            return <div className={`multiOptionRow ${values.includes(option) ? "selected" : ""}`} key={option}>
+            return <div data-purchase-option={option} className={`multiOptionRow ${values.includes(option) ? "selected" : ""} ${draggingOption === option ? "dragging" : ""}`} key={option}>
               <button type="button" className="multiOptionToggle" disabled={changing} onClick={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])}><span>{option}</span><i aria-hidden="true" /></button>
               {optionIndex >= 0 && <span className="multiOptionActions">
-                <button type="button" aria-label={`${option} 위로 이동`} disabled={changing || optionIndex === 0} onClick={() => void moveOption(option, -1)}><ChevronUp size={10} /></button>
-                <button type="button" aria-label={`${option} 아래로 이동`} disabled={changing || optionIndex === options.length - 1} onClick={() => void moveOption(option, 1)}><ChevronDown size={10} /></button>
+                <button type="button" className="multiOptionDrag" aria-label={`${option} 순서 이동`} disabled={changing} onPointerDown={(event) => beginOptionDrag(event, option)} onPointerMove={moveOptionDrag} onPointerUp={endOptionDrag} onPointerCancel={endOptionDrag}><GripVertical size={11} /></button>
                 <button type="button" aria-label={`${option} 삭제`} disabled={changing} onClick={() => void removeOption(option)}><Trash2 size={10} /></button>
               </span>}
             </div>;
