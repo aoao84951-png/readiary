@@ -1340,7 +1340,20 @@
 .savedPurchaseItem > div:first-child > span { min-width: 0; display: flex; align-items: center; gap: 12px; }
 .savedPurchaseItem small { color: #aaa49e; font-size: 8px; }
 .savedPurchaseItem strong { color: #5b5754; font-size: 9.5px; }
-.savedPurchaseItem p { margin: 4px 0 0 92px; color: #9d8882; font-size: 7.5px; line-height: 1.45; }
+.savedPurchaseMeta {
+  width: fit-content;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 7px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: #faf7f6;
+}
+.savedPurchaseMeta > span { min-width: 0; display: flex; align-items: baseline; gap: 7px; }
+.savedPurchaseMeta small { color: #b4aaa6; font-size: 6.5px; font-weight: 700; white-space: nowrap; }
+.savedPurchaseMeta b { color: #88736d; font-size: 7.5px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
 .savedPurchaseActions {
   position: absolute;
   top: 50%;
@@ -1643,7 +1656,7 @@
   .purchaseEntryComposer > label,
   .purchaseMethodProperty,
   .savedPurchaseItem > div:first-child { grid-template-columns: 78px minmax(0, 1fr); }
-  .savedPurchaseItem p { margin-left: 78px; }
+  .savedPurchaseMeta { gap: 11px; }
 }
 .multiEditableSelect summary {
   min-height: 25px;

@@ -227,7 +227,7 @@
   white-space:nowrap;
 }
 .recordForm .savedPurchaseItem small,.recordForm .savedPurchaseItem strong{line-height:1.45}
-.recordForm .savedPurchaseItem p{margin:3px 0 0!important;line-height:1.45!important}
+.recordForm .savedPurchaseMeta{margin-top:7px!important}
 .recordForm .savedPurchaseList.hasLongLabels .savedPurchaseItem>div:first-child{
   grid-template-columns:minmax(0,1fr) auto!important;
   column-gap:16px!important;
