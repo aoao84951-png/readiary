@@ -132,11 +132,8 @@
 .recordForm .countField>.countValue{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:0!important}
 .recordForm .countField>.countValue>input,.recordForm .countField>.countValue>select{display:block!important;height:32px!important;font-size:var(--property-font)!important;font-weight:600!important;line-height:32px!important}
 .recordForm .countField .countNumber,.recordForm .countField .countUnit{position:relative!important;top:-1px!important;height:32px!important;display:flex!important;align-items:center!important;color:#53514e!important;font-size:var(--property-font)!important;font-weight:600!important;line-height:32px!important}
-.recordForm .countField .countNumber{min-width:0!important}
-.recordForm .countField>.countValue.isEmpty .countNumber{flex:0 0 56px!important;width:56px!important;color:var(--property-muted)!important;font-weight:500!important}
-.recordForm .countField>.countValue.digits1 .countNumber{flex:0 0 11px!important;width:11px!important}
-.recordForm .countField>.countValue.digits2 .countNumber{flex:0 0 19px!important;width:19px!important}
-.recordForm .countField>.countValue.digits3 .countNumber{flex:0 0 27px!important;width:27px!important}
+.recordForm .countField .countNumber{flex:0 0 auto!important;width:auto!important;min-width:0!important}
+.recordForm .countField>.countValue.isEmpty .countNumber{color:var(--property-muted)!important;font-weight:500!important}
 .recordForm .countField .countUnit{flex:0 0 24px!important;width:24px!important;min-width:24px!important}
 .recordForm .countField .countNumber>span,.recordForm .countField .countUnit>span{display:block!important;line-height:32px!important;white-space:nowrap!important}
 .recordForm .countField .countNumber>input,
