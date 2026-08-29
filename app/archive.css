@@ -1324,9 +1324,10 @@
 .savedPurchaseHead,
 .savedPurchaseItem {
   display: grid;
-  grid-template-columns: minmax(72px, .8fr) minmax(92px, 1fr) minmax(76px, .85fr) minmax(82px, .9fr) minmax(110px, 1.4fr) 58px;
+  grid-template-columns: minmax(72px, .9fr) minmax(92px, 1.1fr) minmax(76px, 1fr) minmax(82px, 1fr) minmax(110px, 1.25fr) 58px;
   align-items: center;
-  column-gap: 14px;
+  column-gap: 8px;
+  text-align: center;
 }
 .savedPurchaseHead {
   min-height: 32px;
@@ -1345,7 +1346,7 @@
 .savedPurchaseMethods { min-width: 0; color: #8f7c76; font-size: 8px; line-height: 1.45; overflow-wrap: anywhere; }
 .savedPurchaseActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 .savedPurchaseActions button {
   width: 25px;
@@ -1644,16 +1645,22 @@
   .savedPurchaseItem > div:first-child { grid-template-columns: 78px minmax(0, 1fr); }
   .savedPurchaseHead { display: none; }
   .savedPurchaseItem {
-    grid-template-columns: 68px minmax(0, 1fr) 52px;
-    grid-template-areas: "volume paid actions" "date methods actions";
-    gap: 5px 10px;
-    min-height: 66px;
+    grid-template-columns: minmax(48px, .65fr) minmax(76px, 1fr) minmax(76px, 1fr) 52px;
+    grid-template-areas: "volume list paid actions" "date methods methods actions";
+    gap: 4px 8px;
+    min-height: 57px;
+    padding: 5px 0;
+    text-align: center;
   }
   .savedPurchaseVolume { grid-area: volume; }
-  .savedPurchaseDate { grid-area: date; font-size: 7.5px; }
-  .savedPurchaseListPrice { display: none; }
+  .savedPurchaseDate { grid-area: date; justify-self:end; font-size: 7.5px; }
+  .savedPurchaseDate::before { content: "구매일 "; color: #b4aaa6; font-size: 6.5px; font-weight: 700; }
+  .savedPurchaseListPrice { grid-area: list; display: block; }
+  .savedPurchaseListPrice::before { content: "판매가 "; color: #b4aaa6; font-size: 6.5px; font-weight: 700; }
   .savedPurchasePaidPrice { grid-area: paid; }
-  .savedPurchaseMethods { grid-area: methods; font-size: 7.5px; }
+  .savedPurchasePaidPrice::before { content: "실구매가 "; color: #b4aaa6; font-size: 6.5px; font-weight: 700; }
+  .savedPurchaseMethods { grid-area: methods; justify-self:start; font-size: 7.5px; }
+  .savedPurchaseMethods::before { content: "구매방법 "; color: #b4aaa6; font-size: 6.5px; font-weight: 700; }
   .savedPurchaseActions { grid-area: actions; }
 }
 .multiEditableSelect summary {
