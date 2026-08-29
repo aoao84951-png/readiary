@@ -46,6 +46,17 @@ function firstPurchaseDate(book: Pick<BookRecord, "purchase_date" | "purchase_it
   return itemDates[0] || book.purchase_date || "";
 }
 
+function purchaseItemsByDate(items: VolumePurchase[], fallbackDate = "") {
+  return items
+    .map((item, index) => ({ item, index, date: item.purchase_date || fallbackDate }))
+    .sort((a, b) => {
+      if (!a.date && b.date) return 1;
+      if (a.date && !b.date) return -1;
+      return a.date.localeCompare(b.date) || a.index - b.index;
+    })
+    .map(({ item }) => item);
+}
+
 async function downloadImage(dataUrl: string, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const blob = await (await fetch(dataUrl)).blob();
@@ -1567,7 +1578,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       </header>
                       <div className="purchaseDetailTable">
                         <div className="purchaseDetailHead"><span>{book.count_unit || "권"} 정보</span><span>구매일</span><span>판매가</span><span>실구매가</span><span>구매방법</span></div>
-                        {(book.purchase_items?.length ? book.purchase_items : [{ label: "합계", purchase_date: book.purchase_date, list_price: book.list_price, paid_price: book.paid_price, methods: book.purchase_method ? [book.purchase_method] : [] }]).map((item, itemIndex) => <div className="purchaseDetailRow" key={`${item.label}-${itemIndex}`}>
+                        {purchaseItemsByDate(book.purchase_items?.length ? book.purchase_items : [{ label: "합계", purchase_date: book.purchase_date, list_price: book.list_price, paid_price: book.paid_price, methods: book.purchase_method ? [book.purchase_method] : [] }], book.purchase_date || "").map((item, itemIndex) => <div className="purchaseDetailRow" key={`${item.label}-${itemIndex}`}>
                           <b>{item.label}</b>
                           <span>{item.purchase_date || book.purchase_date || "–"}</span>
                           <s>{item.list_price.toLocaleString()}원</s>
@@ -1918,10 +1929,10 @@ export default function FeedPage() {
   }
   function openEdit(book: Book, initialStep: "book" | "reading" | "purchase" | "notes" = "book") {
     const { id, ...record } = book;
-    const purchaseItems = record.purchase_items?.length
+    const purchaseItems = purchaseItemsByDate(record.purchase_items?.length
       ? record.purchase_items.map((item) => ({ ...item, purchase_date: item.purchase_date || record.purchase_date || null, methods: item.methods || [] }))
-      : [{ label: "기존 합계", purchase_date: record.purchase_date || null, list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }];
-    if (record.purchase_method && !purchaseItems.some((item) => item.methods.length)) purchaseItems[0].methods = [record.purchase_method];
+      : [{ label: "기존 합계", purchase_date: record.purchase_date || null, list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }], record.purchase_date || "");
+    if (record.purchase_method && !purchaseItems.some((item) => item.methods?.length)) purchaseItems[0].methods = [record.purchase_method];
     setEditingId(id);
     setPurchaseOnlyEdit(initialStep === "purchase");
     setForm({
@@ -2009,11 +2020,12 @@ export default function FeedPage() {
   const field = <K extends keyof BookRecord>(key: K, value: BookRecord[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
   function setPurchaseItems(items: VolumePurchase[]) {
-    const listPrice = items.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
-    const paidPrice = items.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
-    const methods = [...new Set(items.flatMap((item) => item.methods || []))];
-    const purchaseDate = items.map((item) => item.purchase_date || "").filter(Boolean).sort()[0] || null;
-    setForm((prev) => ({ ...prev, purchase_items: items, purchase_date: purchaseDate, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
+    const sortedItems = purchaseItemsByDate(items);
+    const listPrice = sortedItems.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
+    const paidPrice = sortedItems.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
+    const methods = [...new Set(sortedItems.flatMap((item) => item.methods || []))];
+    const purchaseDate = sortedItems.map((item) => item.purchase_date || "").filter(Boolean).sort()[0] || null;
+    setForm((prev) => ({ ...prev, purchase_items: sortedItems, purchase_date: purchaseDate, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
   }
   function resetPurchaseDraft(items = form.purchase_items || []) {
     setPurchaseDraft({ label: `${items.length + 1}${form.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
