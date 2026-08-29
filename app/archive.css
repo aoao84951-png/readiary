@@ -509,6 +509,7 @@
   padding: 24px;
   background: rgba(43, 40, 38, .24);
   backdrop-filter: blur(4px);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
   animation: modalShadeIn .16s ease-out;
 }
 .purchaseDetailModal {
