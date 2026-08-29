@@ -1589,14 +1589,22 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                       if (event.currentTarget.open && !quickPurchase.label) setQuickPurchase((prev) => ({ ...prev, label: `${(book.purchase_items?.length || 0) + 1}${book.count_unit || "권"}` }));
                     }}>
                       <summary><Plus size={13} /><span>구매 내역 바로 추가</span></summary>
-                      <div className="quickPurchaseForm">
-                        <label><span>{book.count_unit || "권"} 정보</span><input value={quickPurchase.label} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 8~255${book.count_unit || "권"}`} /></label>
-                        <label><span>구매일</span><input type="date" value={quickPurchase.purchase_date || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, purchase_date: event.target.value || null }))} /></label>
-                        <label><span>판매가</span><input inputMode="numeric" value={quickPurchase.list_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
-                        <label><span>실구매가</span><input inputMode="numeric" value={quickPurchase.paid_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
-                        <div className="quickPurchaseMethod"><span>구매방법</span><MultiEditableSelect values={quickPurchase.methods || []} options={purchaseMethodOptions} onChange={(methods) => setQuickPurchase((prev) => ({ ...prev, methods }))} onAdd={onAddPurchaseMethod || (async () => undefined)} /></div>
-                        {quickMessage && <p className="quickPurchaseMessage">{quickMessage}</p>}
-                        <button type="button" disabled={quickSaving || !quickPurchase.label.trim()} onClick={async () => {
+                      <div className="quickPurchaseEditor recordForm wizardForm">
+                        <div className="fields wizardPage wizardPurchasePage">
+                          <div className="purchaseEntryComposer">
+                            <label><span>{book.count_unit || "권"} 정보</span><input value={quickPurchase.label} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 8~255${book.count_unit || "권"}`} /></label>
+                            <div className={`notionDateProperty ${quickPurchase.purchase_date ? "" : "isEmpty"}`}>
+                              <span className="propertyLabel">구매일</span>
+                              <span className={`datePropertyValue ${quickPurchase.purchase_date ? "hasValue" : ""}`}>
+                                <FlexibleDatePicker ariaLabel="구매일" value={quickPurchase.purchase_date || ""} onChange={(date) => setQuickPurchase((prev) => ({ ...prev, purchase_date: date || null }))} />
+                                {quickPurchase.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.preventDefault(); event.stopPropagation(); setQuickPurchase((prev) => ({ ...prev, purchase_date: null })); }}><X size={13} /></button>}
+                              </span>
+                            </div>
+                            <label><span>판매가</span><input type="text" inputMode="numeric" value={quickPurchase.list_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
+                            <label><span>실구매가</span><input type="text" inputMode="numeric" value={quickPurchase.paid_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
+                            <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={quickPurchase.methods || []} options={purchaseMethodOptions} onChange={(methods) => setQuickPurchase((prev) => ({ ...prev, methods }))} onAdd={onAddPurchaseMethod || (async () => undefined)} /></div>
+                            {quickMessage && <p className="quickPurchaseMessage">{quickMessage}</p>}
+                            <div className="purchaseEntryActions"><button type="button" className="primary" disabled={quickSaving || !quickPurchase.label.trim()} onClick={async () => {
                           setQuickSaving(true); setQuickMessage("");
                           try {
                             const updated = await onQuickPurchase(book, { ...quickPurchase, label: quickPurchase.label.trim() });
@@ -1605,7 +1613,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                             setQuickMessage("구매 내역을 저장했어요.");
                           } catch (error) { setQuickMessage(error instanceof Error ? error.message : "저장하지 못했어요."); }
                           finally { setQuickSaving(false); }
-                        }}>{quickSaving ? "저장 중…" : "추가하기"}</button>
+                            }}>{quickSaving ? "저장 중…" : `${book.count_unit || "권"} 기록`}</button></div>
+                          </div>
+                        </div>
                       </div>
                     </details>}
                   </section>
