@@ -1702,6 +1702,7 @@
   object-fit: contain;
 }
 .reviewNote { grid-template-columns: 11px minmax(0, 1fr); gap: 7px; }
+.reviewNote .noteHeart { margin-top: 3px; }
 .noteEditor { display: grid; gap: 7px; }
 .noteComposer {
   display: grid;
