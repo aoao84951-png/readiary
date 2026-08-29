@@ -2682,7 +2682,7 @@ export default function FeedPage() {
                   <div className="bookMetaFields full">
                     <label className="countField">
                       <span className="propertyLabel">{form.count_unit === "화" ? "총 화수" : "총 권수"}</span>
-                      <span className={`countValue ${form.total_count ? `hasCount digits${Math.min(3, String(form.total_count).length)}` : "isEmpty"}`}><span className="countNumber"><span aria-hidden="true">{form.total_count || "비어 있음"}</span><input aria-label="총 수량" type="text" inputMode="numeric" value={form.total_count || ""} onChange={(e) => field("total_count", Number(e.target.value.replace(/\D/g, "")))} /></span><span className="countUnit"><span aria-hidden="true">{form.count_unit || "권"}</span><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span></span>
+                      <span className={`countValue hasCount digits${Math.min(3, String(form.total_count).length)}`}><span className="countNumber"><span aria-hidden="true">{form.total_count}</span><input aria-label="총 수량" type="text" inputMode="numeric" value={form.total_count} onChange={(e) => field("total_count", Number(e.target.value.replace(/\D/g, "")))} /></span><span className="countUnit"><span aria-hidden="true">{form.count_unit || "권"}</span><select aria-label="수량 단위" value={form.count_unit || "권"} onChange={(e) => changeCountUnit(e.target.value as "권" | "화")}><option>권</option><option>화</option></select></span></span>
                     </label>
                     <label className={`categoryProperty ${form.category ? "" : "emptySelectProperty"}`}>
                       <span className="propertyLabel">카테고리</span>
