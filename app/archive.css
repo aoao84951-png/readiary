@@ -2337,6 +2337,7 @@ html { scrollbar-gutter: stable; }
   .addDrawer .wizardReadingPage > .readingDatesField,
   .addDrawer .wizardPurchasePage > label,
   .addDrawer .wizardPurchasePage .purchaseEntryComposer > label,
+  .addDrawer .wizardPurchasePage .purchaseItemDate,
   .addDrawer .wizardPurchasePage .purchaseMethodProperty {
     font-size: var(--mobile-property-label-size);
   }
