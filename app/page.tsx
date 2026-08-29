@@ -37,6 +37,14 @@ type SearchBook = {
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
 
+function firstPurchaseDate(book: Pick<BookRecord, "purchase_date" | "purchase_items">) {
+  const itemDates = (book.purchase_items || [])
+    .map((item) => item.purchase_date || "")
+    .filter(Boolean)
+    .sort();
+  return itemDates[0] || book.purchase_date || "";
+}
+
 async function downloadImage(dataUrl: string, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const blob = await (await fetch(dataUrl)).blob();
@@ -1732,7 +1740,7 @@ export default function FeedPage() {
   const [form, setForm] = useState<BookRecord>(empty);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [readingDate, setReadingDate] = useState("");
-  const [purchaseDraft, setPurchaseDraft] = useState<VolumePurchase>({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+  const [purchaseDraft, setPurchaseDraft] = useState<VolumePurchase>({ label: "1권", purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
   const [editingPurchaseIndex, setEditingPurchaseIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [coverProcessing, setCoverProcessing] = useState(false);
@@ -1795,8 +1803,8 @@ export default function FeedPage() {
       const textMatch = !q || `${book.title} ${book.author}`.toLowerCase().includes(q);
       return textMatch && (!statusFilters.length || statusFilters.includes(book.status)) && (!categoryFilters.length || categoryFilters.includes(book.category));
     }).sort((a, b) => {
-      const aDate = sortMode === "purchase" ? (a.purchase_date || "") : (a.created_at || "");
-      const bDate = sortMode === "purchase" ? (b.purchase_date || "") : (b.created_at || "");
+      const aDate = sortMode === "purchase" ? firstPurchaseDate(a) : (a.created_at || "");
+      const bDate = sortMode === "purchase" ? firstPurchaseDate(b) : (b.created_at || "");
       if (aDate !== bDate) return bDate.localeCompare(aDate);
       return String(b.created_at || "").localeCompare(String(a.created_at || ""));
     });
@@ -1845,7 +1853,7 @@ export default function FeedPage() {
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
-    setPurchaseDraft({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: "1권", purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
   }
   function continueDraft() {
@@ -1854,7 +1862,7 @@ export default function FeedPage() {
     setForm(resumeDraft.form);
     setStep(resumeDraft.step);
     setReadingDate(resumeDraft.readingDate);
-    setPurchaseDraft({ label: `${(resumeDraft.form.purchase_items?.length || 0) + 1}${resumeDraft.form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: `${(resumeDraft.form.purchase_items?.length || 0) + 1}${resumeDraft.form.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setSearch("");
     setResults([]);
@@ -1874,15 +1882,15 @@ export default function FeedPage() {
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
     setReadingDate("");
-    setPurchaseDraft({ label: "1권", list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: "1권", purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setAdding(true);
   }
   function openEdit(book: Book) {
     const { id, ...record } = book;
     const purchaseItems = record.purchase_items?.length
-      ? record.purchase_items.map((item) => ({ ...item, methods: item.methods || [] }))
-      : [{ label: "기존 합계", list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }];
+      ? record.purchase_items.map((item) => ({ ...item, purchase_date: item.purchase_date || record.purchase_date || null, methods: item.methods || [] }))
+      : [{ label: "기존 합계", purchase_date: record.purchase_date || null, list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }];
     if (record.purchase_method && !purchaseItems.some((item) => item.methods.length)) purchaseItems[0].methods = [record.purchase_method];
     setEditingId(id);
     setForm({
@@ -1890,7 +1898,7 @@ export default function FeedPage() {
       purchase_items: purchaseItems,
     });
     setReadingDate("");
-    setPurchaseDraft({ label: `${purchaseItems.length + 1}${record.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: `${purchaseItems.length + 1}${record.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setMessage("");
     setStep("book");
@@ -1942,7 +1950,7 @@ export default function FeedPage() {
       source_url: book.url,
       reading_dates: [todayKey],
     });
-    setPurchaseDraft({ label: `1${unit}`, list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: `1${unit}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setStep("book");
   }
@@ -1973,15 +1981,17 @@ export default function FeedPage() {
     const listPrice = items.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
     const paidPrice = items.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
     const methods = [...new Set(items.flatMap((item) => item.methods || []))];
-    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
+    const purchaseDate = items.map((item) => item.purchase_date || "").filter(Boolean).sort()[0] || null;
+    setForm((prev) => ({ ...prev, purchase_items: items, purchase_date: purchaseDate, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
   }
   function resetPurchaseDraft(items = form.purchase_items || []) {
-    setPurchaseDraft({ label: `${items.length + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
+    setPurchaseDraft({ label: `${items.length + 1}${form.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
   }
   function commitPurchaseDraft() {
     const clean: VolumePurchase = {
       label: purchaseDraft.label.trim() || `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`,
+      purchase_date: purchaseDraft.purchase_date || null,
       list_price: Number(purchaseDraft.list_price) || 0,
       paid_price: Number(purchaseDraft.paid_price) || 0,
       methods: purchaseDraft.methods || [],
@@ -2534,22 +2544,16 @@ export default function FeedPage() {
                 </div>}
                 {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
-                  <div className={`notionDateProperty ${form.purchase_date ? "" : "isEmpty"}`}>
-                    <span className="propertyLabel">구매일</span>
-                    <span className={`datePropertyValue ${form.purchase_date ? "hasValue" : ""}`}>
-                      <FlexibleDatePicker
-                        ariaLabel="구매일"
-                        value={form.purchase_date || ""}
-                        onChange={(date) =>
-                          field("purchase_date", date || null)
-                        }
-                      />
-                      {form.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.preventDefault(); e.stopPropagation(); field("purchase_date", null); }}><X size={13} /></button>}
-                    </span>
-                  </div>
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
+                      <div className={`purchaseItemDate ${purchaseDraft.purchase_date ? "" : "isEmpty"}`}>
+                        <span>구매일</span>
+                        <span className={`datePropertyValue ${purchaseDraft.purchase_date ? "hasValue" : ""}`}>
+                          <FlexibleDatePicker ariaLabel={`${purchaseDraft.label || form.count_unit || "권"} 구매일`} value={purchaseDraft.purchase_date || ""} onChange={(date) => setPurchaseDraft((prev) => ({ ...prev, purchase_date: date || null }))} />
+                          {purchaseDraft.purchase_date && <button type="button" className="dateClear" aria-label="구매일 지우기" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.preventDefault(); event.stopPropagation(); setPurchaseDraft((prev) => ({ ...prev, purchase_date: null })); }}><X size={13} /></button>}
+                        </span>
+                      </div>
                       <label><span>판매가</span><input type="text" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <label><span>실구매가</span><input type="text" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
@@ -2562,7 +2566,7 @@ export default function FeedPage() {
                     {(form.purchase_items || []).map((item, index) => (
                       <div className={`savedPurchaseItem ${item.label.trim().length >= 9 ? "longLabel" : ""}`} key={`${item.label}-${index}`}>
                         <div><b>{item.label}</b><span><small>판매가 {item.list_price.toLocaleString()}원</small><strong>{item.paid_price.toLocaleString()}원</strong></span></div>
-                        {!!item.methods?.length && <p>{item.methods.join(" · ")}</p>}
+                        {(item.purchase_date || !!item.methods?.length) && <p>{[item.purchase_date, ...(item.methods || [])].filter(Boolean).join(" · ")}</p>}
                         <span className="savedPurchaseActions"><button type="button" aria-label={`${item.label} 수정`} onClick={() => editPurchaseItem(index)}><Pencil size={11} /></button><button type="button" aria-label={`${item.label} 삭제`} onClick={() => { const next = (form.purchase_items || []).filter((_, itemIndex) => itemIndex !== index); setPurchaseItems(next); resetPurchaseDraft(next); }}><X size={12} /></button></span>
                       </div>
                     ))}

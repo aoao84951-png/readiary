@@ -1,5 +1,6 @@
 export type VolumePurchase = {
   label: string;
+  purchase_date?: string | null;
   list_price: number;
   paid_price: number;
   methods?: string[];

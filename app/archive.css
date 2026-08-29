@@ -1259,6 +1259,7 @@
   padding: 2px 0 8px;
 }
 .purchaseEntryComposer > label,
+.purchaseItemDate,
 .purchaseMethodProperty {
   min-height: 43px;
   display: grid;
@@ -1268,6 +1269,14 @@
   color: #99958f;
   font-size: 8.5px;
   font-weight: 700;
+}
+.purchaseItemDate > span:first-child {
+  color: #99958f;
+  font-size: 8.5px;
+  font-weight: 700;
+}
+.purchaseItemDate .datePropertyValue {
+  min-width: 0;
 }
 .recordForm .purchaseEntryComposer > label input {
   min-width: 0;

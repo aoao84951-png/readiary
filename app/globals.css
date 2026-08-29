@@ -139,7 +139,7 @@
 .recordForm .countField>.countValue>select{flex:0 0 24px!important;width:24px!important;min-width:24px!important;margin:0!important;padding:0!important;text-align:left!important;vertical-align:middle!important}
 .recordForm .categoryProperty>.propertyLabel,.recordForm .categoryProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .categoryProperty>.propertyLabel{display:flex!important;align-items:center!important}
-.recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
+.recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseItemDate,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
 .recordForm .wizardPurchasePage>.notionDateProperty{grid-column:1/-1!important}
 .recordForm .wizardPurchasePage .purchaseEntryComposer>label>span,.recordForm .wizardPurchasePage .purchaseEntryComposer>label>input,.recordForm .wizardPurchasePage .purchaseMethodProperty>span,.recordForm .wizardPurchasePage .purchaseMethodProperty summary{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .wizardPurchasePage .purchaseEntryComposer>label>span,.recordForm .wizardPurchasePage .purchaseMethodProperty>span{display:flex!important;align-items:center!important}
@@ -190,7 +190,7 @@
 @media(max-width:520px){
   .recordForm.wizardForm{width:100%!important;overflow-x:hidden!important}
   .recordForm .wizardPage{padding-right:0!important;padding-left:0!important}
-  .recordForm .wizardPage>label,.recordForm .wizardPage>.notionDateProperty,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .bookMetaFields>label,.recordForm .wizardPage .purchaseEntryComposer>label,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
+  .recordForm .wizardPage>label,.recordForm .wizardPage>.notionDateProperty,.recordForm .wizardPage .editableSelect,.recordForm .wizardPage .bookMetaFields>label,.recordForm .wizardPage .purchaseEntryComposer>label,.recordForm .wizardPage .purchaseItemDate,.recordForm .wizardPage .purchaseMethodProperty{grid-template-columns:112px minmax(0,1fr)!important}
   .recordForm .datePropertyValue,.recordForm .dateAdder,.recordForm .dateDisplay{min-height:38px}
   .recordForm .readingDatesField{grid-template-columns:112px minmax(0,1fr)!important}
   .recordForm .readingDatesField>.propertyLabel{height:38px;line-height:38px}
