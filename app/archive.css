@@ -524,6 +524,7 @@
   animation: modalIn .18s ease-out;
 }
 .purchaseDetailModal > header {
+  flex: 0 0 auto;
   min-height: 64px;
   display: flex;
   align-items: center;
@@ -540,7 +541,7 @@
 .purchaseDetailAdd { display: flex; align-items: center; gap: 5px; padding: 0 10px; border-radius: 8px; background: #686863; color: #fff; }
 .purchaseDetailAdd span { font-size: 7.5px; font-weight: 750; }
 .purchaseDetailClose { width: 31px; display: grid; place-items: center; padding: 0; border-radius: 50%; background: #f3f2f0; color: #89847f; }
-.purchaseDetailTable { min-height: 0; overflow: auto; padding: 0 17px; }
+.purchaseDetailTable { min-height: 0; flex: 1 1 auto; overflow: auto; padding: 0 17px; }
 .purchaseDetailHead,
 .purchaseDetailRow {
   display: grid;
@@ -556,14 +557,14 @@
 .purchaseDetailRow s { color: #aaa39e; font-size: 7.5px; }
 .purchaseDetailRow strong { color: #585451; font-size: 9px; }
 .purchaseDetailRow em { min-width: 0; overflow: hidden; color: #8e7b75; font-size: 7.5px; font-style: normal; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
-.purchaseDetailModal > footer { min-height: 58px; display: flex; align-items: center; justify-content: flex-end; gap: 28px; padding: 10px 17px; border-top: 1px solid #eeeae8; background: #fbf9f8; }
+.purchaseDetailModal > footer { min-height: 58px; flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 28px; padding: 10px 17px; border-top: 1px solid #eeeae8; background: #fbf9f8; }
 .purchaseDetailModal > footer span { display: grid; gap: 3px; text-align: right; }
 .purchaseDetailModal > footer small { color: #aaa39f; font-size: 6.5px; }
 .purchaseDetailModal > footer s { color: #aaa39f; font-size: 8px; }
 .purchaseDetailModal > footer b { color: #575350; font-size: 10px; }
 @media (max-width: 520px) {
-  .purchaseDetailShade { align-items: end; padding: 0; }
-  .purchaseDetailModal { width: 100%; max-height: min(76dvh, 620px); border-width: 1px 0 0; border-radius: 16px 16px 0 0; }
+  .purchaseDetailShade { place-items: center; padding: 14px; }
+  .purchaseDetailModal { width: 100%; max-height: calc(100dvh - 28px); border-width: 1px; border-radius: 16px; }
   .purchaseDetailModal > header { min-height: 58px; padding-left: 14px; }
   .purchaseDetailTable { padding: 0 10px; }
   .purchaseDetailHead,

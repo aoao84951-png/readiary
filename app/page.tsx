@@ -1,5 +1,6 @@
 "use client";
 import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   ChevronLeft,
@@ -1367,7 +1368,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeSelected();
+      if (event.key !== "Escape") return;
+      if (purchaseDetailsOpen) setPurchaseDetailsOpen(false);
+      else closeSelected();
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
@@ -1375,7 +1378,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [selected]);
+  }, [selected, purchaseDetailsOpen]);
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="recordRow">
       <dt>{label}</dt>
@@ -1553,7 +1556,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       />
                     </dl>
                   </section>
-                  {purchaseDetailsOpen && <div className="purchaseDetailShade imageExportExclude" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPurchaseDetailsOpen(false); }}>
+                  {purchaseDetailsOpen && createPortal(<div className="purchaseDetailShade imageExportExclude" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPurchaseDetailsOpen(false); }}>
                     <section className="purchaseDetailModal" role="dialog" aria-modal="true" aria-label={`${book.title} 권별 구매 내역`}>
                       <header>
                         <span><small>PURCHASE DETAILS</small><b>권별 구매 내역</b></span>
@@ -1574,7 +1577,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       </div>
                       <footer><span><small>총 판매가</small><s>{book.list_price.toLocaleString()}원</s></span><span><small>총 실구매가</small><b>{book.paid_price.toLocaleString()}원</b></span></footer>
                     </section>
-                  </div>}
+                  </div>, document.body)}
                   <section className="recordGroup notesGroup">
                     <div className="archiveNotes">
                       <BookNotes book={book} showEmpty />
