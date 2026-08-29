@@ -158,6 +158,7 @@
 .recordForm .countField .countNumber,.recordForm .countField .countUnit{position:relative!important;top:-1px!important;height:32px!important;display:flex!important;align-items:center!important;color:#53514e!important;font-size:var(--property-font)!important;font-weight:600!important;line-height:32px!important}
 .recordForm .countField .countNumber{flex:0 0 auto!important;width:auto!important;min-width:0!important}
 .recordForm .countField>.countValue.isEmpty .countNumber{color:var(--property-muted)!important;font-weight:500!important}
+.recordForm .countField>.countValue.isEmpty .countUnit{color:var(--property-muted)!important;font-weight:500!important}
 .recordForm .countField .countUnit{flex:0 0 24px!important;width:24px!important;min-width:24px!important}
 .recordForm .countField .countNumber>span,.recordForm .countField .countUnit>span{display:block!important;line-height:32px!important;white-space:nowrap!important}
 .recordForm .countField .countNumber>input,
