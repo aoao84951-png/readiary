@@ -37,30 +37,6 @@ type SearchBook = {
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
 
-function firstPurchaseDate(book: Pick<BookRecord, "purchase_date" | "purchase_items">) {
-  const dates = (book.purchase_items || []).map((item) => item.purchase_date).filter((date): date is string => Boolean(date));
-  return dates.length ? [...dates].sort()[0] : (book.purchase_date || "");
-}
-
-function purchaseLabel(label: string, unit: "권" | "화" = "권") {
-  const clean = label.trim().replace(/[~～−–—]/g, "-").replace(/\s+/g, " ");
-  const match = clean.match(/^(\d+)\s*(?:권|화)?\s*-\s*(\d+)\s*(?:권|화)?$/);
-  if (match) return `${Number(match[1]).toLocaleString()}–${Number(match[2]).toLocaleString()}${unit}`;
-  const single = clean.match(/^(\d+)\s*(?:권|화)?$/);
-  return single ? `${Number(single[1]).toLocaleString()}${unit}` : clean;
-}
-
-function groupedPurchases(book: Book) {
-  const unit = book.count_unit || "권";
-  return (book.purchase_items || []).map((item, sourceIndex) => ({ ...item, sourceIndex, displayLabel: purchaseLabel(item.label, unit) }))
-    .sort((a, b) => {
-      const aNumber = Number(a.label.match(/\d+/)?.[0]);
-      const bNumber = Number(b.label.match(/\d+/)?.[0]);
-      if (Number.isFinite(aNumber) && Number.isFinite(bNumber) && aNumber !== bNumber) return aNumber - bNumber;
-      return a.sourceIndex - b.sourceIndex;
-    });
-}
-
 async function downloadImage(dataUrl: string, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const blob = await (await fetch(dataUrl)).blob();
@@ -1366,7 +1342,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuickPurchase, purchaseMethodOptions = [], onAddPurchaseMethod, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; onQuickPurchase?: (book: Book, item: VolumePurchase) => Promise<Book>; purchaseMethodOptions?: string[]; onAddPurchaseMethod?: (value: string) => Promise<void>; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -1374,9 +1350,6 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
-  const [quickPurchase, setQuickPurchase] = useState<VolumePurchase>({ label: "", list_price: 0, paid_price: 0, purchase_date: "", methods: [] });
-  const [quickSaving, setQuickSaving] = useState(false);
-  const [quickMessage, setQuickMessage] = useState("");
   useEffect(() => {
     if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
   }, [openBook, books]);
@@ -1460,7 +1433,6 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                 Math.round((1 - book.paid_price / book.list_price) * 100),
               )
             : 0;
-          const purchases = groupedPurchases(book);
           return (
             <div
               className="recordModalShade"
@@ -1555,7 +1527,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                       <em>{discount}% OFF</em>
                     </div>
                     <dl>
-                      <Row label="최초 구매일" value={firstPurchaseDate(book) || "–"} />
+                      <Row label="구매일" value={book.purchase_date || "–"} />
                       <Row label="플랫폼" value={book.platform || "–"} />
                       <Row
                         label="총 판매가"
@@ -1571,51 +1543,6 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onDelete, onQuic
                         value={book.purchase_method || "–"}
                       />
                     </dl>
-                    {purchases.length > 0 && <details className="modalPurchaseLedger">
-                      <summary><span>권·화별 구매 내역</span><small>{purchases.length}건 보기</small></summary>
-                      <div className="modalPurchaseLedgerList">
-                        {purchases.map((item, itemIndex) => {
-                          const itemDiscount = item.list_price ? Math.max(0, Math.round((1 - item.paid_price / item.list_price) * 100)) : 0;
-                          return <div className="modalPurchaseLedgerRow" key={`${item.label}-${itemIndex}`}>
-                            <b>{item.displayLabel}</b>
-                            <span className="ledgerPrice"><strong>{item.paid_price.toLocaleString()}원</strong>{item.list_price > 0 && <s>{item.list_price.toLocaleString()}원</s>}</span>
-                            <span className="ledgerMeta"><time>{item.purchase_date || "날짜 미기록"}</time>{itemDiscount > 0 && <em>{itemDiscount}% 할인</em>}</span>
-                            <small>{item.methods?.length ? item.methods.join(" · ") : "구매방법 미기록"}</small>
-                          </div>;
-                        })}
-                      </div>
-                    </details>}
-                    {onQuickPurchase && <details className="modalQuickPurchase imageExportExclude" onToggle={(event) => {
-                      if (event.currentTarget.open && !quickPurchase.label) setQuickPurchase((prev) => ({ ...prev, label: `${(book.purchase_items?.length || 0) + 1}${book.count_unit || "권"}` }));
-                    }}>
-                      <summary><Plus size={13} /><span>구매 내역 바로 추가</span></summary>
-                      <div className="modalQuickPurchaseEditor">
-                        <div className="modalQuickPurchaseFields">
-                            <label><span>{book.count_unit || "권"} 정보</span><input value={quickPurchase.label} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 8~255${book.count_unit || "권"}`} /></label>
-                            <div className="modalQuickPurchaseProperty">
-                              <span>구매일</span>
-                              <span className="modalQuickDate recordForm">
-                                <FlexibleDatePicker ariaLabel="구매일" value={quickPurchase.purchase_date || ""} onChange={(date) => setQuickPurchase((prev) => ({ ...prev, purchase_date: date || null }))} />
-                                {quickPurchase.purchase_date && <button type="button" className="modalQuickDateClear" aria-label="구매일 지우기" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.preventDefault(); event.stopPropagation(); setQuickPurchase((prev) => ({ ...prev, purchase_date: null })); }}><X size={11} /></button>}
-                              </span>
-                            </div>
-                            <label><span>판매가</span><input type="text" inputMode="numeric" value={quickPurchase.list_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
-                            <label><span>실구매가</span><input type="text" inputMode="numeric" value={quickPurchase.paid_price || ""} onChange={(event) => setQuickPurchase((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
-                            <div className="modalQuickPurchaseProperty"><span>구매방법</span><span className="modalQuickControl recordForm"><MultiEditableSelect values={quickPurchase.methods || []} options={purchaseMethodOptions} onChange={(methods) => setQuickPurchase((prev) => ({ ...prev, methods }))} onAdd={onAddPurchaseMethod || (async () => undefined)} /></span></div>
-                            {quickMessage && <p className="quickPurchaseMessage">{quickMessage}</p>}
-                            <div className="modalQuickPurchaseActions"><button type="button" disabled={quickSaving || !quickPurchase.label.trim()} onClick={async () => {
-                          setQuickSaving(true); setQuickMessage("");
-                          try {
-                            const updated = await onQuickPurchase(book, { ...quickPurchase, label: quickPurchase.label.trim() });
-                            setSelected({ book: updated, index });
-                            setQuickPurchase({ label: `${(updated.purchase_items?.length || 0) + 1}${updated.count_unit || "권"}`, list_price: 0, paid_price: 0, purchase_date: "", methods: [] });
-                            setQuickMessage("구매 내역을 저장했어요.");
-                          } catch (error) { setQuickMessage(error instanceof Error ? error.message : "저장하지 못했어요."); }
-                          finally { setQuickSaving(false); }
-                            }}>{quickSaving ? "저장 중…" : `${book.count_unit || "권"} 기록`}</button></div>
-                        </div>
-                      </div>
-                    </details>}
                   </section>
                   <section className="recordGroup notesGroup">
                     <div className="archiveNotes">
@@ -1868,8 +1795,8 @@ export default function FeedPage() {
       const textMatch = !q || `${book.title} ${book.author}`.toLowerCase().includes(q);
       return textMatch && (!statusFilters.length || statusFilters.includes(book.status)) && (!categoryFilters.length || categoryFilters.includes(book.category));
     }).sort((a, b) => {
-      const aDate = sortMode === "purchase" ? firstPurchaseDate(a) : (a.created_at || "");
-      const bDate = sortMode === "purchase" ? firstPurchaseDate(b) : (b.created_at || "");
+      const aDate = sortMode === "purchase" ? (a.purchase_date || "") : (a.created_at || "");
+      const bDate = sortMode === "purchase" ? (b.purchase_date || "") : (b.created_at || "");
       if (aDate !== bDate) return bDate.localeCompare(aDate);
       return String(b.created_at || "").localeCompare(String(a.created_at || ""));
     });
@@ -1981,26 +1908,6 @@ export default function FeedPage() {
     setBooks((prev) => prev.filter((item) => item.id !== book.id));
     setDetailBook(null);
   }
-  async function quickAddPurchase(book: Book, item: VolumePurchase) {
-    const existingItems = book.purchase_items?.length ? book.purchase_items : ((book.list_price || book.paid_price || book.purchase_method)
-      ? [{ label: "기존 구매 합계", list_price: book.list_price || 0, paid_price: book.paid_price || 0, purchase_date: book.purchase_date, methods: book.purchase_method ? [book.purchase_method] : [] }]
-      : []);
-    const purchaseItems = [...existingItems, item];
-    const listPrice = purchaseItems.reduce((sum, current) => sum + (Number(current.list_price) || 0), 0);
-    const paidPrice = purchaseItems.reduce((sum, current) => sum + (Number(current.paid_price) || 0), 0);
-    const methods = [...new Set(purchaseItems.flatMap((current) => current.methods || []))];
-    const dated = purchaseItems.map((current) => current.purchase_date).filter((date): date is string => Boolean(date)).sort();
-    const response = await fetch("/api/books", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...book, purchase_items: purchaseItems, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + "), purchase_date: dated[0] || book.purchase_date }),
-    });
-    const data = await response.json() as { error?: string; item: Book };
-    if (!response.ok) throw new Error(data.error || "구매 내역을 저장하지 못했어요.");
-    setBooks((prev) => prev.map((current) => current.id === book.id ? data.item : current));
-    setDetailBook(data.item);
-    return data.item;
-  }
   async function findBooks(e: FormEvent) {
     e.preventDefault();
     if (!search.trim()) return;
@@ -2066,8 +1973,7 @@ export default function FeedPage() {
     const listPrice = items.reduce((sum, item) => sum + (Number(item.list_price) || 0), 0);
     const paidPrice = items.reduce((sum, item) => sum + (Number(item.paid_price) || 0), 0);
     const methods = [...new Set(items.flatMap((item) => item.methods || []))];
-    const dated = items.map((item) => item.purchase_date).filter((date): date is string => Boolean(date)).sort();
-    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + "), purchase_date: dated[0] || prev.purchase_date }));
+    setForm((prev) => ({ ...prev, purchase_items: items, list_price: listPrice, paid_price: paidPrice, purchase_method: methods.join(" + ") }));
   }
   function resetPurchaseDraft(items = form.purchase_items || []) {
     setPurchaseDraft({ label: `${items.length + 1}${form.count_unit || "권"}`, list_price: 0, paid_price: 0, methods: [] });
@@ -2078,7 +1984,6 @@ export default function FeedPage() {
       label: purchaseDraft.label.trim() || `${(form.purchase_items?.length || 0) + 1}${form.count_unit || "권"}`,
       list_price: Number(purchaseDraft.list_price) || 0,
       paid_price: Number(purchaseDraft.paid_price) || 0,
-      purchase_date: purchaseDraft.purchase_date || null,
       methods: purchaseDraft.methods || [],
     };
     const items = [...(form.purchase_items || [])];
@@ -2297,7 +2202,7 @@ export default function FeedPage() {
           <button className={profileView === "hall" ? "on" : ""} onClick={() => setProfileView("hall")}>HALL OF FAME</button>
         </nav>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} purchaseMethodOptions={purchaseMethodOptions} onAddPurchaseMethod={(value) => addOption("purchase_methods", value)} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onDelete={deleteBook} />}
       {view === "stats" && profileView === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
       {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onDelete={deleteBook} />}
       {loading && books.length === 0 ? (
@@ -2400,7 +2305,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} onQuickPurchase={quickAddPurchase} purchaseMethodOptions={purchaseMethodOptions} onAddPurchaseMethod={(value) => addOption("purchase_methods", value)} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onDelete={deleteBook} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><Hash size={17} strokeWidth={1.55} /></button>
@@ -2645,7 +2550,6 @@ export default function FeedPage() {
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
-                      <label><span>구매일</span><input type="date" value={purchaseDraft.purchase_date || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, purchase_date: event.target.value || null }))} /></label>
                       <label><span>판매가</span><input type="text" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <label><span>실구매가</span><input type="text" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
