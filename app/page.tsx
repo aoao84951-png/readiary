@@ -2512,9 +2512,9 @@ export default function FeedPage() {
               }}>
                 <div className="wizardProgress" aria-label="기록 작성 단계">
                   {wizardSteps.map((item, index) => (
-                    <span className={`${item === step ? "active" : ""} ${wizardSteps.indexOf(step as typeof wizardSteps[number]) > index ? "done" : ""}`} key={item}>
+                    <button type="button" aria-current={item === step ? "step" : undefined} onClick={() => moveWizard(item)} className={`${item === step ? "active" : ""} ${wizardSteps.indexOf(step as typeof wizardSteps[number]) > index ? "done" : ""}`} key={item}>
                       <i>{index + 1}</i><b>{item.toUpperCase()}</b>
-                    </span>
+                    </button>
                   ))}
                 </div>
                 {step === "book" && <div className="wizardPage wizardBookPage">

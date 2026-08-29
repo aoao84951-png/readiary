@@ -995,16 +995,21 @@
   padding: 10px 0 8px;
   color: #bbb7b3;
 }
-.wizardProgress span {
+.wizardProgress button {
   position: relative;
   min-width: 0;
   display: grid;
   justify-items: center;
   gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font: 700 8px "Courier New", monospace;
   letter-spacing: .08em;
+  cursor: pointer;
 }
-.wizardProgress span::before {
+.wizardProgress button::before {
   content: "";
   position: absolute;
   z-index: 0;
@@ -1014,7 +1019,7 @@
   height: 1px;
   background: #ece9e6;
 }
-.wizardProgress span:first-child::before { display: none; }
+.wizardProgress button:first-child::before { display: none; }
 .wizardProgress i {
   position: relative;
   z-index: 1;
@@ -1028,10 +1033,13 @@
   font-style: normal;
   font-size: 8px;
 }
-.wizardProgress span.done::before,
-.wizardProgress span.done i,
-.wizardProgress span.active i { background: #efd7df; color: #a86f83; }
-.wizardProgress span.active b { color: #a86f83; }
+.wizardProgress button.done::before,
+.wizardProgress button.done i,
+.wizardProgress button.active i { background: #efd7df; color: #a86f83; }
+.wizardProgress button.active b { color: #a86f83; }
+.wizardProgress button:hover b,.wizardProgress button:focus-visible b { color: #8f7580; }
+.wizardProgress button:focus-visible { outline: 0; }
+.wizardProgress button:focus-visible i { box-shadow: 0 0 0 3px rgba(239,215,223,.55); }
 .wizardPage {
   align-content: start;
   margin-top: 20px;
@@ -1198,8 +1206,8 @@
     padding-top: 11px;
     padding-bottom: 8px;
   }
-  .wizardProgress span { gap: 7px; font-size: 7.5px; }
-  .wizardProgress span::before { top: 10px; }
+  .wizardProgress button { gap: 7px; font-size: 7.5px; }
+  .wizardProgress button::before { top: 10px; }
   .wizardProgress i { width: 21px; height: 21px; font-size: 8px; }
   .wizardPage { margin-top: 16px; }
   .recordForm .wizardPage > label,
