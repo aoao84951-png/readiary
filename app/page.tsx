@@ -1006,8 +1006,34 @@ function InteractiveRating({
   value: number;
   onChange: (value: number) => void;
 }) {
+  const gestureRef = useRef<{ startX: number; dragging: boolean } | null>(null);
+  const valueAtPointer = (target: HTMLSpanElement, clientX: number, halfSteps: boolean) => {
+    const stars = target.querySelector<HTMLElement>(".starScale");
+    const rect = stars?.getBoundingClientRect() || target.getBoundingClientRect();
+    const raw = Math.max(0, Math.min(5, ((clientX - rect.left) / rect.width) * 5));
+    return halfSteps ? Math.round(raw * 2) / 2 : Math.max(1, Math.ceil(raw));
+  };
   return (
-    <span className="ratingControl">
+    <span
+      className="ratingControl"
+      onPointerDown={(event) => {
+        event.preventDefault();
+        gestureRef.current = { startX: event.clientX, dragging: false };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        onChange(valueAtPointer(event.currentTarget, event.clientX, false));
+      }}
+      onPointerMove={(event) => {
+        const gesture = gestureRef.current;
+        if (!gesture) return;
+        if (Math.abs(event.clientX - gesture.startX) >= 3) gesture.dragging = true;
+        if (gesture.dragging) onChange(valueAtPointer(event.currentTarget, event.clientX, true));
+      }}
+      onPointerUp={(event) => {
+        gestureRef.current = null;
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+      }}
+      onPointerCancel={() => { gestureRef.current = null; }}
+    >
       <StarScale value={value} interactive />
       <input
         type="range"
@@ -2312,7 +2338,7 @@ export default function FeedPage() {
   }
   function beginSwipe(event: TouchEvent<HTMLElement>) {
     const target = event.target as HTMLElement;
-    if (adding || detailBook || target.closest("button, input, textarea, select, a, [role='dialog']")) return;
+    if (adding || detailBook || target.closest("button, input, textarea, select, a, .ratingControl, [role='dialog']")) return;
     const touch = event.touches[0];
     swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
   }
