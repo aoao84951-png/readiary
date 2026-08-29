@@ -57,6 +57,26 @@ function purchaseItemsByDate(items: VolumePurchase[], fallbackDate = "") {
     .map(({ item }) => item);
 }
 
+function purchaseItemQuantity(item: VolumePurchase, book: BookRecord, legacy = false) {
+  if (legacy || /^(기존\s*)?합계$/.test(item.label.trim())) return Math.max(1, book.total_count || 1);
+  const range = item.label.match(/(\d+)\s*(?:~|-|–)\s*(\d+)/);
+  if (range) return Math.max(1, Number(range[2]) - Number(range[1]) + 1);
+  return 1;
+}
+
+function bookPurchaseEntries(book: Book) {
+  const legacy = !book.purchase_items?.length;
+  const items = legacy
+    ? [{ label: "합계", purchase_date: book.purchase_date, list_price: book.list_price, paid_price: book.paid_price, methods: book.purchase_method ? [book.purchase_method] : [] }]
+    : book.purchase_items || [];
+  return items.map((item) => ({
+    book,
+    item,
+    date: item.purchase_date || book.purchase_date || "",
+    quantity: purchaseItemQuantity(item, book, legacy),
+  }));
+}
+
 async function downloadImage(dataUrl: string, filename: string) {
   const safeFilename = `${filename.replace(/[\\/:*?"<>|]/g, "-")}.png`;
   const blob = await (await fetch(dataUrl)).blob();
@@ -1607,7 +1627,7 @@ function StatSection({ title, subtitle, items }: { title: string; subtitle: stri
   return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statCards">{items.map((item, index) => <article className="statCard" key={item.name}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><strong>{item.paid.toLocaleString()}원</strong><small>{item.volumes}권 · {item.works}작품</small></article>)}</div></section>;
 }
 
-function StatsListModal({ title, subtitle, books, mode, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase"; onClose: () => void }) {
+function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase"; purchaseMonth?: string; onClose: () => void }) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
@@ -1619,6 +1639,8 @@ function StatsListModal({ title, subtitle, books, mode, onClose }: { title: stri
     };
   }, [onClose]);
   const statusClass = (status: string) => status === "완독" ? "done" : status === "하차" ? "paused" : status === "읽는 중" ? "reading" : status === "읽기 전" ? "before" : "basket";
+  const monthlyEntries = (book: Book) => mode === "purchase" && purchaseMonth ? bookPurchaseEntries(book).filter(entry => entry.date.startsWith(purchaseMonth)) : [];
+  const monthlyTotal = books.reduce((sum, book) => sum + monthlyEntries(book).reduce((bookSum, entry) => bookSum + (entry.item.paid_price || 0), 0), 0);
   return (
     <div className="statsListShade" onMouseDown={onClose}>
       <section className="statsListModal" role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
@@ -1627,23 +1649,28 @@ function StatsListModal({ title, subtitle, books, mode, onClose }: { title: stri
           <button type="button" onClick={onClose} aria-label="목록 닫기"><X size={17} /></button>
         </header>
         <div className="statsBookList">
-          {books.length ? books.map((book) => (
+          {books.length ? books.map((book) => {
+            const entries = monthlyEntries(book);
+            const labels = entries.map(entry => entry.item.label);
+            const days = [...new Set(entries.map(entry => entry.date.slice(8, 10)).filter(Boolean))];
+            const monthPaid = entries.reduce((sum, entry) => sum + (entry.item.paid_price || 0), 0);
+            return (
             <article className="statsBookItem" key={book.id}>
               <span className="archiveCover">{book.cover_url ? <img src={book.cover_url} alt="" /> : <span>▦</span>}</span>
               <span className="archiveIdentity">
                 <b>{book.title}</b>
                 <small>{book.author || "저자 미상"} · {book.category}</small>
-                {mode === "purchase" && <em>{book.purchase_method || "구매방법 미기록"}</em>}
+                {mode === "purchase" && <em>{labels.length ? labels.join(" · ") : "권 정보 미기록"}</em>}
               </span>
               {mode === "status" ? (
                 <span className={`archiveStatus ${statusClass(book.status)}`}>{book.status}<small>{book.read_count}/{book.total_count}{book.count_unit || "권"}</small></span>
               ) : (
-                <span className="statsPurchaseAmount"><b>{book.paid_price.toLocaleString()}원</b><small>{book.purchase_date?.slice(8, 10) || "–"}일 · {book.platform || "플랫폼 미기록"}</small></span>
+                <span className="statsPurchaseAmount"><b>{monthPaid.toLocaleString()}원</b><small>{days.length ? `${days.map(day => `${Number(day)}일`).join(" · ")} · ` : ""}{book.platform || "플랫폼 미기록"}</small></span>
               )}
             </article>
-          )) : <div className="statsListEmpty">해당하는 기록이 아직 없어요.</div>}
+          );}) : <div className="statsListEmpty">해당하는 기록이 아직 없어요.</div>}
         </div>
-        <footer><span>{String(books.length).padStart(2, "0")} BOOKS</span>{mode === "purchase" && <b>합계 {books.reduce((sum, book) => sum + (book.paid_price || 0), 0).toLocaleString()}원</b>}</footer>
+        <footer><span>{String(books.length).padStart(2, "0")} BOOKS</span>{mode === "purchase" && <b>합계 {monthlyTotal.toLocaleString()}원</b>}</footer>
       </section>
     </div>
   );
@@ -1680,7 +1707,7 @@ function HallOfFame({ books, onEdit, onAddPurchase, onDelete }: { books: Book[];
 
 function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
   const [purchaseYear, setPurchaseYear] = useState("");
-  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" } | null>(null);
+  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase"; purchaseMonth?: string } | null>(null);
   const won = (value: number) => `${value.toLocaleString()}원`;
   const totalVolumes = books.reduce((sum, book) => sum + (book.total_count || 0), 0);
   const readVolumes = books.reduce((sum, book) => sum + (book.read_count || 0), 0);
@@ -1700,15 +1727,16 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
   const platforms = group("platform");
   const recordedStatuses = group("status");
   const statuses = ["책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(name => recordedStatuses.find(item => item.name === name) || { name, works: 0, volumes: 0, paid: 0 });
-  const months = Object.values(books.reduce<Record<string, { name: string; works: number; volumes: number; paid: number }>>((all, book) => {
-    const name = book.purchase_date?.slice(0, 7);
-    if (!name) return all;
-    all[name] ||= { name, works: 0, volumes: 0, paid: 0 };
-    all[name].works += 1;
-    all[name].volumes += book.total_count || 0;
-    all[name].paid += book.paid_price || 0;
-    return all;
-  }, {})).sort((a, b) => b.name.localeCompare(a.name));
+  const purchaseEntries = books.flatMap(bookPurchaseEntries).filter(entry => entry.date);
+  const months = [...new Set(purchaseEntries.map(entry => entry.date.slice(0, 7)))].map(name => {
+    const entries = purchaseEntries.filter(entry => entry.date.startsWith(name));
+    return {
+      name,
+      works: new Set(entries.map(entry => entry.book.id)).size,
+      volumes: entries.reduce((sum, entry) => sum + entry.quantity, 0),
+      paid: entries.reduce((sum, entry) => sum + (entry.item.paid_price || 0), 0),
+    };
+  }).sort((a, b) => b.name.localeCompare(a.name));
   const purchaseYears = [...new Set(months.map(item => item.name.slice(0, 4)))];
   const activePurchaseYear = purchaseYears.includes(purchaseYear) ? purchaseYear : purchaseYears[0];
   if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
@@ -1746,8 +1774,9 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
       {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><label className="purchaseYearSelect"><span>연도 선택</span><select aria-label="구매 로그 연도 선택" value={activePurchaseYear} onChange={(event) => setPurchaseYear(event.target.value)}>{purchaseYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
         const month = String(index + 1).padStart(2, "0");
         const item = months.find(value => value.name === `${activePurchaseYear}-${month}`);
-        const monthBooks = books.filter(book => book.purchase_date?.startsWith(`${activePurchaseYear}-${month}`));
-        return <button type="button" className={item ? "hasPurchase" : ""} key={month} onClick={() => setListModal({ title: `${activePurchaseYear}년 ${Number(month)}월`, subtitle: item ? `${item.works}작품 구매` : "구매 기록 없음", books: monthBooks, mode: "purchase" })}><span>{month}</span><strong>{item ? won(item.paid) : "–"}</strong><small>{item ? `${item.volumes}권 · ${item.works}작품` : "기록 없음"}</small></button>;
+        const purchaseMonth = `${activePurchaseYear}-${month}`;
+        const monthBooks = [...new Map(purchaseEntries.filter(entry => entry.date.startsWith(purchaseMonth)).map(entry => [entry.book.id, entry.book])).values()];
+        return <button type="button" className={item ? "hasPurchase" : ""} key={month} onClick={() => setListModal({ title: `${activePurchaseYear}년 ${Number(month)}월`, subtitle: item ? `${item.volumes}권 · ${item.works}작품 구매` : "구매 기록 없음", books: monthBooks, mode: "purchase", purchaseMonth })}><span>{month}</span><strong>{item ? won(item.paid) : "–"}</strong><small>{item ? `${item.volumes}권 · ${item.works}작품` : "기록 없음"}</small></button>;
       })}</div></section>}
       {listModal && <StatsListModal {...listModal} onClose={() => setListModal(null)} />}
     </section>
