@@ -354,3 +354,6 @@
 }
 
 .statusText.before{color:#6f9d7e}
+
+/* Keep mixed Latin/Korean feed tags aligned across browser font metrics. */
+.metaActions .genreText,.metaActions .statusText{display:inline-flex;align-items:center;height:14px;font-family:'Apple SD Gothic Neo','Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;line-height:14px}
