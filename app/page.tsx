@@ -1768,6 +1768,7 @@ export default function FeedPage() {
   const [readingDate, setReadingDate] = useState("");
   const [purchaseDraft, setPurchaseDraft] = useState<VolumePurchase>({ label: "1권", purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
   const [editingPurchaseIndex, setEditingPurchaseIndex] = useState<number | null>(null);
+  const [purchaseOnlyEdit, setPurchaseOnlyEdit] = useState(false);
   const [saving, setSaving] = useState(false);
   const [coverProcessing, setCoverProcessing] = useState(false);
   const [platformOptions, setPlatformOptions] = useState(defaultPlatforms);
@@ -1856,6 +1857,7 @@ export default function FeedPage() {
     requestAnimationFrame(() => window.scrollTo(0, scrollRef.current));
   }
   function openAdd() {
+    setPurchaseOnlyEdit(false);
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     const storedDraft = window.localStorage.getItem("readiary-record-draft");
@@ -1885,6 +1887,7 @@ export default function FeedPage() {
   function continueDraft() {
     if (!resumeDraft) return;
     setEditingId(null);
+    setPurchaseOnlyEdit(false);
     setForm(resumeDraft.form);
     setStep(resumeDraft.step);
     setReadingDate(resumeDraft.readingDate);
@@ -1902,6 +1905,7 @@ export default function FeedPage() {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     setEditingId(null);
+    setPurchaseOnlyEdit(false);
     setStep("search");
     setSearch("");
     setResults([]);
@@ -1919,6 +1923,7 @@ export default function FeedPage() {
       : [{ label: "기존 합계", purchase_date: record.purchase_date || null, list_price: record.list_price || 0, paid_price: record.paid_price || 0, methods: record.purchase_method ? [record.purchase_method] : [] }];
     if (record.purchase_method && !purchaseItems.some((item) => item.methods.length)) purchaseItems[0].methods = [record.purchase_method];
     setEditingId(id);
+    setPurchaseOnlyEdit(initialStep === "purchase");
     setForm({
       ...record,
       purchase_items: purchaseItems,
@@ -2102,8 +2107,10 @@ export default function FeedPage() {
       setBooks((prev) => editingId
         ? prev.map((book) => book.id === editingId ? data.item : book)
         : [data.item, ...prev]);
+      if (purchaseOnlyEdit) setDetailBook(data.item);
       setAdding(false);
       setEditingId(null);
+      setPurchaseOnlyEdit(false);
       window.localStorage.removeItem("readiary-record-draft");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "저장하지 못했어요.");
@@ -2423,7 +2430,7 @@ export default function FeedPage() {
               </div>
             ) : (
               <form className="recordForm wizardForm" onSubmit={(e) => {
-                if (step === "notes") void save(e);
+                if (step === "notes" || (step === "purchase" && purchaseOnlyEdit)) void save(e);
                 else { e.preventDefault(); nextWizardStep(); }
               }}>
                 <div className="wizardProgress" aria-label="기록 작성 단계">
@@ -2624,8 +2631,8 @@ export default function FeedPage() {
                 {message && <p className="formMessage">{message}</p>}
                 <div className="wizardActions">
                   <button type="button" className="wizardPrevious" onClick={previousWizardStep}>{step === "book" && !editingId ? "검색으로" : "이전"}</button>
-                  {step === "notes" ? (
-                    <button className="save" disabled={saving}>{saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}</button>
+                  {step === "notes" || (step === "purchase" && purchaseOnlyEdit) ? (
+                    <button className="save" disabled={saving}>{saving ? "저장 중…" : purchaseOnlyEdit ? "구매 기록 저장" : editingId ? "수정 저장" : "기록 저장"}</button>
                   ) : (
                     <button className="wizardNext">다음</button>
                   )}
