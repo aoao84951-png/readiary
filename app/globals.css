@@ -61,6 +61,30 @@
   .recordForm .dateClear{width:28px;height:28px}
 }
 
+/* Keep long statistics lists inside a complete mobile dialog. */
+@media (max-width: 520px) {
+  .statsListShade {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
+  }
+  .statsListModal {
+    max-height: calc(100dvh - max(20px, env(safe-area-inset-top)) - max(20px, env(safe-area-inset-bottom)));
+  }
+  .statsListHead,
+  .statsListModal > footer {
+    flex: 0 0 auto;
+  }
+  .statsBookList {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
 /* A soft marker stroke highlights the title without tinting the page edge. */
 .hallPage {
   padding-top: 0;
