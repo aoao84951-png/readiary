@@ -280,20 +280,20 @@
 .modalPurchaseLedger>summary,.modalQuickPurchase>summary{display:flex;align-items:center;gap:5px;min-height:34px;color:#92908c;font-size:8px;font-weight:650;cursor:pointer;list-style:none}
 .modalPurchaseLedger>summary::-webkit-details-marker,.modalQuickPurchase>summary::-webkit-details-marker{display:none}
 .modalPurchaseLedger>summary small{margin-left:auto;color:#b5b2ae;font-size:7px;font-weight:500}
-.modalPurchaseLedgerList{border-top:1px solid #ecece9}
-.modalPurchaseLedgerRow{display:grid;grid-template-columns:68px minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:10px;row-gap:3px;min-height:48px;padding:8px 2px;border-bottom:1px solid #ecece9;background:transparent}
+.modalPurchaseLedgerList{display:grid;gap:3px;padding:5px 0 2px;border-top:1px solid #ecece9}
+.modalPurchaseLedgerRow{display:grid;grid-template-columns:68px minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:10px;row-gap:3px;min-height:46px;padding:7px 2px;background:transparent}
 .modalPurchaseLedgerRow>b{grid-row:1/3;color:#5e5d58;font-size:9px}.ledgerPrice{display:flex;align-items:baseline;gap:7px}.ledgerPrice strong{color:#5e5d58;font-size:9px}.ledgerPrice s{color:#b5b2ae;font-size:7px}.ledgerMeta{display:flex;justify-content:flex-end;gap:6px;color:#aaa7a3;font-size:7px}.ledgerMeta em{color:#ad758a;font-size:7px;font-style:normal}.modalPurchaseLedgerRow>small{grid-column:2/4;color:#9d9995;font-size:7px}
 .modalQuickPurchase>summary{width:max-content;min-height:31px;color:#ad758a}.modalQuickPurchase>summary svg{width:10px;height:10px}
-.modalQuickPurchaseEditor{border-top:1px solid #ecece9}
-.modalQuickPurchaseFields{display:grid;grid-template-columns:1fr 1fr}
-.modalQuickPurchaseFields>label,.modalQuickPurchaseProperty{min-width:0;min-height:39px;display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:7px;border-bottom:1px solid #ecece9}
+.modalQuickPurchaseEditor{padding:4px 0 1px;border-top:1px solid #ecece9}
+.modalQuickPurchaseFields{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;row-gap:2px}
+.modalQuickPurchaseFields>label,.modalQuickPurchaseProperty{min-width:0;min-height:38px;display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:7px}
 .modalQuickPurchaseFields>label:nth-child(odd){padding-right:12px}
 .modalQuickPurchaseFields>label>span,.modalQuickPurchaseProperty>span:first-child{color:#aaa7a3;font-size:8px;font-weight:600}
 .modalQuickPurchaseFields input{min-width:0;width:100%;height:30px;padding:0;border:0;background:transparent;color:#5d5d58;font-size:9px;font-weight:650;outline:0}
 .modalQuickPurchaseFields input::placeholder{color:#b8b5b1;font-size:9px;font-weight:500}
 .modalQuickPurchaseProperty{grid-column:1/3}
 .modalQuickDate{position:relative;min-width:0}.modalQuickDate .flexDatePicker,.modalQuickDate .flexDateTrigger{width:100%}.modalQuickDate .flexDateTrigger{min-height:30px;padding:0 24px 0 0;border:0;background:transparent;color:#5d5d58;font-size:9px;font-weight:650;text-align:left}.modalQuickDateClear{position:absolute;top:50%;right:0;width:20px;height:20px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:#f4f3f1;color:#9b9894;transform:translateY(-50%);cursor:pointer}
-.modalQuickPurchaseProperty>.multiEditableSelect{position:relative;min-width:0;margin:0;padding:0}.modalQuickPurchaseProperty .multiEditableSelect summary{min-height:30px;padding:0 18px 0 0;border:0;background:transparent;color:#5d5d58;font-size:9px;font-weight:650}.modalQuickPurchaseProperty .multiOptionMenu{z-index:20}
+.modalQuickDate.recordForm,.modalQuickControl.recordForm{--property-font:9px;--property-muted:#b8b5b1;display:block;min-width:0}.modalQuickControl .multiEditableSelect{position:relative;min-width:0;margin:0;padding:0}.modalQuickControl .multiEditableSelect summary{min-height:30px;padding:0 18px 0 0;border:0;background:transparent;color:#5d5d58;font-size:9px;font-weight:650}.modalQuickControl .multiOptionMenu{z-index:20}
 .quickPurchaseMessage{grid-column:1/3;margin:8px 0 0;color:#9e7180;font-size:8px}.modalQuickPurchaseActions{grid-column:1/3;display:flex;justify-content:flex-end;padding-top:8px}.modalQuickPurchaseActions button{width:auto;min-width:54px;height:28px;padding:0 11px;border:0;border-radius:8px;background:#676762;color:#fff;font-size:8px;font-weight:750;cursor:pointer}.modalQuickPurchaseActions button:disabled{opacity:.45}
 @media(max-width:520px){.modalPurchaseLedgerRow{grid-template-columns:55px minmax(0,1fr) auto}.modalQuickPurchaseFields{grid-template-columns:1fr}.modalQuickPurchaseFields>label:nth-child(odd){padding-right:0}.modalQuickPurchaseProperty,.quickPurchaseMessage,.modalQuickPurchaseActions{grid-column:1}.modalQuickPurchaseActions{justify-content:flex-end}}
 .recordRow {
