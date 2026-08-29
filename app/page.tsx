@@ -1822,6 +1822,9 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
   const list = books.reduce((sum, book) => sum + (book.list_price || 0), 0);
   const rated = books.filter(book => typeof book.rating === "number" && book.rating > 0);
   const averageRating = rated.length ? rated.reduce((sum, book) => sum + (book.rating || 0), 0) / rated.length : 0;
+  const averageRatingDisplay = averageRating
+    ? (Math.round((averageRating + Number.EPSILON) * 10) / 10).toFixed(1)
+    : "–";
   const group = (key: "category" | "platform" | "status") => Object.values(books.reduce<Record<string, { name: string; works: number; volumes: number; paid: number }>>((all, book) => {
     const name = book[key] || "미분류";
     all[name] ||= { name, works: 0, volumes: 0, paid: 0 };
@@ -1858,7 +1861,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         <div className="profileNumbers">
           <div><strong>{books.length}</strong><small>작품</small></div>
           <div><strong>{readVolumes}</strong><small>읽은 권수</small></div>
-          <div><strong>{averageRating ? averageRating.toFixed(1) : "–"}</strong><small>평균 평점</small></div>
+          <div><strong>{averageRatingDisplay}</strong><small>평균 평점</small></div>
         </div>
         <div className="profileReadingBio"><b>나의 독서 통계</b><span>books, notes &amp; little memories</span></div>
       </header>
@@ -1870,7 +1873,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
       </div>
       <div className="readingSnapshot">
         <div><small>읽은 권수</small><b>{readVolumes} / {totalVolumes}권</b></div>
-        <div><small>평균 평점</small><b>★ {averageRating ? averageRating.toFixed(1) : "–"}</b></div>
+        <div><small>평균 평점</small><b>★ {averageRatingDisplay}</b></div>
         <div><small>평균 작품 지출</small><b>{won(books.length ? Math.round(paid / books.length) : 0)}</b></div>
       </div>
       <div className="statsSplit">
