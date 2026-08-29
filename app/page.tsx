@@ -1182,11 +1182,22 @@ function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: stri
 
 function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: string[]; kind: "liked" | "disliked"; onChange: (notes: string[]) => void }) {
   const [draft, setDraft] = useState("");
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingDraft, setEditingDraft] = useState("");
   const addNote = () => {
     const clean = draft.trim();
     if (!clean) return;
     onChange([...notes.filter((note) => note.trim()), clean]);
     setDraft("");
+  };
+  const startEditing = (index: number) => { setEditingIndex(index); setEditingDraft(notes[index]); };
+  const cancelEditing = () => { setEditingIndex(null); setEditingDraft(""); };
+  const saveEditing = () => {
+    if (editingIndex === null) return;
+    const clean = editingDraft.trim();
+    if (!clean) return;
+    onChange(notes.map((note, index) => index === editingIndex ? clean : note));
+    cancelEditing();
   };
   return (
     <section className={`noteEditor full ${kind}`}>
@@ -1198,10 +1209,13 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
       {!!notes.some((note) => note.trim()) && (
         <div className="savedNoteList">
           {notes.map((note, index) => note.trim() && (
-            <div className="savedNote" key={index}>
+            <div className={`savedNote ${editingIndex === index ? "editing" : ""}`} key={index}>
               <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
-              <AutoTextarea ariaLabel={`${label} ${index + 1}`} value={note} onChange={(value) => onChange(notes.map((item, itemIndex) => itemIndex === index ? value : item))} />
-              <button type="button" aria-label={`${label} ${index + 1} 삭제`} onClick={() => onChange(notes.filter((_, itemIndex) => itemIndex !== index))}><X size={11} /></button>
+              {editingIndex === index ? <div className="savedNoteEdit">
+                <AutoTextarea ariaLabel={`${label} ${index + 1} 수정`} value={editingDraft} onChange={setEditingDraft} />
+                <span><button type="button" onClick={cancelEditing}>취소</button><button type="button" disabled={!editingDraft.trim()} onClick={saveEditing}>수정 완료</button></span>
+              </div> : <button type="button" className="savedNoteText" aria-label={`${label} ${index + 1} 수정`} onClick={() => startEditing(index)}>{note}</button>}
+              <button type="button" className="savedNoteDelete" aria-label={`${label} ${index + 1} 삭제`} onClick={() => { if (editingIndex === index) cancelEditing(); onChange(notes.filter((_, itemIndex) => itemIndex !== index)); }}><X size={11} /></button>
             </div>
           ))}
         </div>

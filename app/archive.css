@@ -1736,7 +1736,7 @@
   overflow: hidden;
   transform: translateY(1px);
 }
-.savedNote > button {
+.savedNote > .savedNoteDelete {
   width: 18px;
   height: 18px;
   display: grid;
@@ -1745,6 +1745,37 @@
   background: transparent;
   color: #b8b1ad;
 }
+.savedNoteText {
+  width: 100%;
+  min-width: 0;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #53514e;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.62;
+  text-align: left;
+  white-space: pre-wrap;
+  cursor: text;
+}
+.savedNoteText:hover,.savedNoteText:focus-visible { color: #3f3d3a; outline: 0; }
+.savedNoteEdit { min-width: 0; display: grid; gap: 6px; }
+.recordForm .savedNoteEdit textarea {
+  padding: 6px 8px;
+  border: 1px solid #e7dfdc;
+  border-radius: 7px;
+  background: #fcfaf9;
+  transform: none;
+  outline: 0;
+}
+.recordForm .savedNoteEdit textarea:focus { border-color: #d9bdc6; background: #fff; }
+.savedNoteEdit > span { display: flex; justify-content: flex-end; gap: 5px; }
+.savedNoteEdit > span button { min-height: 25px; padding: 0 8px; border: 0; border-radius: 6px; background: #f1efec; color: #85807c; font-size: 7.5px; font-weight: 700; cursor: pointer; }
+.savedNoteEdit > span button:last-child { background: #716f69; color: #fff; }
+.savedNoteEdit > span button:disabled { opacity: .4; cursor: default; }
 .noteEditor.liked .noteComposer > button { color: #bd7d94; }
 .noteEditor.disliked .noteComposer > button { color: #7799bc; }
 .basketNotes { display: grid; gap: 8px; }
@@ -2318,6 +2349,11 @@ html { scrollbar-gutter: stable; }
     line-height: 1.62;
     transform: none;
   }
+  .addDrawer .recordForm .savedNoteEdit textarea {
+    padding: 7px 8px;
+    border: 1px solid #e7dfdc;
+  }
+  .addDrawer .recordForm .savedNoteText { font-size: 11px; }
   .addDrawer .recordForm .savedNote .noteHeart {
     margin-top: 3px;
   }
