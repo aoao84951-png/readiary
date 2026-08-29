@@ -5,7 +5,6 @@ import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   ChevronLeft,
   ChevronRight,
-  GripVertical,
   Grid3X3,
   LayoutGrid,
   ImagePlus,
@@ -596,6 +595,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
   const dragOptionRef = useRef("");
   const dragOrderRef = useRef(options);
   const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressOptionClickRef = useRef(false);
   useEffect(() => {
     if (dragOptionRef.current) return;
     setOrderedOptions(options);
@@ -633,17 +633,18 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
     try { await onOptionsChange(next); }
     finally { setChangingOption(""); }
   }
-  function beginOptionDrag(event: React.PointerEvent<HTMLButtonElement>, option: string) {
+  function beginOptionDrag(event: React.PointerEvent<HTMLElement>, option: string) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
     dragTimerRef.current = setTimeout(() => {
       dragOptionRef.current = option;
       dragOrderRef.current = [...orderedOptions];
+      suppressOptionClickRef.current = true;
       setDraggingOption(option);
     }, 220);
   }
-  function moveOptionDrag(event: React.PointerEvent<HTMLButtonElement>) {
+  function moveOptionDrag(event: React.PointerEvent<HTMLElement>) {
     const dragged = dragOptionRef.current;
     if (!dragged) return;
     event.preventDefault();
@@ -666,6 +667,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
     dragOptionRef.current = "";
     setDraggingOption("");
     if (next.some((item, index) => item !== options[index])) void replaceOptions(next, dragged);
+    window.setTimeout(() => { suppressOptionClickRef.current = false; }, 0);
   }
   async function removeOption(option: string) {
     onChange(values.filter((value) => value !== option));
@@ -678,16 +680,15 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
     <details ref={detailsRef} className="multiEditableSelect">
       <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span></summary>
       <div className="multiOptionMenu">
-        <label className="multiOptionSearch"><Search size={12} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="구매방법 검색" /></label>
+        <div className="multiOptionSearch" role="search"><Search size={12} /><input aria-label="구매방법 검색" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="구매방법 검색" /></div>
         <div className="multiOptionList">
           {filtered.map((option) => {
             const optionIndex = orderedOptions.indexOf(option);
             const changing = changingOption === option;
-            return <div data-purchase-option={option} className={`multiOptionRow ${values.includes(option) ? "selected" : ""} ${draggingOption === option ? "dragging" : ""}`} key={option}>
-              <button type="button" className="multiOptionToggle" disabled={changing} onClick={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])}><span>{option}</span><i aria-hidden="true" /></button>
+            return <div data-purchase-option={option} className={`multiOptionRow ${values.includes(option) ? "selected" : ""} ${draggingOption === option ? "dragging" : ""}`} key={option} onPointerDown={(event) => { if (!(event.target as HTMLElement).closest(".multiOptionDelete")) beginOptionDrag(event, option); }} onPointerMove={moveOptionDrag} onPointerUp={endOptionDrag} onPointerCancel={endOptionDrag}>
+              <button type="button" className="multiOptionToggle" disabled={changing} onClick={() => { if (suppressOptionClickRef.current) return; onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option]); }}><span>{option}</span><i aria-hidden="true" /></button>
               {optionIndex >= 0 && <span className="multiOptionActions">
-                <button type="button" className="multiOptionDrag" aria-label={`${option} 순서 이동`} disabled={changing} onPointerDown={(event) => beginOptionDrag(event, option)} onPointerMove={moveOptionDrag} onPointerUp={endOptionDrag} onPointerCancel={endOptionDrag}><GripVertical size={11} /></button>
-                <button type="button" aria-label={`${option} 삭제`} disabled={changing} onClick={() => void removeOption(option)}><Trash2 size={10} /></button>
+                <button type="button" className="multiOptionDelete" aria-label={`${option} 삭제`} disabled={changing} onClick={() => void removeOption(option)}><Trash2 size={10} /></button>
               </span>}
             </div>;
           })}
