@@ -5,6 +5,8 @@ import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Grid3X3,
   LayoutGrid,
   ImagePlus,
@@ -583,12 +585,15 @@ function EditableSelect({ label, value, options, onChange, onAdd }: { label: str
   );
 }
 
-function MultiEditableSelect({ values, options, onChange, onAdd }: { values: string[]; options: string[]; onChange: (values: string[]) => void; onAdd: (value: string) => Promise<void> }) {
+function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange }: { values: string[]; options: string[]; onChange: (values: string[]) => void; onAdd: (value: string) => Promise<void>; onOptionsChange: (options: string[]) => Promise<void> }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState("");
+  const [query, setQuery] = useState("");
   const [savingOption, setSavingOption] = useState(false);
+  const [changingOption, setChangingOption] = useState("");
   const all = [...new Set([...options, ...values])];
+  const filtered = all.filter((option) => option.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   useEffect(() => {
     function closeOnOutsidePointer(event: PointerEvent) {
       const details = detailsRef.current;
@@ -596,6 +601,7 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
       details.open = false;
       setCreating(false);
       setDraft("");
+      setQuery("");
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
@@ -613,20 +619,43 @@ function MultiEditableSelect({ values, options, onChange, onAdd }: { values: str
       setSavingOption(false);
     }
   }
+  async function replaceOptions(next: string[], option: string) {
+    setChangingOption(option);
+    try { await onOptionsChange(next); }
+    finally { setChangingOption(""); }
+  }
+  async function moveOption(option: string, direction: -1 | 1) {
+    const index = options.indexOf(option);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= options.length) return;
+    const next = [...options];
+    [next[index], next[target]] = [next[target], next[index]];
+    await replaceOptions(next, option);
+  }
+  async function removeOption(option: string) {
+    onChange(values.filter((value) => value !== option));
+    await replaceOptions(options.filter((item) => item !== option), option);
+  }
   return (
     <details ref={detailsRef} className="multiEditableSelect">
       <summary className={values.length ? "" : "isEmpty"}><span>{values.length ? values.join(" + ") : "비어 있음"}</span></summary>
       <div className="multiOptionMenu">
-        {all.map((option) => (
-          <button
-            type="button"
-            className={values.includes(option) ? "selected" : ""}
-            key={option}
-            onClick={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])}
-          >
-            <span>{option}</span><i aria-hidden="true" />
-          </button>
-        ))}
+        <label className="multiOptionSearch"><Search size={12} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="구매방법 검색" /></label>
+        <div className="multiOptionList">
+          {filtered.map((option) => {
+            const optionIndex = options.indexOf(option);
+            const changing = changingOption === option;
+            return <div className={`multiOptionRow ${values.includes(option) ? "selected" : ""}`} key={option}>
+              <button type="button" className="multiOptionToggle" disabled={changing} onClick={() => onChange(values.includes(option) ? values.filter((value) => value !== option) : [...values, option])}><span>{option}</span><i aria-hidden="true" /></button>
+              {optionIndex >= 0 && <span className="multiOptionActions">
+                <button type="button" aria-label={`${option} 위로 이동`} disabled={changing || optionIndex === 0} onClick={() => void moveOption(option, -1)}><ChevronUp size={10} /></button>
+                <button type="button" aria-label={`${option} 아래로 이동`} disabled={changing || optionIndex === options.length - 1} onClick={() => void moveOption(option, 1)}><ChevronDown size={10} /></button>
+                <button type="button" aria-label={`${option} 삭제`} disabled={changing} onClick={() => void removeOption(option)}><Trash2 size={10} /></button>
+              </span>}
+            </div>;
+          })}
+          {!filtered.length && <p className="multiOptionEmpty">검색 결과가 없습니다.</p>}
+        </div>
         {creating ? (
           <span className="newMultiOption">
             <input autoFocus value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void commit(); } if (event.key === "Escape") setCreating(false); }} placeholder="새 구매방법" />
@@ -1866,9 +1895,9 @@ export default function FeedPage() {
     load();
     const savedSort = window.localStorage.getItem("readiary-sort-mode");
     if (savedSort === "created" || savedSort === "purchase") setSortMode(savedSort);
-    fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; profile_image?: string }>).then((data) => {
+    fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; purchase_methods_customized?: boolean; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
-      setPurchaseMethodOptions([...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
+      setPurchaseMethodOptions(data.purchase_methods_customized ? (data.purchase_methods || []) : [...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
       const localProfile = window.localStorage.getItem("readiary-profile-image") || "";
       setProfileImage(data.profile_image || localProfile);
     }).catch(() => undefined);
@@ -2148,6 +2177,12 @@ export default function FeedPage() {
     if (!response.ok) { setMessage(data.error || "선택지를 저장하지 못했어요."); throw new Error(data.error); }
     if (kind === "platforms") setPlatformOptions((prev) => [...new Set([...prev, value])]);
     else setPurchaseMethodOptions((prev) => [...new Set([...prev, value])]);
+  }
+  async function replacePurchaseMethodOptions(values: string[]) {
+    const response = await fetch("/api/options", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "purchase_methods", action: "replace", values }) });
+    const data = await response.json() as { error?: string };
+    if (!response.ok) { setMessage(data.error || "구매방법 목록을 저장하지 못했어요."); throw new Error(data.error); }
+    setPurchaseMethodOptions(values);
   }
   async function changeProfileImage(file?: File) {
     if (!file) return;
@@ -2666,7 +2701,7 @@ export default function FeedPage() {
                       </div>
                       <label><span>판매가</span><input type="text" inputMode="numeric" value={purchaseDraft.list_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, list_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
                       <label><span>실구매가</span><input type="text" inputMode="numeric" value={purchaseDraft.paid_price || ""} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, paid_price: Number(event.target.value.replace(/\D/g, "")) }))} placeholder="비어 있음" /></label>
-                      <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} /></div>
+                      <div className="purchaseMethodProperty"><span>구매방법</span><MultiEditableSelect values={purchaseDraft.methods || []} options={purchaseMethodOptions} onChange={(values) => setPurchaseDraft((prev) => ({ ...prev, methods: values }))} onAdd={(value) => addOption("purchase_methods", value)} onOptionsChange={replacePurchaseMethodOptions} /></div>
                       <div className="purchaseEntryActions">
                         {editingPurchaseIndex !== null && <button type="button" onClick={() => resetPurchaseDraft()}>취소</button>}
                         <button type="button" className="primary" onClick={commitPurchaseDraft}>{editingPurchaseIndex === null ? `${form.count_unit || "권"} 기록` : "수정 완료"}</button>

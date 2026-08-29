@@ -1852,14 +1852,73 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
-  max-height: 190px;
-  overflow: auto;
+  overflow: hidden;
   padding: 6px;
   border: 1px solid #e8e3df;
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 10px 28px rgba(72, 62, 58, .12);
 }
+.multiOptionSearch {
+  height: 31px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+  padding: 0 7px;
+  border-radius: 7px;
+  background: #f6f5f3;
+  color: #aaa49f;
+}
+.recordForm .multiOptionSearch input {
+  min-width: 0;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #5e5a57;
+  font-size: 8.5px;
+  outline: 0;
+}
+.multiOptionList { max-height: 220px; overflow-y: auto; overscroll-behavior: contain; }
+.multiOptionRow {
+  min-height: 31px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  border-radius: 7px;
+}
+.multiOptionRow:hover,.multiOptionRow:focus-within { background: #f8f6f4; }
+.multiOptionRow.selected { background: #faf5f6; }
+.multiOptionToggle {
+  min-width: 0;
+  min-height: 31px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border: 0;
+  background: transparent;
+  color: #67625f;
+  font-size: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+.multiOptionToggle span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.multiOptionToggle i { width: 11px; height: 11px; display: grid; place-items: center; border: 1px solid #d8d3cf; border-radius: 3px; }
+.multiOptionRow.selected .multiOptionToggle i { border-color: #b88495; background: #b88495; }
+.multiOptionRow.selected .multiOptionToggle i::after { content: "✓"; color: #fff; font-size: 7px; font-style: normal; line-height: 1; }
+.multiOptionActions { display: flex; align-items: center; padding-right: 3px; opacity: .38; transition: opacity .15s ease; }
+.multiOptionRow:hover .multiOptionActions,.multiOptionRow:focus-within .multiOptionActions { opacity: 1; }
+.multiOptionActions button { width: 22px; height: 24px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 5px; background: transparent; color: #aaa39e; cursor: pointer; }
+.multiOptionActions button:hover:not(:disabled) { background: #eeeae7; color: #746d69; }
+.multiOptionActions button:last-child:hover:not(:disabled) { color: #b76f76; }
+.multiOptionActions button:disabled { opacity: .2; cursor: default; }
+.multiOptionEmpty { margin: 0; padding: 18px 8px; color: #aaa49f; font-size: 8px; text-align: center; }
 .multiOptionMenu > label {
   min-height: 29px;
   display: flex;
