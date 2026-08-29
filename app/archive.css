@@ -193,6 +193,64 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.statusQuickButton {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.statusQuickButton:disabled { cursor: default; }
+.statusQuickButton b { color: inherit; font-size: 11px; }
+.statusHighlight.done .statusQuickButton b { color: #6f8fb9; }
+.statusHighlight.paused .statusQuickButton b { color: #c97887; }
+.statusHighlight.reading .statusQuickButton b { color: #c59b24; }
+.statusHighlight.before .statusQuickButton b { color: #6f9d7e; }
+.statusHighlight.basket .statusQuickButton b { color: #858580; }
+.statusQuickButton small { color: #aaa9a4; font-size: 7px; font-weight: 500; }
+.statusQuickEditor {
+  width: min(150px, calc(100% - 12px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 4px;
+}
+.statusQuickEditor select {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #e5e2de;
+  border-radius: 7px;
+  background: #fff;
+  color: #5d5d58;
+  font-size: 8.5px;
+  font-weight: 700;
+  outline: 0;
+}
+.statusQuickEditor > button {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f3f2ef;
+  color: #99958f;
+  cursor: pointer;
+}
+.statusQuickEditor small {
+  grid-column: 1 / -1;
+  max-width: 100%;
+  color: #aaa9a4;
+  font-size: 6.5px;
+  text-align: center;
+}
+.statusHighlight.editing { padding: 5px 0; }
 .bookFacts {
   display: grid;
   grid-template-columns: 1.4fr 0.8fr 1fr;

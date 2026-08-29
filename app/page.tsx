@@ -1382,7 +1382,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onDelete, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onDelete?: (book: Book) => Promise<void>; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onStatusChange, onDelete, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -1391,10 +1391,13 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [purchaseDetailsOpen, setPurchaseDetailsOpen] = useState(false);
+  const [statusEditing, setStatusEditing] = useState(false);
+  const [statusSaving, setStatusSaving] = useState(false);
+  const [statusError, setStatusError] = useState("");
   useEffect(() => {
     if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
   }, [openBook, books]);
-  const closeSelected = () => { setSelected(null); setPurchaseDetailsOpen(false); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
+  const closeSelected = () => { setSelected(null); setPurchaseDetailsOpen(false); setStatusEditing(false); setStatusError(""); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
   useEffect(() => {
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
@@ -1554,9 +1557,29 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       </b>
                       <small>독서량</small>
                     </div>
-                    <div className={`statusHighlight ${statusClass(book.status)}`}>
-                      <b>{book.status}</b>
-                      <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
+                    <div className={`statusHighlight ${statusClass(book.status)} ${statusEditing ? "editing" : ""}`}>
+                      {statusEditing && onStatusChange ? <div className="statusQuickEditor">
+                        <select aria-label="독서 상태 수정" autoFocus value={book.status} disabled={statusSaving} onChange={async (event) => {
+                          const nextStatus = event.target.value;
+                          if (nextStatus === book.status) return;
+                          setStatusSaving(true);
+                          setStatusError("");
+                          try {
+                            const updated = await onStatusChange(book, nextStatus);
+                            setSelected({ book: updated, index });
+                            setStatusEditing(false);
+                          } catch (error) {
+                            setStatusError(error instanceof Error ? error.message : "상태를 수정하지 못했어요.");
+                          } finally { setStatusSaving(false); }
+                        }}>
+                          <option>책바구니</option><option>읽기 전</option><option>읽는 중</option><option>완독</option><option>하차</option>
+                        </select>
+                        <button type="button" aria-label="상태 수정 닫기" onClick={() => { setStatusEditing(false); setStatusError(""); }}><X size={11} /></button>
+                        <small>{statusSaving ? "저장 중…" : statusError || "상태 선택"}</small>
+                      </div> : <button type="button" className="statusQuickButton" disabled={!onStatusChange} onClick={() => { setStatusEditing(true); setStatusError(""); }}>
+                        <b>{book.status}</b>
+                        <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : onStatusChange ? "상태 · 눌러서 수정" : "상태"}</small>
+                      </button>}
                     </div>
                   </div>
                   <section className="recordGroup purchaseGroup">
@@ -1676,7 +1699,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
   );
 }
 
-function HallOfFame({ books, onEdit, onAddPurchase, onDelete }: { books: Book[]; onEdit: (book: Book) => void; onAddPurchase: (book: Book) => void; onDelete: (book: Book) => Promise<void> }) {
+function HallOfFame({ books, onEdit, onAddPurchase, onStatusChange, onDelete }: { books: Book[]; onEdit: (book: Book) => void; onAddPurchase: (book: Book) => void; onStatusChange: (book: Book, status: string) => Promise<Book>; onDelete: (book: Book) => Promise<void> }) {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const favorites = books.filter((book) => book.rating === 5);
   return (
@@ -1700,7 +1723,7 @@ function HallOfFame({ books, onEdit, onAddPurchase, onDelete }: { books: Book[];
         <div className="hallEmpty"><Star size={20} strokeWidth={1.2} /><b>첫 번째 인생책을 기다리고 있어요</b><small>별점 5점을 준 책이 이곳에 전시됩니다.</small></div>
       )}
       <footer className="hallCount"><span>{String(favorites.length).padStart(2, "0")} FAVORITES</span></footer>
-      {selectedBook && <ModalRecordArchive books={favorites} openBook={selectedBook} onClose={() => setSelectedBook(null)} onEdit={onEdit} onAddPurchase={onAddPurchase} onDelete={onDelete} hideList />}
+      {selectedBook && <ModalRecordArchive books={favorites} openBook={selectedBook} onClose={() => setSelectedBook(null)} onEdit={onEdit} onAddPurchase={onAddPurchase} onStatusChange={onStatusChange} onDelete={onDelete} hideList />}
     </section>
   );
 }
@@ -1986,6 +2009,19 @@ export default function FeedPage() {
     if (!r.ok) throw new Error(data.error || "삭제하지 못했어요.");
     setBooks((prev) => prev.filter((item) => item.id !== book.id));
     setDetailBook(null);
+  }
+  async function changeBookStatus(book: Book, status: string) {
+    const finishedDate = status === "완독" || status === "하차" ? book.finished_date : null;
+    const r = await fetch("/api/books", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...book, status, finished_date: finishedDate }),
+    });
+    const data = await r.json() as { error?: string; item: Book };
+    if (!r.ok) throw new Error(data.error || "상태를 수정하지 못했어요.");
+    setBooks((prev) => prev.map((item) => item.id === book.id ? data.item : item));
+    setDetailBook((current) => current?.id === book.id ? data.item : current);
+    return data.item;
   }
   async function findBooks(e: FormEvent) {
     e.preventDefault();
@@ -2286,9 +2322,9 @@ export default function FeedPage() {
           <button className={profileView === "hall" ? "on" : ""} onClick={() => setProfileView("hall")}>HALL OF FAME</button>
         </nav>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onDelete={deleteBook} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onStatusChange={changeBookStatus} onDelete={deleteBook} />}
       {view === "stats" && profileView === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
-      {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onDelete={deleteBook} />}
+      {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onStatusChange={changeBookStatus} onDelete={deleteBook} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
       ) : view === "records" || view === "stats" ? null
@@ -2389,7 +2425,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onDelete={deleteBook} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><Hash size={17} strokeWidth={1.55} /></button>
