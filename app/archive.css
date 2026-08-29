@@ -488,6 +488,92 @@
     monospace;
   letter-spacing: 0.03em;
 }
+.purchaseSummaryButton {
+  width: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .16s ease, transform .16s ease;
+}
+.purchaseSummaryButton:hover { background: #f7f3f1; }
+.purchaseSummaryButton:active { transform: scale(.995); }
+.purchaseSummaryButton:focus-visible { outline: 1px solid #d9c5c1; outline-offset: 2px; }
+.purchaseDetailShade {
+  position: fixed;
+  z-index: 75;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(43, 40, 38, .24);
+  backdrop-filter: blur(4px);
+  animation: modalShadeIn .16s ease-out;
+}
+.purchaseDetailModal {
+  width: min(620px, 100%);
+  max-height: min(680px, calc(100dvh - 48px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #eee9e7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 20px 64px rgba(50, 42, 40, .18);
+  animation: modalIn .18s ease-out;
+}
+.purchaseDetailModal > header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 14px 10px 17px;
+  border-bottom: 1px solid #eeeae8;
+}
+.purchaseDetailModal > header > span { display: grid; gap: 4px; }
+.purchaseDetailModal > header small { color: #b99099; font: 7px "Courier New", monospace; letter-spacing: .12em; }
+.purchaseDetailModal > header b { color: #514e4b; font-size: 11px; }
+.purchaseDetailModal > header > div { display: flex; align-items: center; gap: 6px; }
+.purchaseDetailModal > header button { height: 31px; border: 0; cursor: pointer; }
+.purchaseDetailAdd { display: flex; align-items: center; gap: 5px; padding: 0 10px; border-radius: 8px; background: #686863; color: #fff; }
+.purchaseDetailAdd span { font-size: 7.5px; font-weight: 750; }
+.purchaseDetailClose { width: 31px; display: grid; place-items: center; padding: 0; border-radius: 50%; background: #f3f2f0; color: #89847f; }
+.purchaseDetailTable { min-height: 0; overflow: auto; padding: 0 17px; }
+.purchaseDetailHead,
+.purchaseDetailRow {
+  display: grid;
+  grid-template-columns: minmax(60px,.75fr) minmax(80px,1fr) minmax(68px,.8fr) minmax(74px,.9fr) minmax(100px,1.35fr);
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.purchaseDetailHead { min-height: 34px; color: #b2aca8; font-size: 6.5px; font-weight: 700; }
+.purchaseDetailRow { min-height: 53px; border-top: 1px solid #f0ecea; }
+.purchaseDetailRow b { color: #5c5855; font-size: 9px; overflow-wrap: anywhere; }
+.purchaseDetailRow span { color: #8e7b75; font-size: 7.5px; white-space: nowrap; }
+.purchaseDetailRow s { color: #aaa39e; font-size: 7.5px; }
+.purchaseDetailRow strong { color: #585451; font-size: 9px; }
+.purchaseDetailRow em { min-width: 0; overflow: hidden; color: #8e7b75; font-size: 7.5px; font-style: normal; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.purchaseDetailModal > footer { min-height: 58px; display: flex; align-items: center; justify-content: flex-end; gap: 28px; padding: 10px 17px; border-top: 1px solid #eeeae8; background: #fbf9f8; }
+.purchaseDetailModal > footer span { display: grid; gap: 3px; text-align: right; }
+.purchaseDetailModal > footer small { color: #aaa39f; font-size: 6.5px; }
+.purchaseDetailModal > footer s { color: #aaa39f; font-size: 8px; }
+.purchaseDetailModal > footer b { color: #575350; font-size: 10px; }
+@media (max-width: 520px) {
+  .purchaseDetailShade { align-items: end; padding: 0; }
+  .purchaseDetailModal { width: 100%; max-height: min(76dvh, 620px); border-width: 1px 0 0; border-radius: 16px 16px 0 0; }
+  .purchaseDetailModal > header { min-height: 58px; padding-left: 14px; }
+  .purchaseDetailTable { padding: 0 10px; }
+  .purchaseDetailHead,
+  .purchaseDetailRow { grid-template-columns: minmax(38px,.65fr) minmax(62px,1fr) minmax(48px,.75fr) minmax(52px,.85fr) minmax(58px,1.15fr); gap: 2px; }
+  .purchaseDetailHead { min-height: 29px; font-size: 5.8px; }
+  .purchaseDetailRow { min-height: 49px; }
+  .purchaseDetailRow b,.purchaseDetailRow strong { font-size: 8.5px; }
+  .purchaseDetailRow span,.purchaseDetailRow s,.purchaseDetailRow em { font-size: 6.8px; }
+  .purchaseDetailModal > footer { min-height: 52px; gap: 20px; padding: 8px 12px; }
+}
 .archiveNotes {
   display: grid;
   gap: 16px;
