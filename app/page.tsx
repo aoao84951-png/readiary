@@ -1588,6 +1588,9 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                 Math.round((1 - book.paid_price / book.list_price) * 100),
               )
             : 0;
+          const hasNotes = book.status === "책바구니"
+            ? Boolean((book.basket_reason || "").trim() || book.basket_images?.length)
+            : Boolean(book.liked_notes.some((note) => note.trim()) || book.disliked_notes.some((note) => note.trim()));
           return (
             <div
               className="recordModalShade"
@@ -1742,7 +1745,8 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                     </section>
                   </div>, document.body)}
                   <section className="recordGroup notesGroup">
-                    {onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
+                    {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
+                    {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
                     <div className="archiveNotes">
                       <BookNotes book={book} showEmpty />
                     </div>

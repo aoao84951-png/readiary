@@ -650,7 +650,10 @@
 }
 .notesGroup { position: relative; }
 .notesQuickActions { position: absolute; z-index: 1; top: -4px; right: 0; }
-.notesQuickActions button {
+.notesEmptyHead { min-height: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.notesEmptyHead > span { color: #aaa7a3; font: 700 8px "Courier New", monospace; letter-spacing: .14em; }
+.notesQuickActions button,
+.notesEmptyHead button {
   width: 18px;
   height: 18px;
   display: grid;
@@ -662,7 +665,8 @@
   color: #ad8291;
   cursor: pointer;
 }
-.notesQuickActions button:hover,.notesQuickActions button:focus-visible { background: #f5edef; color: #9e6e7f; outline: 0; }
+.notesQuickActions button:hover,.notesQuickActions button:focus-visible,
+.notesEmptyHead button:hover,.notesEmptyHead button:focus-visible { background: #f5edef; color: #9e6e7f; outline: 0; }
 .emptyNotes {
   margin: 0;
   padding: 14px 0;
