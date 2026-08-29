@@ -1658,9 +1658,8 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
             <article className="statsBookItem" key={book.id}>
               <span className="archiveCover">{book.cover_url ? <img src={book.cover_url} alt="" /> : <span>▦</span>}</span>
               <span className="archiveIdentity">
-                <b>{book.title}</b>
+                <span className="statsBookTitleLine"><b>{book.title}</b>{mode === "purchase" && <em title={labels.join(" · ")}>{labels.length ? labels.join(" · ") : "권 정보 미기록"}</em>}</span>
                 <small>{book.author || "저자 미상"} · {book.category}</small>
-                {mode === "purchase" && <em>{labels.length ? labels.join(" · ") : "권 정보 미기록"}</em>}
               </span>
               {mode === "status" ? (
                 <span className={`archiveStatus ${statusClass(book.status)}`}>{book.status}<small>{book.read_count}/{book.total_count}{book.count_unit || "권"}</small></span>

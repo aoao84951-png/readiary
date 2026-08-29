@@ -113,6 +113,43 @@
   color: #999;
   font-size: 8.5px;
 }
+.statsBookTitleLine {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+.statsBookTitleLine > b {
+  min-width: 0;
+  overflow: hidden;
+  color: #4d4d49;
+  font-size: 11px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.statsBookItem .archiveIdentity .statsBookTitleLine em {
+  min-width: 0;
+  max-width: 45%;
+  display: block;
+  flex: 0 1 auto;
+  margin: 0 0 1px;
+  padding: 3px 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f7f2f1;
+  color: #9b837f;
+  font-size: 7.5px;
+  font-style: normal;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 520px) {
+  .statsBookTitleLine { gap: 5px; }
+  .statsBookTitleLine > b { font-size: 10px; }
+  .statsBookItem .archiveIdentity .statsBookTitleLine em { max-width: 42%; padding: 3px 6px; font-size: 7px; }
+}
 .archiveStatus {
   display: grid;
   justify-items: end;
