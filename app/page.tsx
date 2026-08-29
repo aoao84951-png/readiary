@@ -1578,7 +1578,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                         <small>{statusSaving ? "저장 중…" : statusError || "상태 선택"}</small>
                       </div> : <button type="button" className="statusQuickButton" disabled={!onStatusChange} onClick={() => { setStatusEditing(true); setStatusError(""); }}>
                         <b>{book.status}</b>
-                        <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : onStatusChange ? "상태 · 눌러서 수정" : "상태"}</small>
+                        <small>{book.finished_date ? `${book.status === "하차" ? "하차일" : "완독일"} ${book.finished_date}` : "상태"}</small>
                       </button>}
                     </div>
                   </div>
