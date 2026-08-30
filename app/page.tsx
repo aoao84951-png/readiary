@@ -2846,9 +2846,8 @@ export default function FeedPage() {
                   <button>{searching ? "…" : "검색"}</button>
                 </form>
                 <button type="button" className={`advancedSearchToggle ${advancedSearchOpen ? "open" : ""}`} aria-expanded={advancedSearchOpen} onClick={() => setAdvancedSearchOpen((open) => !open)}>
-                  <SlidersHorizontal size={12} />
                   <span>상세검색</span>
-                  <small>{advancedSearchOpen ? "접기" : "작가와 플랫폼으로 좁히기"}</small>
+                  {advancedSearchOpen && <small>접기</small>}
                 </button>
                 {advancedSearchOpen && (
                   <div className="advancedSearchFields">
