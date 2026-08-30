@@ -722,6 +722,10 @@
   height: 68px;
   border-radius: 4px;
 }
+.modalArchive > .archiveListButton .archiveCover img {
+  object-fit: contain;
+  background: #f7f7f5;
+}
 .modalArchive > .archiveListButton .archiveIdentity > b {
   font-family: "Archive Pretendard", "Apple SD Gothic Neo", sans-serif;
   font-size: 13px;
