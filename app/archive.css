@@ -694,6 +694,69 @@
 .archiveListButton:hover {
   background: #fafaf8;
 }
+/* Give the archive index a more readable, book-forward scale. */
+.modalArchive > .archiveHead {
+  padding-bottom: 14px;
+  font-size: 9px;
+}
+.modalArchive > .archiveHead b {
+  font-size: 9px;
+}
+.modalArchive > .archiveListButton {
+  min-height: 94px;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 12px 4px;
+}
+.modalArchive > .archiveListButton .archiveCover,
+.modalArchive > .archiveListButton .archiveCover img {
+  width: 52px;
+  height: 68px;
+  border-radius: 4px;
+}
+.modalArchive > .archiveListButton .archiveIdentity > b {
+  font-size: 13px;
+}
+.modalArchive > .archiveListButton .archiveIdentity small {
+  margin-top: 5px;
+  font-size: 9.5px;
+}
+.modalArchive > .archiveListButton .archiveStatus {
+  gap: 6px;
+  font-size: 10.5px;
+}
+.modalArchive > .archiveListButton .archiveStatus small {
+  font-size: 7.5px;
+}
+@media (max-width: 520px) {
+  .modalArchive > .archiveHead {
+    padding-bottom: 13px;
+    font-size: 8.5px;
+  }
+  .modalArchive > .archiveHead b {
+    font-size: 8.5px;
+  }
+  .modalArchive > .archiveListButton {
+    min-height: 90px;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 11px 3px;
+  }
+  .modalArchive > .archiveListButton .archiveCover,
+  .modalArchive > .archiveListButton .archiveCover img {
+    width: 48px;
+    height: 64px;
+  }
+  .modalArchive > .archiveListButton .archiveIdentity > b {
+    font-size: 11.5px;
+  }
+  .modalArchive > .archiveListButton .archiveIdentity small {
+    font-size: 8.8px;
+  }
+  .modalArchive > .archiveListButton .archiveStatus {
+    font-size: 9.5px;
+  }
+}
 .recordModalShade {
   position: fixed;
   z-index: 60;
