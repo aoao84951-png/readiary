@@ -2040,7 +2040,7 @@
 .topToolMenu {
   position: absolute;
   z-index: 31;
-  top: calc(100% + 5px);
+  top: 100%;
   right: 10px;
   width: 144px;
   padding: 5px;
