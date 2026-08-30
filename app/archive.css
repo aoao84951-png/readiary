@@ -1856,6 +1856,7 @@
 .selectionFormatToolbar > button:hover,
 .selectionFormatToolbar > button:focus-visible,
 .selectionFormatToolbar > button[aria-expanded="true"] { background: #f4f1ef; outline: none; }
+.selectionFormatToolbar > button.active { background: #f7e9ee; color: #b46f87; }
 .selectionFormatToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
 .selectionFormatToolbar .paletteTrigger span { width: 11px; height: 11px; border-radius: 50%; background: linear-gradient(135deg,#d44c47 0 25%,#b58a27 25% 50%,#448361 50% 75%,#337ea9 75%); }
 .noteColorPalette {
@@ -1874,6 +1875,8 @@
 }
 .noteColorPalette button { width: 34px; height: 28px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
 .noteColorPalette button:hover { background: #f5f2f0; }
+.noteColorPalette button.active { background: #f2eeec; box-shadow: inset 0 0 0 1px rgba(91,80,74,.12); }
+.noteColorPalette button.active i { box-shadow: 0 0 0 2px #fff, 0 0 0 3px currentColor; }
 .noteColorPalette i { width: 14px; height: 14px; border-radius: 4px; background: currentColor; opacity: .82; }
 .noteColorPalette .gray { color: #787774; }.noteColorPalette .brown { color: #9f6b53; }.noteColorPalette .orange { color: #d9730d; }
 .noteColorPalette .yellow { color: #cb912f; }.noteColorPalette .green { color: #448361; }.noteColorPalette .blue { color: #337ea9; }

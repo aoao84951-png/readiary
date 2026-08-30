@@ -1172,6 +1172,16 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
 }
 const noteColors = ["gray", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"] as const;
 type NoteColor = typeof noteColors[number];
+const noteColorHex: Record<NoteColor, string> = { gray: "#787774", brown: "#9f6b53", orange: "#d9730d", yellow: "#cb912f", green: "#448361", blue: "#337ea9", purple: "#9065b0", pink: "#c14c8a", red: "#d44c47" };
+function noteColorFromCss(value: string): NoteColor | null | undefined {
+  const cssColor = value.toLowerCase().replace(/\s/g, "");
+  if (!cssColor) return undefined;
+  for (const [color, hex] of Object.entries(noteColorHex) as [NoteColor, string][]) {
+    const rgb = hex.match(/[a-f\d]{2}/gi)?.map((part) => Number.parseInt(part, 16));
+    if (cssColor === hex || cssColor === `rgb(${rgb?.join(",")})`) return color;
+  }
+  return null;
+}
 const noteFormatPattern = /(\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\{\{(gray|brown|orange|yellow|green|blue|purple|pink|red|gold):([\s\S]+?)\}\})/g;
 
 function formattedNoteParts(value: string, keyPrefix = "note"): ReactNode[] {
@@ -1218,15 +1228,39 @@ function noteValueToHtml(value: string): string {
 }
 
 function noteEditorToValue(root: HTMLElement) {
+  const declaredColor = (element: HTMLElement): { found: boolean; color: NoteColor | null } => {
+    const dataColor = element.dataset.noteColor;
+    if (dataColor && noteColors.includes(dataColor as NoteColor)) return { found: true, color: dataColor as NoteColor };
+    const color = noteColorFromCss(element.style.color || element.getAttribute("color") || "");
+    return color === undefined ? { found: false, color: null } : { found: true, color };
+  };
+  const textValue = (node: Node) => {
+    let content = node.textContent || "";
+    let bold = false;
+    let underline = false;
+    let color: NoteColor | null = null;
+    let colorResolved = false;
+    let parent = node.parentElement;
+    while (parent && parent !== root) {
+      const weight = parent.style.fontWeight;
+      if (parent.tagName === "B" || parent.tagName === "STRONG" || Number.parseInt(weight, 10) >= 600 || weight === "bold") bold = true;
+      if (parent.tagName === "U" || parent.style.textDecoration.includes("underline")) underline = true;
+      if (!colorResolved) {
+        const result = declaredColor(parent);
+        if (result.found) { colorResolved = true; color = result.color; }
+      }
+      parent = parent.parentElement;
+    }
+    if (color) content = `{{${color}:${content}}}`;
+    if (underline) content = `__${content}__`;
+    if (bold) content = `**${content}**`;
+    return content;
+  };
   const serialize = (node: Node): string => {
-    if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
+    if (node.nodeType === Node.TEXT_NODE) return textValue(node);
     if (!(node instanceof HTMLElement)) return "";
     if (node.tagName === "BR") return "\n";
     const content = Array.from(node.childNodes).map(serialize).join("");
-    if (node.tagName === "STRONG" || node.tagName === "B") return `**${content}**`;
-    if (node.tagName === "U") return `__${content}__`;
-    const color = node.dataset.noteColor;
-    if (color && noteColors.includes(color as NoteColor)) return `{{${color}:${content}}}`;
     if (node.tagName === "DIV" || node.tagName === "P") return `${content}\n`;
     return content;
   };
@@ -1329,7 +1363,7 @@ function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: stri
 function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const lastEmitted = useRef<string | null>(null);
-  const [toolbar, setToolbar] = useState<{ top: number; left: number } | null>(null);
+  const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; color: NoteColor | null } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   useEffect(() => {
     const editor = ref.current;
@@ -1352,47 +1386,47 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       return;
     }
     const rect = selection.getRangeAt(0).getBoundingClientRect();
-    setToolbar({ top: Math.max(8, rect.top - 46), left: Math.min(window.innerWidth - 92, Math.max(92, rect.left + rect.width / 2)) });
+    const colorElement = (selection.anchorNode instanceof HTMLElement ? selection.anchorNode : selection.anchorNode?.parentElement)?.closest<HTMLElement>("[data-note-color], [style*='color'], font[color]");
+    const dataColor = colorElement?.dataset.noteColor;
+    const selectedColor = dataColor && noteColors.includes(dataColor as NoteColor)
+      ? dataColor as NoteColor
+      : noteColorFromCss(colorElement?.style.color || colorElement?.getAttribute("color") || "") || null;
+    setToolbar({
+      top: Math.max(8, rect.top - 46),
+      left: Math.min(window.innerWidth - 92, Math.max(92, rect.left + rect.width / 2)),
+      bold: document.queryCommandState("bold"),
+      underline: document.queryCommandState("underline"),
+      color: selectedColor,
+    });
   };
-  const wrapSelection = (tag: "strong" | "u") => {
+  const toggleFormat = (command: "bold" | "underline") => {
     const selection = window.getSelection();
     if (!selection?.rangeCount || selection.isCollapsed) return;
-    const range = selection.getRangeAt(0);
-    const wrapper = document.createElement(tag);
-    wrapper.appendChild(range.extractContents());
-    range.insertNode(wrapper);
-    range.selectNodeContents(wrapper);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    document.execCommand(command, false);
     emitValue();
     updateToolbar();
   };
   const colorSelection = (color: NoteColor) => {
     const selection = window.getSelection();
     if (!selection?.rangeCount || selection.isCollapsed) return;
-    const range = selection.getRangeAt(0);
-    const wrapper = document.createElement("span");
-    wrapper.className = `noteAccent ${color}`;
-    wrapper.dataset.noteColor = color;
-    wrapper.appendChild(range.extractContents());
-    range.insertNode(wrapper);
-    range.selectNodeContents(wrapper);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const shouldReset = toolbar?.color === color;
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, shouldReset ? "#4d4d49" : noteColorHex[color]);
+    document.execCommand("styleWithCSS", false, "false");
     emitValue();
     setPaletteOpen(false);
-    updateToolbar();
+    requestAnimationFrame(updateToolbar);
   };
   return (
     <div className="richNoteField">
       <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onInput={emitValue} onPointerUp={() => requestAnimationFrame(updateToolbar)} onKeyUp={() => requestAnimationFrame(updateToolbar)} onBlur={() => setTimeout(() => { if (!document.activeElement?.closest(".selectionFormatToolbar")) { setToolbar(null); setPaletteOpen(false); } }, 0)} />
       {toolbar && createPortal(
         <span className="selectionFormatToolbar" style={{ top: toolbar.top, left: toolbar.left }} aria-label="선택한 글자 서식">
-          <button type="button" className="bold" aria-label="굵게" onPointerDown={(event) => event.preventDefault()} onClick={() => wrapSelection("strong")}>B</button>
-          <button type="button" className="underline" aria-label="밑줄" onPointerDown={(event) => event.preventDefault()} onClick={() => wrapSelection("u")}>U</button>
+          <button type="button" className={`bold ${toolbar.bold ? "active" : ""}`} aria-label="굵게" aria-pressed={toolbar.bold} onPointerDown={(event) => event.preventDefault()} onClick={() => toggleFormat("bold")}>B</button>
+          <button type="button" className={`underline ${toolbar.underline ? "active" : ""}`} aria-label="밑줄" aria-pressed={toolbar.underline} onPointerDown={(event) => event.preventDefault()} onClick={() => toggleFormat("underline")}>U</button>
           <button type="button" className="paletteTrigger" aria-label="글자색 선택" aria-expanded={paletteOpen} onPointerDown={(event) => event.preventDefault()} onClick={() => setPaletteOpen((open) => !open)}><span /></button>
           {paletteOpen && <span className="noteColorPalette">
-            {noteColors.map((color) => <button type="button" key={color} className={color} aria-label={`${color} 색상`} onPointerDown={(event) => event.preventDefault()} onClick={() => colorSelection(color)}><i /></button>)}
+            {noteColors.map((color) => <button type="button" key={color} className={`${color} ${toolbar.color === color ? "active" : ""}`} aria-label={`${color} 색상${toolbar.color === color ? " 해제" : " 적용"}`} aria-pressed={toolbar.color === color} onPointerDown={(event) => event.preventDefault()} onClick={() => colorSelection(color)}><i /></button>)}
           </span>}
         </span>,
         document.body,
