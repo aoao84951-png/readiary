@@ -2848,7 +2848,6 @@ export default function FeedPage() {
                 <div className="searchSecondaryActions">
                   <button type="button" className={`advancedSearchToggle ${advancedSearchOpen ? "open" : ""}`} aria-expanded={advancedSearchOpen} onClick={() => setAdvancedSearchOpen((open) => !open)}>
                     <span>상세검색</span>
-                    {advancedSearchOpen && <small>접기</small>}
                   </button>
                   <button type="button" className="manual" onClick={() => {
                     setForm((current) => ({ ...current, total_count: 0, category: "" }));
@@ -2859,19 +2858,13 @@ export default function FeedPage() {
                 </div>
                 {advancedSearchOpen && (
                   <div className="advancedSearchFields">
-                    <label>
-                      <span>작가</span>
-                      <input value={searchAuthor} onChange={(event) => setSearchAuthor(event.target.value)} placeholder="작가명 입력" />
-                    </label>
-                    <label>
-                      <span>플랫폼</span>
-                      <select value={searchPlatform} onChange={(event) => setSearchPlatform(event.target.value)}>
-                        <option value="">전체 플랫폼</option>
-                        <option value="리디북스">리디북스</option>
-                        <option value="카카오페이지">카카오페이지</option>
-                        <option value="네이버시리즈">네이버시리즈</option>
-                      </select>
-                    </label>
+                    <input aria-label="작가명" value={searchAuthor} onChange={(event) => setSearchAuthor(event.target.value)} placeholder="작가명 입력" />
+                    <select aria-label="검색 플랫폼" value={searchPlatform} onChange={(event) => setSearchPlatform(event.target.value)}>
+                      <option value="">전체 플랫폼</option>
+                      <option value="리디북스">리디북스</option>
+                      <option value="카카오페이지">카카오페이지</option>
+                      <option value="네이버시리즈">네이버시리즈</option>
+                    </select>
                   </div>
                 )}
                 {message && <p className="formMessage">{message}</p>}
