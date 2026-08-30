@@ -1229,10 +1229,11 @@ function noteValueToHtml(value: string): string {
 
 function noteEditorToValue(root: HTMLElement) {
   const declaredColor = (element: HTMLElement): { found: boolean; color: NoteColor | null } => {
+    const explicitColor = noteColorFromCss(element.style.color || element.getAttribute("color") || "");
+    if (explicitColor !== undefined) return { found: true, color: explicitColor };
     const dataColor = element.dataset.noteColor;
     if (dataColor && noteColors.includes(dataColor as NoteColor)) return { found: true, color: dataColor as NoteColor };
-    const color = noteColorFromCss(element.style.color || element.getAttribute("color") || "");
-    return color === undefined ? { found: false, color: null } : { found: true, color };
+    return { found: false, color: null };
   };
   const textValue = (node: Node) => {
     let content = node.textContent || "";
@@ -1387,10 +1388,11 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     }
     const rect = selection.getRangeAt(0).getBoundingClientRect();
     const colorElement = (selection.anchorNode instanceof HTMLElement ? selection.anchorNode : selection.anchorNode?.parentElement)?.closest<HTMLElement>("[data-note-color], [style*='color'], font[color]");
+    const explicitColor = noteColorFromCss(colorElement?.style.color || colorElement?.getAttribute("color") || "");
     const dataColor = colorElement?.dataset.noteColor;
-    const selectedColor = dataColor && noteColors.includes(dataColor as NoteColor)
-      ? dataColor as NoteColor
-      : noteColorFromCss(colorElement?.style.color || colorElement?.getAttribute("color") || "") || null;
+    const selectedColor = explicitColor !== undefined
+      ? explicitColor
+      : dataColor && noteColors.includes(dataColor as NoteColor) ? dataColor as NoteColor : null;
     setToolbar({
       top: Math.max(8, rect.top - 46),
       left: Math.min(window.innerWidth - 92, Math.max(92, rect.left + rect.width / 2)),
