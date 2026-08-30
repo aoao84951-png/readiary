@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Archive Pretendard";
+  src: url("/fonts/Pretendard-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
 .archiveList {
   width: min(100%, 520px);
   margin: 0 auto;
@@ -715,7 +723,9 @@
   border-radius: 4px;
 }
 .modalArchive > .archiveListButton .archiveIdentity > b {
+  font-family: "Archive Pretendard", "Apple SD Gothic Neo", sans-serif;
   font-size: 13px;
+  font-weight: 600;
 }
 .modalArchive > .archiveListButton .archiveIdentity small {
   margin-top: 5px;
