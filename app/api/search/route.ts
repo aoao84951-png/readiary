@@ -55,9 +55,33 @@ async function naver(q:string):Promise<SearchBook[]> {
 
 export async function GET(req:NextRequest) {
   const q=req.nextUrl.searchParams.get('q')?.trim(); if(!q) return NextResponse.json({books:[]});
-  const results=(await Promise.all([ridi(q),kakao(q),naver(q)])).flat().filter(item=>item.title);
-  for (const item of results) item.countUnit ||= item.platform === '카카오페이지' && !/단행본|단권/.test(item.title) || item.totalCount >= 50 ? '화' : '권';
+  const author=req.nextUrl.searchParams.get('author')?.trim()||'';
+  const platform=req.nextUrl.searchParams.get('platform')?.trim()||'';
   const normalize=(text:string)=>text.toLowerCase().replace(/\[[^\]]*\]|\(총[^)]*\)|단행본|개정판|완전판|외전|특별/g,'').replace(/[^0-9a-z가-힣]/g,'');
+  const providers=[
+    {name:'리디북스',search:ridi},
+    {name:'카카오페이지',search:kakao},
+    {name:'네이버시리즈',search:naver},
+  ].filter(provider=>!platform||provider.name===platform);
+  const preciseQuery=author?`${q} ${author}`:q;
+  const groups=await Promise.all(providers.map(async provider=>{
+    const precise=await provider.search(preciseQuery);
+    if(!author)return precise;
+    const broad=await provider.search(q);
+    const seen=new Set<string>();
+    return [...precise,...broad].filter(item=>{const key=item.url||`${item.title}-${item.author}`;if(seen.has(key))return false;seen.add(key);return true;});
+  }));
+  let results=groups.flat().filter(item=>item.title);
+  if(author){
+    const titleKey=normalize(q);
+    const authorKey=normalize(author);
+    results=results.filter(item=>{
+      const itemTitle=normalize(item.title);
+      const itemAuthor=normalize(item.author);
+      return (itemTitle.includes(titleKey)||titleKey.includes(itemTitle))&&itemAuthor.includes(authorKey);
+    });
+  }
+  for (const item of results) item.countUnit ||= item.platform === '카카오페이지' && !/단행본|단권/.test(item.title) || item.totalCount >= 50 ? '화' : '권';
   for(const item of results) {
     if(item.cover || item.platform!=='네이버시리즈') continue;
     const titleKey=normalize(item.title);

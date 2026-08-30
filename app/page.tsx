@@ -2173,6 +2173,9 @@ export default function FeedPage() {
   const [adding, setAdding] = useState(false);
   const [step, setStep] = useState<"search" | "book" | "reading" | "purchase" | "notes">("search");
   const [search, setSearch] = useState("");
+  const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
+  const [searchAuthor, setSearchAuthor] = useState("");
+  const [searchPlatform, setSearchPlatform] = useState("");
   const [results, setResults] = useState<SearchBook[]>([]);
   const [searching, setSearching] = useState(false);
   const [form, setForm] = useState<BookRecord>(empty);
@@ -2296,6 +2299,9 @@ export default function FeedPage() {
     setEditingId(null);
     setStep("search");
     setSearch("");
+    setAdvancedSearchOpen(false);
+    setSearchAuthor("");
+    setSearchPlatform("");
     setResults([]);
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
@@ -2313,6 +2319,9 @@ export default function FeedPage() {
     setPurchaseDraft({ label: `${(resumeDraft.form.purchase_items?.length || 0) + 1}${resumeDraft.form.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setSearch("");
+    setAdvancedSearchOpen(false);
+    setSearchAuthor("");
+    setSearchPlatform("");
     setResults([]);
     setMessage("");
     setResumeDraft(null);
@@ -2327,6 +2336,9 @@ export default function FeedPage() {
     setPurchaseOnlyEdit(false);
     setStep("search");
     setSearch("");
+    setAdvancedSearchOpen(false);
+    setSearchAuthor("");
+    setSearchPlatform("");
     setResults([]);
     setMessage("");
     setForm({ ...empty, reading_dates: [todayKey] });
@@ -2385,11 +2397,14 @@ export default function FeedPage() {
     setSearching(true);
     setMessage("");
     try {
-      const r = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
+      const params = new URLSearchParams({ q: search.trim() });
+      if (advancedSearchOpen && searchAuthor.trim()) params.set("author", searchAuthor.trim());
+      if (advancedSearchOpen && searchPlatform) params.set("platform", searchPlatform);
+      const r = await fetch(`/api/search?${params.toString()}`);
       const data = await r.json() as { books?: SearchBook[] };
       setResults(data.books || []);
       if (!data.books?.length)
-        setMessage("검색 결과가 없어요. 직접 입력할 수 있어요.");
+        setMessage(advancedSearchOpen ? "제목·작가·플랫폼이 일치하는 결과가 없어요." : "검색 결과가 없어요. 상세검색이나 직접 입력을 이용해보세요.");
     } catch {
       setMessage("검색에 실패했어요.");
     } finally {
@@ -2826,10 +2841,32 @@ export default function FeedPage() {
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="제목 또는 작가 검색"
+                    placeholder="책 제목 검색"
                   />
                   <button>{searching ? "…" : "검색"}</button>
                 </form>
+                <button type="button" className={`advancedSearchToggle ${advancedSearchOpen ? "open" : ""}`} aria-expanded={advancedSearchOpen} onClick={() => setAdvancedSearchOpen((open) => !open)}>
+                  <SlidersHorizontal size={12} />
+                  <span>상세검색</span>
+                  <small>{advancedSearchOpen ? "접기" : "작가와 플랫폼으로 좁히기"}</small>
+                </button>
+                {advancedSearchOpen && (
+                  <div className="advancedSearchFields">
+                    <label>
+                      <span>작가</span>
+                      <input value={searchAuthor} onChange={(event) => setSearchAuthor(event.target.value)} placeholder="작가명 입력" />
+                    </label>
+                    <label>
+                      <span>플랫폼</span>
+                      <select value={searchPlatform} onChange={(event) => setSearchPlatform(event.target.value)}>
+                        <option value="">전체 플랫폼</option>
+                        <option value="리디북스">리디북스</option>
+                        <option value="카카오페이지">카카오페이지</option>
+                        <option value="네이버시리즈">네이버시리즈</option>
+                      </select>
+                    </label>
+                  </div>
+                )}
                 <button className="manual" onClick={() => {
                   setForm((current) => ({ ...current, total_count: 0, category: "" }));
                   setStep("book");

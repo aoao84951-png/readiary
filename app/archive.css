@@ -1429,6 +1429,50 @@
 }
 .results img,
 .results .miniNoCover { border-radius: 4px; }
+.advancedSearchToggle {
+  width: 100%;
+  height: 34px;
+  display: grid;
+  grid-template-columns: 16px auto 1fr;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 0 8px;
+  border: 0;
+  border-bottom: 1px solid #ece9e6;
+  background: transparent;
+  color: #8f8b87;
+  text-align: left;
+  cursor: pointer;
+}
+.advancedSearchToggle span { font-size: 9px; font-weight: 700; }
+.advancedSearchToggle small { justify-self: end; color: #b3afab; font-size: 7.5px; }
+.advancedSearchToggle.open { color: #b27489; border-bottom-color: #ead9df; }
+.advancedSearchFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 9px;
+  padding: 11px;
+  border-radius: 11px;
+  background: #faf8f7;
+}
+.advancedSearchFields label { min-width: 0; color: #aaa5a1; font-size: 7.5px; font-weight: 700; }
+.advancedSearchFields input,
+.advancedSearchFields select {
+  width: 100%;
+  height: 30px;
+  margin-top: 4px;
+  padding: 0 7px;
+  border: 1px solid #e8e2df;
+  border-radius: 7px;
+  outline: none;
+  background: #fff;
+  color: #56524f;
+  font-size: 9px;
+}
+.advancedSearchFields input:focus,
+.advancedSearchFields select:focus { border-color: #dcb9c5; }
 .recordForm .coverPicker input {
   position: absolute;
   z-index: 3;
