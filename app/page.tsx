@@ -1938,7 +1938,6 @@ export default function FeedPage() {
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>("created");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const [topMenuPosition, setTopMenuPosition] = useState({ top: 43, right: 12 });
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
@@ -2371,7 +2370,7 @@ export default function FeedPage() {
   }
   return (
     <main className="feedPage dockLayout" onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
-      <header className="compactTopBar">
+      <header className={`compactTopBar ${topMenuOpen ? "menuOpen" : ""}`}>
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
           onClick={() => {
@@ -2385,9 +2384,7 @@ export default function FeedPage() {
         </button>
         <button
           className={`topMenuToggle ${topMenuOpen || filterOpen ? "on" : ""}`}
-          onClick={(event) => {
-            const rect = event.currentTarget.getBoundingClientRect();
-            setTopMenuPosition({ top: rect.bottom + 5, right: window.innerWidth - rect.right });
+          onClick={() => {
             setTopMenuOpen((open) => !open);
             setSearchOpen(false);
           }}
@@ -2396,18 +2393,14 @@ export default function FeedPage() {
           <Ellipsis size={18} />
           {(statusFilters.length > 0 || categoryFilters.length > 0) && <i aria-hidden="true" />}
         </button>
+        {topMenuOpen && <div className="topToolMenu">
+          <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
+          <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
+          <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
+          <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
+        </div>}
       </header>
-      {topMenuOpen && (
-        <>
-          <button className="topMenuBackdrop" aria-label="보기 메뉴 닫기" onClick={() => setTopMenuOpen(false)} />
-          <div className="topToolMenu" style={{ top: topMenuPosition.top, right: topMenuPosition.right }}>
-            <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
-            <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
-            <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
-            <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
-          </div>
-        </>
-      )}
+      {topMenuOpen && <button className="topMenuBackdrop" aria-label="보기 메뉴 닫기" onClick={() => setTopMenuOpen(false)} />}
       {notice && <div className="refreshNotice">{notice}</div>}
       {searchOpen && (
         <div className="searchBar">
