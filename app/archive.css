@@ -1784,9 +1784,15 @@
 .savedNoteText strong { font-weight: 800; }
 .reviewNote p u,
 .savedNoteText u { text-decoration-color: rgba(180,113,139,.55); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
-.noteAccent.pink { color: #c67893; }
-.noteAccent.blue { color: #6f91b6; }
-.noteAccent.gold { color: #b58a27; }
+.noteAccent.gray { color: #787774; }
+.noteAccent.brown { color: #9f6b53; }
+.noteAccent.orange { color: #d9730d; }
+.noteAccent.yellow,.noteAccent.gold { color: #b58a27; }
+.noteAccent.green { color: #448361; }
+.noteAccent.blue { color: #337ea9; }
+.noteAccent.purple { color: #9065b0; }
+.noteAccent.pink { color: #c14c8a; }
+.noteAccent.red { color: #d44c47; }
 .noteEditor { display: grid; gap: 7px; }
 .noteComposer {
   display: grid;
@@ -1806,36 +1812,72 @@
   overflow-y: auto;
 }
 .richNoteField { min-width: 0; display: grid; }
-.richNoteToolbar {
-  height: 22px;
+.richNoteEditor {
+  min-height: 30px;
+  max-height: 120px;
+  padding: 7px 0 6px;
+  overflow-y: auto;
+  outline: 0;
+  color: #4d4d49;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.richNoteEditor:empty::before { content: attr(data-placeholder); color: #b8b4b0; pointer-events: none; }
+.selectionFormatToolbar {
+  position: fixed;
+  z-index: 250;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  opacity: .5;
-  transition: opacity .15s ease;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid rgba(82,73,68,.1);
+  border-radius: 10px;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 26px rgba(49,43,39,.16);
+  backdrop-filter: blur(14px);
+  transform: translateX(-50%);
 }
-.richNoteField:focus-within .richNoteToolbar { opacity: 1; }
-.richNoteToolbar button {
-  width: 19px;
-  height: 19px;
+.selectionFormatToolbar > button {
+  width: 27px;
+  height: 27px;
   display: grid;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 5px;
+  border-radius: 6px;
   background: transparent;
-  color: #8f8985;
-  font: 700 9px Georgia, serif;
+  color: #57524e;
+  font: 700 13px Georgia, serif;
   cursor: pointer;
 }
-.richNoteToolbar button:hover,
-.richNoteToolbar button:focus-visible { background: #f5f1ef; outline: none; }
-.richNoteToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
-.richNoteToolbar .color { position: relative; }
-.richNoteToolbar .color::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.richNoteToolbar .color.pink { color: #cf849f; }
-.richNoteToolbar .color.blue { color: #789fc7; }
-.richNoteToolbar .color.gold { color: #c29a38; }
+.selectionFormatToolbar > button:hover,
+.selectionFormatToolbar > button:focus-visible,
+.selectionFormatToolbar > button[aria-expanded="true"] { background: #f4f1ef; outline: none; }
+.selectionFormatToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
+.selectionFormatToolbar .paletteTrigger span { width: 11px; height: 11px; border-radius: 50%; background: linear-gradient(135deg,#d44c47 0 25%,#b58a27 25% 50%,#448361 50% 75%,#337ea9 75%); }
+.noteColorPalette {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 126px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 3px;
+  padding: 7px;
+  border: 1px solid rgba(82,73,68,.1);
+  border-radius: 10px;
+  background: rgba(255,255,255,.99);
+  box-shadow: 0 10px 24px rgba(49,43,39,.15);
+}
+.noteColorPalette button { width: 34px; height: 28px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
+.noteColorPalette button:hover { background: #f5f2f0; }
+.noteColorPalette i { width: 14px; height: 14px; border-radius: 4px; background: currentColor; opacity: .82; }
+.noteColorPalette .gray { color: #787774; }.noteColorPalette .brown { color: #9f6b53; }.noteColorPalette .orange { color: #d9730d; }
+.noteColorPalette .yellow { color: #cb912f; }.noteColorPalette .green { color: #448361; }.noteColorPalette .blue { color: #337ea9; }
+.noteColorPalette .purple { color: #9065b0; }.noteColorPalette .pink { color: #c14c8a; }.noteColorPalette .red { color: #d44c47; }
 .noteComposer > button {
   align-self: center;
   padding: 5px 8px;
@@ -1902,7 +1944,16 @@
   transform: none;
   outline: 0;
 }
-.savedNoteEdit .richNoteToolbar { padding-left: 3px; }
+.savedNoteEdit .richNoteEditor {
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 1px solid #e7dfdc;
+  border-radius: 7px;
+  background: #fcfaf9;
+  font-size: 9px;
+  line-height: 1.62;
+}
+.savedNoteEdit .richNoteEditor:focus { border-color: #d9bdc6; background: #fff; }
 .recordForm .savedNoteEdit textarea:focus { border-color: #d9bdc6; background: #fff; }
 .savedNoteEdit > span { display: flex; justify-content: flex-end; gap: 5px; }
 .savedNoteEdit > span button { min-height: 25px; padding: 0 8px; border: 0; border-radius: 6px; background: #f1efec; color: #85807c; font-size: 7.5px; font-weight: 700; cursor: pointer; }
