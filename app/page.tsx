@@ -2845,10 +2845,18 @@ export default function FeedPage() {
                   />
                   <button>{searching ? "…" : "검색"}</button>
                 </form>
-                <button type="button" className={`advancedSearchToggle ${advancedSearchOpen ? "open" : ""}`} aria-expanded={advancedSearchOpen} onClick={() => setAdvancedSearchOpen((open) => !open)}>
-                  <span>상세검색</span>
-                  {advancedSearchOpen && <small>접기</small>}
-                </button>
+                <div className="searchSecondaryActions">
+                  <button type="button" className={`advancedSearchToggle ${advancedSearchOpen ? "open" : ""}`} aria-expanded={advancedSearchOpen} onClick={() => setAdvancedSearchOpen((open) => !open)}>
+                    <span>상세검색</span>
+                    {advancedSearchOpen && <small>접기</small>}
+                  </button>
+                  <button type="button" className="manual" onClick={() => {
+                    setForm((current) => ({ ...current, total_count: 0, category: "" }));
+                    setStep("book");
+                  }}>
+                    검색 없이 직접 입력
+                  </button>
+                </div>
                 {advancedSearchOpen && (
                   <div className="advancedSearchFields">
                     <label>
@@ -2866,12 +2874,6 @@ export default function FeedPage() {
                     </label>
                   </div>
                 )}
-                <button className="manual" onClick={() => {
-                  setForm((current) => ({ ...current, total_count: 0, category: "" }));
-                  setStep("book");
-                }}>
-                  검색 없이 직접 입력
-                </button>
                 {message && <p className="formMessage">{message}</p>}
                 <div className="results">
                   {results.map((book, i) => (
