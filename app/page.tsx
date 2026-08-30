@@ -1075,10 +1075,14 @@ function CalendarCover({ books, onOpen }: { books: Book[]; onOpen: (book: Book) 
 
 function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) => void }) {
   const calendarRef = useRef<HTMLElement>(null);
+  const calendarPickerRef = useRef<HTMLDivElement>(null);
+  const selectedCalendarYearRef = useRef<HTMLButtonElement>(null);
   const now = new Date();
   const [cursor, setCursor] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [calendarPicker, setCalendarPicker] = useState<"year" | "month" | null>(null);
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
+  const [calendarYearDraft, setCalendarYearDraft] = useState(String(year));
   const firstDay = new Date(year, month, 1).getDay();
   const dayCount = new Date(year, month + 1, 0).getDate();
   const dateKey = (day: number) => `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -1091,11 +1095,63 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
     const day = index - firstDay + 1;
     return day > 0 && day <= dayCount ? day : null;
   });
+  const firstPickerYear = Math.min(1900, year - 50);
+  const lastPickerYear = Math.max(now.getFullYear() + 100, year + 50);
+  const pickerYears = Array.from({ length: lastPickerYear - firstPickerYear + 1 }, (_, index) => firstPickerYear + index);
+  useEffect(() => {
+    if (!calendarPicker) return;
+    const closePicker = (event: PointerEvent) => {
+      if (!calendarPickerRef.current?.contains(event.target as Node)) setCalendarPicker(null);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCalendarPicker(null);
+    };
+    document.addEventListener("pointerdown", closePicker);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closePicker);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [calendarPicker]);
+  useEffect(() => {
+    if (calendarPicker !== "year") return;
+    setCalendarYearDraft(String(year));
+    const frame = requestAnimationFrame(() => selectedCalendarYearRef.current?.scrollIntoView({ block: "center" }));
+    return () => cancelAnimationFrame(frame);
+  }, [calendarPicker, year]);
+  const commitCalendarYear = () => {
+    const nextYear = Number.parseInt(calendarYearDraft, 10);
+    if (!Number.isFinite(nextYear) || nextYear < 1 || nextYear > 9999) {
+      setCalendarYearDraft(String(year));
+      return;
+    }
+    setCursor(new Date(nextYear, month, 1));
+    setCalendarPicker(null);
+  };
   return (
     <section className="calendarPage" ref={calendarRef}>
       <header className="calendarHeader">
         <button onClick={() => setCursor(new Date(year, month - 1, 1))} aria-label="이전 달"><ChevronLeft size={17} /></button>
-        <div><b>{year}</b><strong>{String(month + 1).padStart(2, "0")}</strong></div>
+        <div className="calendarDatePicker" ref={calendarPickerRef}>
+          <button type="button" className="calendarYearTrigger" aria-label="연도 선택" aria-expanded={calendarPicker === "year"} onClick={() => setCalendarPicker((current) => current === "year" ? null : "year")}><b>{year}</b></button>
+          <button type="button" className="calendarMonthTrigger" aria-label="월 선택" aria-expanded={calendarPicker === "month"} onClick={() => setCalendarPicker((current) => current === "month" ? null : "month")}><strong>{String(month + 1).padStart(2, "0")}</strong></button>
+          {calendarPicker === "year" && (
+            <span className="calendarPickerPopover calendarYearPopover" role="dialog" aria-label="이동할 연도 선택">
+              <span className="calendarYearInput">
+                <input type="text" inputMode="numeric" maxLength={4} value={calendarYearDraft} aria-label="연도 직접 입력" onChange={(event) => setCalendarYearDraft(event.target.value.replace(/\D/g, ""))} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commitCalendarYear(); } }} />
+                <button type="button" onClick={commitCalendarYear}>이동</button>
+              </span>
+              <span className="calendarYearOptions">
+                {pickerYears.map((pickerYear) => <button type="button" key={pickerYear} ref={pickerYear === year ? selectedCalendarYearRef : undefined} className={pickerYear === year ? "selected" : ""} onClick={() => { setCursor(new Date(pickerYear, month, 1)); setCalendarPicker(null); }}>{pickerYear}</button>)}
+              </span>
+            </span>
+          )}
+          {calendarPicker === "month" && (
+            <span className="calendarPickerPopover calendarMonthPopover" role="dialog" aria-label="이동할 월 선택">
+              {Array.from({ length: 12 }, (_, pickerMonth) => <button type="button" key={pickerMonth} className={pickerMonth === month ? "selected" : ""} onClick={() => { setCursor(new Date(year, pickerMonth, 1)); setCalendarPicker(null); }}>{String(pickerMonth + 1).padStart(2, "0")}</button>)}
+            </span>
+          )}
+        </div>
         <span className="calendarHeadActions"><ImageShareButton compact filename={`readiary-${year}-${String(month + 1).padStart(2, "0")}-calendar`} getTarget={() => calendarRef.current} /><button onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="다음 달"><ChevronRight size={17} /></button></span>
       </header>
       <div className="calendarWeek">{["SUN","MON","TUE","WED","THU","FRI","SAT"].map(day => <span key={day}>{day}</span>)}</div>
