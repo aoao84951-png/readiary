@@ -1780,6 +1780,13 @@
 }
 .reviewNote { grid-template-columns: 11px minmax(0, 1fr); gap: 7px; }
 .reviewNote .noteHeart { margin-top: 3px; }
+.reviewNote p strong,
+.savedNoteText strong { font-weight: 800; }
+.reviewNote p u,
+.savedNoteText u { text-decoration-color: rgba(180,113,139,.55); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+.noteAccent.pink { color: #c67893; }
+.noteAccent.blue { color: #6f91b6; }
+.noteAccent.gold { color: #b58a27; }
 .noteEditor { display: grid; gap: 7px; }
 .noteComposer {
   display: grid;
@@ -1798,6 +1805,37 @@
   resize: none;
   overflow-y: auto;
 }
+.richNoteField { min-width: 0; display: grid; }
+.richNoteToolbar {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: .5;
+  transition: opacity .15s ease;
+}
+.richNoteField:focus-within .richNoteToolbar { opacity: 1; }
+.richNoteToolbar button {
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #8f8985;
+  font: 700 9px Georgia, serif;
+  cursor: pointer;
+}
+.richNoteToolbar button:hover,
+.richNoteToolbar button:focus-visible { background: #f5f1ef; outline: none; }
+.richNoteToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
+.richNoteToolbar .color { position: relative; }
+.richNoteToolbar .color::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.richNoteToolbar .color.pink { color: #cf849f; }
+.richNoteToolbar .color.blue { color: #789fc7; }
+.richNoteToolbar .color.gold { color: #c29a38; }
 .noteComposer > button {
   align-self: center;
   padding: 5px 8px;
@@ -1864,6 +1902,7 @@
   transform: none;
   outline: 0;
 }
+.savedNoteEdit .richNoteToolbar { padding-left: 3px; }
 .recordForm .savedNoteEdit textarea:focus { border-color: #d9bdc6; background: #fff; }
 .savedNoteEdit > span { display: flex; justify-content: flex-end; gap: 5px; }
 .savedNoteEdit > span button { min-height: 25px; padding: 0 8px; border: 0; border-radius: 6px; background: #f1efec; color: #85807c; font-size: 7.5px; font-weight: 700; cursor: pointer; }

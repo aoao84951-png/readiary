@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
@@ -1170,6 +1170,29 @@ function CalendarView({ books, onOpen }: { books: Book[]; onOpen: (book: Book) =
     </section>
   );
 }
+const noteFormatPattern = /(\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\{\{(pink|blue|gold):([\s\S]+?)\}\})/g;
+
+function formattedNoteParts(value: string, keyPrefix = "note"): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+  const pattern = new RegExp(noteFormatPattern.source, "g");
+  while ((match = pattern.exec(value))) {
+    if (match.index > cursor) parts.push(value.slice(cursor, match.index));
+    const key = `${keyPrefix}-${match.index}`;
+    if (match[2] !== undefined) parts.push(<strong key={key}>{formattedNoteParts(match[2], `${key}-bold`)}</strong>);
+    else if (match[3] !== undefined) parts.push(<u key={key}>{formattedNoteParts(match[3], `${key}-underline`)}</u>);
+    else parts.push(<span key={key} className={`noteAccent ${match[4]}`}>{formattedNoteParts(match[5], `${key}-color`)}</span>);
+    cursor = pattern.lastIndex;
+  }
+  if (cursor < value.length) parts.push(value.slice(cursor));
+  return parts;
+}
+
+function FormattedNote({ value }: { value: string }) {
+  return <>{formattedNoteParts(value)}</>;
+}
+
 function Notes({
   notes,
   kind,
@@ -1188,7 +1211,7 @@ function Notes({
       {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
           <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
-          <p>{note}</p>
+          <p><FormattedNote value={note} /></p>
         </div>
       ))}
     </section>
@@ -1263,6 +1286,46 @@ function AutoTextarea({ value, onChange, placeholder, ariaLabel }: { value: stri
   return <textarea ref={ref} rows={1} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} aria-label={ariaLabel} />;
 }
 
+type NoteFormat = "bold" | "underline" | "pink" | "blue" | "gold";
+
+function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?: string }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const textarea = ref.current;
+    if (!textarea) return;
+    textarea.style.height = "0px";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [value]);
+  const applyFormat = (format: NoteFormat) => {
+    const textarea = ref.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = value.slice(start, end);
+    const [opening, closing] = format === "bold"
+      ? ["**", "**"]
+      : format === "underline"
+        ? ["__", "__"]
+        : [`{{${format}:`, "}}"];
+    onChange(`${value.slice(0, start)}${opening}${selected}${closing}${value.slice(end)}`);
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const nextStart = start + opening.length;
+      textarea.setSelectionRange(nextStart, nextStart + selected.length);
+    });
+  };
+  return (
+    <div className="richNoteField">
+      <span className="richNoteToolbar" aria-label="노트 서식">
+        <button type="button" className="bold" aria-label="굵게" title="굵게" onPointerDown={(event) => event.preventDefault()} onClick={() => applyFormat("bold")}>B</button>
+        <button type="button" className="underline" aria-label="밑줄" title="밑줄" onPointerDown={(event) => event.preventDefault()} onClick={() => applyFormat("underline")}>U</button>
+        {(["pink", "blue", "gold"] as const).map((color) => <button type="button" key={color} className={`color ${color}`} aria-label={`${color === "pink" ? "분홍" : color === "blue" ? "파랑" : "골드"}색 강조`} title="글자색" onPointerDown={(event) => event.preventDefault()} onClick={() => applyFormat(color)} />)}
+      </span>
+      <textarea ref={ref} rows={1} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} aria-label={ariaLabel} />
+    </div>
+  );
+}
+
 function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: string[]; kind: "liked" | "disliked"; onChange: (notes: string[]) => void }) {
   const [draft, setDraft] = useState("");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -1286,7 +1349,7 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
     <section className={`noteEditor full ${kind}`}>
       <label>{label}</label>
       <div className="noteComposer">
-        <AutoTextarea value={draft} onChange={setDraft} placeholder="감상을 적어주세요" />
+        <RichNoteTextarea value={draft} onChange={setDraft} placeholder="감상을 적어주세요" />
         <button type="button" disabled={!draft.trim()} onClick={addNote}>등록</button>
       </div>
       {!!notes.some((note) => note.trim()) && (
@@ -1295,9 +1358,9 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
             <div className={`savedNote ${editingIndex === index ? "editing" : ""}`} key={index}>
               <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
               {editingIndex === index ? <div className="savedNoteEdit">
-                <AutoTextarea ariaLabel={`${label} ${index + 1} 수정`} value={editingDraft} onChange={setEditingDraft} />
+                <RichNoteTextarea ariaLabel={`${label} ${index + 1} 수정`} value={editingDraft} onChange={setEditingDraft} />
                 <span><button type="button" onClick={cancelEditing}>취소</button><button type="button" disabled={!editingDraft.trim()} onClick={saveEditing}>수정 완료</button></span>
-              </div> : <button type="button" className="savedNoteText" aria-label={`${label} ${index + 1} 수정`} onClick={() => startEditing(index)}>{note}</button>}
+              </div> : <button type="button" className="savedNoteText" aria-label={`${label} ${index + 1} 수정`} onClick={() => startEditing(index)}><FormattedNote value={note} /></button>}
               <button type="button" className="savedNoteDelete" aria-label={`${label} ${index + 1} 삭제`} onClick={() => { if (editingIndex === index) cancelEditing(); onChange(notes.filter((_, itemIndex) => itemIndex !== index)); }}><X size={11} /></button>
             </div>
           ))}
