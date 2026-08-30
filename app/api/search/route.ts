@@ -67,9 +67,9 @@ export async function GET(req:NextRequest) {
   const groups=await Promise.all(providers.map(async provider=>{
     const precise=await provider.search(preciseQuery);
     if(!author)return precise;
-    const broad=await provider.search(q);
+    const [byAuthor,broad]=await Promise.all([provider.search(author),provider.search(q)]);
     const seen=new Set<string>();
-    return [...precise,...broad].filter(item=>{const key=item.url||`${item.title}-${item.author}`;if(seen.has(key))return false;seen.add(key);return true;});
+    return [...precise,...byAuthor,...broad].filter(item=>{const key=item.url||`${item.title}-${item.author}`;if(seen.has(key))return false;seen.add(key);return true;});
   }));
   let results=groups.flat().filter(item=>item.title);
   if(author){
