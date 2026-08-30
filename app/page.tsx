@@ -1424,7 +1424,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
         <span className="selectionFormatToolbar" style={{ top: toolbar.top, left: toolbar.left }} aria-label="선택한 글자 서식">
           <button type="button" className={`bold ${toolbar.bold ? "active" : ""}`} aria-label="굵게" aria-pressed={toolbar.bold} onPointerDown={(event) => event.preventDefault()} onClick={() => toggleFormat("bold")}>B</button>
           <button type="button" className={`underline ${toolbar.underline ? "active" : ""}`} aria-label="밑줄" aria-pressed={toolbar.underline} onPointerDown={(event) => event.preventDefault()} onClick={() => toggleFormat("underline")}>U</button>
-          <button type="button" className="paletteTrigger" aria-label="글자색 선택" aria-expanded={paletteOpen} onPointerDown={(event) => event.preventDefault()} onClick={() => setPaletteOpen((open) => !open)}><span /></button>
+          <button type="button" className="paletteTrigger" style={{ color: toolbar.color ? noteColorHex[toolbar.color] : undefined }} aria-label="글자색 선택" aria-expanded={paletteOpen} onPointerDown={(event) => event.preventDefault()} onClick={() => setPaletteOpen((open) => !open)}><span>A</span></button>
           {paletteOpen && <span className="noteColorPalette">
             {noteColors.map((color) => <button type="button" key={color} className={`${color} ${toolbar.color === color ? "active" : ""}`} aria-label={`${color} 색상${toolbar.color === color ? " 해제" : " 적용"}`} aria-pressed={toolbar.color === color} onPointerDown={(event) => event.preventDefault()} onClick={() => colorSelection(color)}><i /></button>)}
           </span>}

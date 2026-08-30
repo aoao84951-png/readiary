@@ -1850,7 +1850,10 @@
   border-radius: 6px;
   background: transparent;
   color: #57524e;
-  font: 700 13px Georgia, serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
 }
 .selectionFormatToolbar > button:hover,
@@ -1858,7 +1861,33 @@
 .selectionFormatToolbar > button[aria-expanded="true"] { background: #f4f1ef; outline: none; }
 .selectionFormatToolbar > button.active { background: #f7e9ee; color: #b46f87; }
 .selectionFormatToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
-.selectionFormatToolbar .paletteTrigger span { width: 11px; height: 11px; border-radius: 50%; background: linear-gradient(135deg,#d44c47 0 25%,#b58a27 25% 50%,#448361 50% 75%,#337ea9 75%); }
+.selectionFormatToolbar .paletteTrigger {
+  width: 29px;
+  border: 1px solid #e3dfdc;
+  background: #fff;
+  color: #57524e;
+  box-shadow: 0 1px 2px rgba(54,46,42,.04);
+}
+.selectionFormatToolbar .paletteTrigger span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 19px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.selectionFormatToolbar .paletteTrigger span::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 0;
+  left: 1px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: .75;
+}
 .noteColorPalette {
   position: absolute;
   top: 40px;
