@@ -418,11 +418,21 @@
 .statsSummary.spendingSummary>div{min-height:76px}
 .statsSummary.spendingSummary>div:nth-child(2){border-right:0}
 .statsSummary.spendingSummary>div:nth-child(-n+2){border-bottom:0}
-.genreStatsSection>header{align-items:center}
-.genreStatusFilters{display:flex;gap:5px;padding:2px 3px 12px;overflow-x:auto;scrollbar-width:none}
-.genreStatusFilters::-webkit-scrollbar{display:none}
-.genreStatusFilters>button{flex:0 0 auto;height:28px;padding:0 10px;border:1px solid #e9e6e3;border-radius:8px;background:#fff;color:#99948f;font-size:8px;font-weight:700;cursor:pointer}
-.genreStatusFilters>button.on{border-color:#b77b91;background:#f6ebef;color:#a2697e}
+.statsPage .profileStatsHeader{border-bottom:0}
+.statsPage .genreStatsSection>header{align-items:center;border-bottom:0}
+.genreStatusFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:0 3px 14px}
+.genreStatusFilters>button{min-width:0;min-height:62px;padding:8px 3px;border:0;border-top:2px solid #aaa9a4;border-right:1px solid #ecece8;border-bottom:1px solid #ecece8;background:transparent;color:#777772;font-size:8.5px;font-weight:700;text-align:center;cursor:pointer}
+.genreStatusFilters>button:nth-child(1){border-top-color:#a6a6a1}
+.genreStatusFilters>button:nth-child(2){border-top-color:#93ad8a}
+.genreStatusFilters>button:nth-child(3){border-top-color:#d8ac46}
+.genreStatusFilters>button:nth-child(4){border-top-color:#7f9fc0}
+.genreStatusFilters>button:nth-child(5){border-top-color:#c9828a;border-right:0}
+.genreStatusFilters>button:hover,.genreStatusFilters>button:focus-visible{background:#fafaf8;outline:0}
+.genreStatusFilters>button.on{background:#faf6f7;color:#a4687e}
+.genreStatusFilters>button:nth-child(2).on{background:#f4f7f2;color:#718869}
+.genreStatusFilters>button:nth-child(3).on{background:#fbf8ef;color:#af8229}
+.genreStatusFilters>button:nth-child(4).on{background:#f2f6f9;color:#6484a7}
+.genreStatusFilters>button:nth-child(5).on{background:#faf2f3;color:#ae6971}
 .genreStatRows{border-top:1px solid #ecece8}
 .genreStatRows>button{width:100%;min-height:59px;display:grid;grid-template-columns:26px minmax(90px,1fr) minmax(100px,2fr) 58px;align-items:center;gap:10px;padding:0 3px;border:0;border-bottom:1px solid #f0f0ed;background:transparent;text-align:left;cursor:pointer}
 .genreStatRows>button:hover,.genreStatRows>button:focus-visible{background:#fafaf8;outline:0}
@@ -447,4 +457,5 @@
   .spendingSection .spendingSummary{margin-top:0}
   .genreStatRows>button{grid-template-columns:23px minmax(72px,1fr) minmax(70px,1.35fr) 50px;gap:7px}
   .genreStatusFilters{padding-bottom:10px}
+  .genreStatusFilters>button{min-height:54px;padding:7px 2px;font-size:7px}
 }
