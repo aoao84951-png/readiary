@@ -35,6 +35,45 @@ type SearchBook = {
   category: string;
   platform: string;
 };
+
+const BOOK_CACHE_DATABASE = "readiary-cache";
+const BOOK_CACHE_STORE = "records";
+const BOOK_CACHE_KEY = "books";
+
+function openBookCache() {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const request = window.indexedDB.open(BOOK_CACHE_DATABASE, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(BOOK_CACHE_STORE)) request.result.createObjectStore(BOOK_CACHE_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function readCachedBooks() {
+  if (typeof window === "undefined" || !window.indexedDB) return [] as Book[];
+  const database = await openBookCache();
+  try {
+    return await new Promise<Book[]>((resolve, reject) => {
+      const request = database.transaction(BOOK_CACHE_STORE, "readonly").objectStore(BOOK_CACHE_STORE).get(BOOK_CACHE_KEY);
+      request.onsuccess = () => resolve(Array.isArray(request.result) ? request.result as Book[] : []);
+      request.onerror = () => reject(request.error);
+    });
+  } finally { database.close(); }
+}
+
+async function writeCachedBooks(books: Book[]) {
+  if (typeof window === "undefined" || !window.indexedDB) return;
+  const database = await openBookCache();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const request = database.transaction(BOOK_CACHE_STORE, "readwrite").objectStore(BOOK_CACHE_STORE).put(books, BOOK_CACHE_KEY);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } finally { database.close(); }
+}
 type ViewMode = "grid" | "feed" | "calendar" | "records" | "stats";
 type SortMode = "created" | "purchase";
 type SortDirection = "desc" | "asc";
@@ -1507,7 +1546,7 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
 }
 function Cover({ book }: { book: Book }) {
   return book.cover_url ? (
-    <img src={book.cover_url} alt={`${book.title} 표지`} />
+    <img src={book.cover_url} alt={`${book.title} 표지`} loading="lazy" decoding="async" />
   ) : (
     <div className="noCover">
       <span>▦</span>
@@ -2279,6 +2318,7 @@ export default function FeedPage() {
     try {
       const r = await fetch("/api/books", { cache: "no-store" });
       const data = await r.json() as { items?: Book[]; configured?: boolean };
+      if (!r.ok) throw new Error("최신 기록을 불러오지 못했어요.");
       setBooks(data.items || []);
       if (show) {
         setNotice(
@@ -2293,7 +2333,19 @@ export default function FeedPage() {
     }
   }
   useEffect(() => {
-    load();
+    let active = true;
+    void (async () => {
+      try {
+        const cachedBooks = await readCachedBooks();
+        if (active && cachedBooks.length) {
+          setBooks(cachedBooks);
+          setLoading(false);
+        }
+      } catch {
+        // Cache failure should never prevent the live Firebase request.
+      }
+      if (active) await load();
+    })();
     const savedSort = window.localStorage.getItem("readiary-sort-mode");
     if (savedSort === "created" || savedSort === "purchase") setSortMode(savedSort);
     const savedDirection = window.localStorage.getItem("readiary-sort-direction");
@@ -2304,7 +2356,12 @@ export default function FeedPage() {
       const localProfile = window.localStorage.getItem("readiary-profile-image") || "";
       setProfileImage(data.profile_image || localProfile);
     }).catch(() => undefined);
+    return () => { active = false; };
   }, []);
+  useEffect(() => {
+    if (loading) return;
+    void writeCachedBooks(books).catch(() => undefined);
+  }, [books, loading]);
   useEffect(() => {
     if (!adding || editingId || step === "search") return;
     const meaningful = Boolean(form.title.trim() || form.author.trim() || form.cover_url || step !== "book");
