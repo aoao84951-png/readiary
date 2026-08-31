@@ -534,7 +534,8 @@
 .profileCover:focus-visible,.modalBookCover:focus-visible,.coverLightboxClose:focus-visible{outline-color:#a88fce}
 .statsCategoryTabs>button.on{color:#826aa9}.statsCategoryTabs>button.on:after{background:#a88fce}
 .statsSection>header span:before{color:#a88fce}.statsCopy>i{color:#967dbb}
-.statsPage{background:radial-gradient(ellipse 145px 115px at 150px 95px,rgba(232,224,246,.55),transparent 100%),radial-gradient(circle at calc(100% - 55px) 210px,rgba(231,239,248,.5),transparent 120px),#fff}
+.statsPage{background:#fff}
 .statCard>span{background:#f0ebf7;color:#8d73b4}.yearTabs button.on{background:#f0ebf7;color:#8067a6}.statsListHead small{color:#896fac}
 .filterToggle i{background:#9b82c1}.filterOptions button.on i{border-color:#9b82c1;background:#9b82c1;box-shadow:0 0 0 3px #f0ebf7}
-@media(max-width:520px){.statsPage{background:radial-gradient(ellipse 105px 90px at 110px 70px,rgba(232,224,246,.58),transparent 100%),radial-gradient(circle at calc(100% - 15px) 150px,rgba(231,239,248,.5),transparent 90px),#fff}}
+@media(max-width:520px){.statsPage{background:#fff}}
+.hallHero>small{color:#8f74b5}.hallHero h1::after{background:rgba(187,166,220,.4)}.hallHero>span{color:#ffc83d}.hallEmpty{color:#ffc83d}.hallBook>i{color:#8f74b5}
