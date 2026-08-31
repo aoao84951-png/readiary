@@ -2843,45 +2843,7 @@ export default function FeedPage() {
         <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
       ) : view === "grid" ? (
         <>
-        <section className="collectionIndex" aria-label="모아보기 필터">
-          <nav className="collectionGenres" aria-label="장르 선택">
-            {[
-              ["", "00", "전체", "all"],
-              ["BL", "01", "BL", "bl"],
-              ["로맨스", "02", "로맨스", "romance"],
-              ["로맨스판타지", "03", "로맨스판타지", "rofan"],
-              ["문학", "04", "일반문학", "literature"],
-            ].map(([value, number, label, tone]) => (
-              <button
-                type="button"
-                className={`${tone} ${value ? categoryFilters.length === 1 && categoryFilters[0] === value ? "on" : "" : categoryFilters.length === 0 ? "on" : ""}`}
-                key={value || "all"}
-                onClick={() => setCategoryFilters(value ? [value] : [])}
-              >
-                <small>{number}</small><span>{label}</span>
-              </button>
-            ))}
-          </nav>
-          <nav className="collectionStatuses" aria-label="상태 선택">
-            {[
-              ["", "전체"], ["책바구니", "책바구니"], ["읽기 전", "읽기 전"],
-              ["읽는 중", "읽는 중"], ["완독", "완독"], ["하차", "하차"],
-            ].map(([value, label]) => {
-              const count = value ? books.filter(book => book.status === value).length : books.length;
-              return (
-                <button
-                  type="button"
-                  className={`${value === "읽기 전" ? "before" : value === "읽는 중" ? "reading" : value === "완독" ? "done" : value === "하차" ? "paused" : "neutral"} ${value ? statusFilters.length === 1 && statusFilters[0] === value ? "on" : "" : statusFilters.length === 0 ? "on" : ""}`}
-                  key={value || "all"}
-                  onClick={() => setStatusFilters(value ? [value] : [])}
-                >
-                  <i aria-hidden="true" /><span>{label}</span><small>{count}</small>
-                </button>
-              );
-            })}
-          </nav>
-        </section>
-        <div className="collectionResult"><span>{categoryFilters[0] === "문학" ? "일반문학" : categoryFilters[0] || "전체"} · {statusFilters[0] || "전체"}</span><b>{visible.length}</b> 작품</div>
+        {(categoryFilters.length > 0 || statusFilters.length > 0) && <div className="collectionResult"><span>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체 장르"} · {statusFilters.length ? statusFilters.join(" · ") : "전체 상태"}</span><b>{visible.length}</b> 작품</div>}
         <section className="bookGrid collectionGrid">
           {visible.map((book, index) => {
             return (

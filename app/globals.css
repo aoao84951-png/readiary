@@ -5,7 +5,7 @@
 
 /* Editorial collection index and compact four-column shelf. */
 .collectionIndex{position:sticky;z-index:19;top:43px;width:100%;margin:0 auto;background:#fff;border-bottom:1px solid #ece8e5}
-.feedPage:has(.collectionIndex)>.compactTopBar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
+.feedPage:has(.collectionGrid)>.compactTopBar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
 .feedPage:has(>.searchBar) .collectionIndex{top:85px}
 .collectionGenres{height:48px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
 .collectionGenres>button{position:relative;min-width:0;display:grid;place-content:center;gap:3px;padding:0 3px;border:0;border-right:1px solid #f2efed;background:transparent;color:#a09b97;text-align:center;cursor:pointer}
