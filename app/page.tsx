@@ -2127,7 +2127,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
     all[name].books.push(book);
     return all;
   }, {})).sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name));
-  const largestGenreCount = genreGroups[0]?.books.length || 1;
+  const genreSeal = (genre: string) => genre === "BL" ? "/genre-seals/bl.png" : genre === "로맨스" ? "/genre-seals/romance.png" : genre === "로맨스판타지" ? "/genre-seals/romance-fantasy.png" : genre === "문학" ? "/genre-seals/literature.png" : "";
   const purchaseEntries = books.flatMap(bookPurchaseEntries).filter(entry => entry.date);
   const months = [...new Set(purchaseEntries.map(entry => entry.date.slice(0, 7)))].map(name => {
     const entries = purchaseEntries.filter(entry => entry.date.startsWith(name));
@@ -2204,8 +2204,8 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
               return <button type="button" className={genreStatus === status ? "on" : ""} key={status || "all"} onClick={() => setGenreStatus(status)}><span>{status || "전체"}</span><small>{count}</small></button>;
             })}
           </div>
-          <div className="genreStatRows">
-            {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><i><em style={{ width: `${(item.books.length / largestGenreCount) * 100}%` }} /></i><strong>{item.books.length}<small>작품</small></strong></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
+          <div className="genreSealGrid">
+            {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><small>GENRE {String(index + 1).padStart(2, "0")}</small><span className="genreSealMark">{genreSeal(item.name) ? <img src={genreSeal(item.name)} alt="" /> : <i>{item.name.slice(0, 1)}</i>}</span><b>{item.name}</b><strong>{item.books.length}<em>작품</em></strong><span className="genreSealOpen">목록 보기 <i>↗</i></span></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
           </div>
         </div>
       </section>
