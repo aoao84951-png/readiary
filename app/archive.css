@@ -823,6 +823,13 @@
   background: #f2f2ef;
   color: #aaa;
 }
+.modalBookCover {
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.modalBookCover:disabled { cursor: default; }
 .recordModalHead > span:nth-child(2) {
   min-width: 0;
   display: grid;
@@ -2086,6 +2093,43 @@
 }
 .noteImageLightbox > img { max-width: min(900px, 92vw); max-height: 88dvh; display: block; border-radius: 8px; object-fit: contain; box-shadow: 0 18px 60px rgba(0,0,0,.28); }
 .noteImageLightbox > button { position: fixed; z-index: 1; top: 18px; right: 18px; width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: #66615e; cursor: pointer; }
+.coverLightbox {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(28px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  background: rgba(12, 12, 12, .94);
+  backdrop-filter: blur(12px);
+  cursor: zoom-out;
+  animation: modalShadeIn .18s ease-out;
+}
+.coverLightbox > img {
+  max-width: 100%;
+  max-height: calc(100dvh - 56px);
+  display: block;
+  object-fit: contain;
+  border-radius: 3px;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, .5);
+  cursor: default;
+}
+.coverLightboxClose {
+  position: fixed;
+  z-index: 1;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .13);
+  color: #fff;
+  cursor: pointer;
+}
 @media (max-width: 520px) {
   .noteImageLightbox { padding: 18px; }
   .noteImageLightbox > img { max-width: 100%; max-height: 84dvh; }

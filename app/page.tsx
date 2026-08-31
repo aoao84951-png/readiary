@@ -1000,6 +1000,31 @@ function ClassicRating({ rating }: { rating: number | null }) {
   );
 }
 
+function CoverLightbox({ src, title, onClose }: { src: string; title: string; onClose: () => void }) {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.stopImmediatePropagation();
+      onClose();
+    };
+    window.addEventListener("keydown", closeOnEscape, true);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape, true);
+    };
+  }, [onClose]);
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="coverLightbox" role="dialog" aria-modal="true" aria-label={`${title} 표지 전체보기`} onMouseDown={onClose}>
+      <button type="button" className="coverLightboxClose" aria-label="표지 전체보기 닫기" onClick={onClose}><X size={22} /></button>
+      <img src={src} alt={`${title} 표지`} onMouseDown={(event) => event.stopPropagation()} />
+    </div>,
+    document.body,
+  );
+}
+
 function InteractiveRating({
   value,
   onChange,
@@ -1734,10 +1759,11 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
   const [statusEditing, setStatusEditing] = useState(false);
   const [statusSaving, setStatusSaving] = useState(false);
   const [statusError, setStatusError] = useState("");
+  const [coverOpen, setCoverOpen] = useState(false);
   useEffect(() => {
     if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
   }, [openBook, books]);
-  const closeSelected = () => { setSelected(null); setPurchaseDetailsOpen(false); setStatusEditing(false); setStatusError(""); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
+  const closeSelected = () => { setSelected(null); setCoverOpen(false); setPurchaseDetailsOpen(false); setStatusEditing(false); setStatusError(""); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
   useEffect(() => {
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
@@ -1839,13 +1865,13 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                 onMouseDown={(event) => event.stopPropagation()}
               >
                 <header className="recordModalHead">
-                  <span className="modalBookCover">
+                  <button type="button" className="modalBookCover" disabled={!book.cover_url} onClick={() => setCoverOpen(true)} aria-label={book.cover_url ? `${book.title} 표지 전체보기` : undefined}>
                     {book.cover_url ? (
                       <img src={book.cover_url} alt="" />
                     ) : (
                       <span>▦</span>
                     )}
-                  </span>
+                  </button>
                   <span>
                     <small>RECORD {String(index + 1).padStart(2, "0")}</small>
                     <b>{book.title}</b>
@@ -1983,6 +2009,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                     </div>
                   </section>
                 </div>
+                {coverOpen && book.cover_url && <CoverLightbox src={book.cover_url} title={book.title} onClose={() => setCoverOpen(false)} />}
               </section>
             </div>
           );
@@ -2191,6 +2218,7 @@ export default function FeedPage() {
   const [profileImage, setProfileImage] = useState("");
   const [message, setMessage] = useState("");
   const [detailBook, setDetailBook] = useState<Book | null>(null);
+  const [feedCoverBook, setFeedCoverBook] = useState<Book | null>(null);
   const [resumeDraft, setResumeDraft] = useState<{ form: BookRecord; step: "book" | "reading" | "purchase" | "notes"; readingDate: string } | null>(null);
   const scrollRef = useRef(0);
   const drawerRef = useRef<HTMLElement | null>(null);
@@ -2747,13 +2775,13 @@ export default function FeedPage() {
             >
               <header className="postHead">
                 <span className="identity">
-                  <span className="profileCover">
+                  <button type="button" className="profileCover" disabled={!book.cover_url} onClick={() => setFeedCoverBook(book)} aria-label={book.cover_url ? `${book.title} 표지 전체보기` : undefined}>
                     {book.cover_url ? (
                       <img src={book.cover_url} alt="" />
                     ) : (
                       <span>📖</span>
                     )}
-                  </span>
+                  </button>
                   <b>{book.title}</b>
                   <small>{book.author || "저자 미상"}</small>
                 </span>
@@ -2802,6 +2830,7 @@ export default function FeedPage() {
         </section>
       )}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList />}
+      {feedCoverBook?.cover_url && <CoverLightbox src={feedCoverBook.cover_url} title={feedCoverBook.title} onClose={() => setFeedCoverBook(null)} />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>
         <button className={currentSection === "feed" ? "active" : ""} onClick={() => navigateSection("feed")} aria-label="피드"><Hash size={17} strokeWidth={1.55} /></button>

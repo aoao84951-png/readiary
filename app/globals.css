@@ -383,3 +383,7 @@
 
 /* Keep mixed Latin/Korean feed tags aligned across browser font metrics. */
 .metaActions .genreText,.metaActions .statusText{display:inline-flex;align-items:center;height:14px;font-family:'Apple SD Gothic Neo','Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;line-height:14px}
+
+.profileCover{border:0;cursor:zoom-in}
+.profileCover:disabled{cursor:default}
+.profileCover:focus-visible,.modalBookCover:focus-visible,.coverLightboxClose:focus-visible{outline:2px solid #cf8fa7;outline-offset:3px}
