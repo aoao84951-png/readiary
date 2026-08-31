@@ -2022,7 +2022,7 @@ function StatSection({ title, subtitle, items }: { title: string; subtitle: stri
   return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statCards">{items.map((item, index) => <article className="statCard" key={item.name}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><strong>{item.paid.toLocaleString()}원</strong><small>{item.volumes}권 · {item.works}작품</small></article>)}</div></section>;
 }
 
-function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase"; purchaseMonth?: string; onClose: () => void }) {
+function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading"; purchaseMonth?: string; onClose: () => void }) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
@@ -2040,7 +2040,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
     <div className="statsListShade" onMouseDown={onClose}>
       <section className="statsListModal" role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
         <header className="statsListHead">
-          <span><small>{mode === "status" ? "READING STATUS" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>
+          <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>
           <button type="button" onClick={onClose} aria-label="목록 닫기"><X size={17} /></button>
         </header>
         <div className="statsBookList">
@@ -2057,7 +2057,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
                 <small>{book.author || "저자 미상"} · {book.category}</small>
                 {mode === "purchase" && <em>{labels.length ? labels.join(" · ") : "권 정보 미기록"}</em>}
               </span>
-              {mode === "status" ? (
+              {mode !== "purchase" ? (
                 <span className={`archiveStatus ${statusClass(book.status)}`}>{book.status}<small>{book.read_count}/{book.total_count}{book.count_unit || "권"}</small></span>
               ) : (
                 <span className="statsPurchaseAmount"><b>{monthPaid.toLocaleString()}원</b><small>{days.length ? `${days.map(day => `${Number(day)}일`).join(" · ")} · ` : ""}{book.platform || "플랫폼 미기록"}</small></span>
@@ -2102,10 +2102,9 @@ function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange,
 
 function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
   const [purchaseYear, setPurchaseYear] = useState("");
-  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase"; purchaseMonth?: string } | null>(null);
+  const [readingYear, setReadingYear] = useState("");
+  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading"; purchaseMonth?: string } | null>(null);
   const won = (value: number) => `${value.toLocaleString()}원`;
-  const totalVolumes = books.reduce((sum, book) => sum + (book.total_count || 0), 0);
-  const readVolumes = books.reduce((sum, book) => sum + (book.read_count || 0), 0);
   const paid = books.reduce((sum, book) => sum + (book.paid_price || 0), 0);
   const list = books.reduce((sum, book) => sum + (book.list_price || 0), 0);
   const rated = books.filter(book => typeof book.rating === "number" && book.rating > 0);
@@ -2137,6 +2136,24 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
   }).sort((a, b) => b.name.localeCompare(a.name));
   const purchaseYears = [...new Set(months.map(item => item.name.slice(0, 4)))];
   const activePurchaseYear = purchaseYears.includes(purchaseYear) ? purchaseYear : purchaseYears[0];
+  const finishedBooks = books.filter(book => (book.status === "완독" || book.status === "하차") && /^\d{4}-\d{2}-\d{2}$/.test(book.finished_date || ""));
+  const currentYear = String(new Date().getFullYear());
+  const readingYears = [...new Set(finishedBooks.map(book => (book.finished_date || "").slice(0, 4)))].sort((a, b) => b.localeCompare(a));
+  if (!readingYears.includes(currentYear)) readingYears.unshift(currentYear);
+  const activeReadingYear = readingYears.includes(readingYear) ? readingYear : readingYears[0];
+  const yearlyFinishedBooks = finishedBooks.filter(book => book.finished_date?.startsWith(activeReadingYear));
+  const yearlyCompleted = yearlyFinishedBooks.filter(book => book.status === "완독");
+  const yearlyDropped = yearlyFinishedBooks.filter(book => book.status === "하차");
+  const readingMonths = Array.from({ length: 12 }, (_, index) => {
+    const month = String(index + 1).padStart(2, "0");
+    const monthBooks = yearlyFinishedBooks.filter(book => book.finished_date?.startsWith(`${activeReadingYear}-${month}`));
+    return {
+      month,
+      books: monthBooks,
+      completed: monthBooks.filter(book => book.status === "완독").length,
+      dropped: monthBooks.filter(book => book.status === "하차").length,
+    };
+  });
   if (!books.length) return <div className="state">통계를 만들 기록이 아직 없어요.</div>;
   return (
     <section className="statsPage">
@@ -2146,23 +2163,26 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
           <b><Plus size={12} strokeWidth={1.7} /></b>
           <input type="file" accept="image/*" onChange={(event) => { onProfileImage(event.target.files?.[0]); event.target.value = ""; }} />
         </label>
-        <div className="profileNumbers">
+        <div className="profileNumbers profileNumbersCompact">
           <div><strong>{books.length}</strong><small>작품</small></div>
-          <div><strong>{readVolumes}</strong><small>읽은 권수</small></div>
           <div><strong>{averageRatingDisplay}</strong><small>평균 평점</small></div>
         </div>
         <div className="profileReadingBio"><b>나의 독서 통계</b><span>books, notes &amp; little memories</span></div>
       </header>
-      <div className="statsSummary">
-        <div><small>기록한 작품</small><strong>{books.length}<i>작품</i></strong></div>
-        <div><small>소장 권수</small><strong>{totalVolumes}<i>권</i></strong></div>
+      <section className="statsSection readingYearSection">
+        <header><span>MY READING YEAR</span><label className="purchaseYearSelect"><span>독서 연도 선택</span><select aria-label="독서 통계 연도 선택" value={activeReadingYear} onChange={(event) => setReadingYear(event.target.value)}>{readingYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header>
+        <div className="readingYearTotals">
+          <div><small>완독한 작품</small><strong>{yearlyCompleted.length}<i>작품</i></strong></div>
+          <div><small>하차한 작품</small><strong>{yearlyDropped.length}<i>작품</i></strong></div>
+        </div>
+        <div className="readingYearMonths">
+          {readingMonths.map(item => <button type="button" className={item.books.length ? "hasReading" : ""} key={item.month} onClick={() => setListModal({ title: `${activeReadingYear}년 ${Number(item.month)}월`, subtitle: item.books.length ? `완독 ${item.completed}작품 · 하차 ${item.dropped}작품` : "완독·하차 기록 없음", books: item.books, mode: "reading" })}><span>{item.month}</span><div><i style={{ height: `${Math.max(item.completed ? 14 : 0, Math.min(54, item.completed * 12))}px` }} /><i style={{ height: `${Math.max(item.dropped ? 8 : 0, Math.min(54, item.dropped * 12))}px` }} /></div><small>{item.books.length ? `${item.completed} · ${item.dropped}` : "–"}</small></button>)}
+        </div>
+        <footer className="readingYearLegend"><span><i />완독</span><span><i />하차</span></footer>
+      </section>
+      <div className="statsSummary spendingSummary">
         <div><small>총 실구매액</small><strong>{won(paid)}</strong></div>
         <div><small>절약한 금액</small><strong>{won(Math.max(0, list - paid))}</strong></div>
-      </div>
-      <div className="readingSnapshot">
-        <div><small>읽은 권수</small><b>{readVolumes} / {totalVolumes}권</b></div>
-        <div><small>평균 평점</small><b>★ {averageRatingDisplay}</b></div>
-        <div><small>평균 작품 지출</small><b>{won(books.length ? Math.round(paid / books.length) : 0)}</b></div>
       </div>
       <div className="statsSplit">
         <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} />

@@ -387,3 +387,46 @@
 .profileCover{border:0;cursor:zoom-in}
 .profileCover:disabled{cursor:default}
 .profileCover:focus-visible,.modalBookCover:focus-visible,.coverLightboxClose:focus-visible{outline:2px solid #cf8fa7;outline-offset:3px}
+
+.profileNumbers.profileNumbersCompact{grid-template-columns:repeat(2,minmax(0,1fr));max-width:250px}
+.readingYearSection{margin-top:34px}
+.readingYearSection>header{align-items:center}
+.readingYearTotals{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid #ecece8;border-bottom:1px solid #ecece8}
+.readingYearTotals>div{min-height:86px;display:flex;flex-direction:column;justify-content:space-between;padding:16px;border-right:1px solid #ecece8}
+.readingYearTotals>div:last-child{border-right:0}
+.readingYearTotals small{color:#aaa9a4;font-size:8px;font-weight:650}
+.readingYearTotals strong{color:#5b5b56;font-size:20px;font-weight:780;letter-spacing:-.04em}
+.readingYearTotals strong i{margin-left:4px;color:#aaa9a4;font-size:7px;font-style:normal;font-weight:650;letter-spacing:0}
+.readingYearTotals>div:first-child strong{color:#6f91b5}
+.readingYearTotals>div:last-child strong{color:#bd777f}
+.readingYearMonths{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));margin-top:14px;border-top:1px solid #f0f0ed;border-bottom:1px solid #f0f0ed}
+.readingYearMonths>button{min-width:0;height:112px;display:grid;grid-template-rows:auto 1fr auto;justify-items:center;gap:6px;padding:9px 2px 8px;border:0;border-right:1px solid #f0f0ed;background:transparent;color:#c1c1bc;cursor:pointer}
+.readingYearMonths>button:last-child{border-right:0}
+.readingYearMonths>button:hover,.readingYearMonths>button:focus-visible{background:#fafaf8;outline:0}
+.readingYearMonths>button>span{font:700 7px 'Courier New',monospace}
+.readingYearMonths>button>div{height:56px;display:flex;align-items:flex-end;justify-content:center;gap:3px}
+.readingYearMonths>button>div i{width:5px;min-height:2px;border-radius:5px 5px 1px 1px;background:#8faecc}
+.readingYearMonths>button>div i:last-child{background:#ca8990}
+.readingYearMonths>button>small{color:#bbb9b5;font-size:6.5px}
+.readingYearMonths>button.hasReading>span{color:#9b7080}
+.readingYearMonths>button.hasReading>small{color:#777772;font-weight:700}
+.readingYearLegend{display:flex;justify-content:flex-end;gap:12px;padding-top:9px;color:#aaa9a4;font-size:7px}
+.readingYearLegend span{display:flex;align-items:center;gap:4px}
+.readingYearLegend i{width:7px;height:7px;border-radius:2px;background:#8faecc}
+.readingYearLegend span:last-child i{background:#ca8990}
+.statsSummary.spendingSummary{grid-template-columns:repeat(2,1fr);margin-top:34px}
+.statsSummary.spendingSummary>div{min-height:76px}
+.statsSummary.spendingSummary>div:nth-child(2){border-right:0}
+.statsSummary.spendingSummary>div:nth-child(-n+2){border-bottom:0}
+@media(max-width:520px){
+  .profileNumbers.profileNumbersCompact{max-width:none}
+  .readingYearSection{margin-top:28px}
+  .readingYearTotals>div{min-height:72px;padding:12px}
+  .readingYearTotals strong{font-size:18px}
+  .readingYearMonths{grid-template-columns:repeat(6,1fr)}
+  .readingYearMonths>button{height:88px;padding:7px 2px 6px;border-bottom:1px solid #f0f0ed}
+  .readingYearMonths>button:nth-child(6n){border-right:0}
+  .readingYearMonths>button:nth-child(n+7){border-bottom:0}
+  .readingYearMonths>button>div{height:37px}
+  .statsSummary.spendingSummary{grid-template-columns:repeat(2,1fr);margin-top:28px}
+}
