@@ -1344,7 +1344,7 @@ function Notes({
   return (
     <section className={`reviewNotes ${kind}`}>
       <span className="reviewLabel">
-        {kind === "liked" ? "LOVE NOTES" : "NOPE NOTES"}{" "}
+        {kind === "liked" ? "LIKES" : "DISLIKES"}{" "}
         <small>{String(visibleNotes.length).padStart(2, "0")}</small>
       </span>
       {visibleNotes.map((note, i) => (
