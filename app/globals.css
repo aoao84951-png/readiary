@@ -7,6 +7,15 @@
 .collectionIndex{position:sticky;z-index:19;top:43px;width:100%;margin:0 auto;background:#fff;border-bottom:1px solid #ece8e5}
 .feedPage:has(.collectionIndex)>.compactTopBar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
 .feedPage:has(>.searchBar) .collectionIndex{top:85px}
+
+/* Lavender signature theme. Semantic genre and reading-status colors stay unchanged. */
+.profileCover{background:conic-gradient(from 205deg,#ddd2f1,#c7b4e5 20%,#aa91d2 43%,#8e75bd 66%,#9eb5dc 84%,#ddd2f1)}
+.profileCover:focus-visible,.modalBookCover:focus-visible,.coverLightboxClose:focus-visible{outline-color:#a88fce}
+.statsCategoryTabs>button.on{color:#826aa9}.statsCategoryTabs>button.on:after{background:#a88fce}
+.statsSection>header span:before{color:#a88fce}.statsCopy>i{color:#967dbb}.statsPage{background:radial-gradient(ellipse 145px 115px at 150px 95px,rgba(232,224,246,.55),transparent 100%),radial-gradient(circle at calc(100% - 55px) 210px,rgba(231,239,248,.5),transparent 120px),#fff}
+.statCard>span{background:#f0ebf7;color:#8d73b4}.yearTabs button.on{background:#f0ebf7;color:#8067a6}.statsListHead small{color:#896fac}
+.filterToggle i{background:#9b82c1}.filterOptions button.on i{border-color:#9b82c1;background:#9b82c1;box-shadow:0 0 0 3px #f0ebf7}
+@media(max-width:520px){.statsPage{background:radial-gradient(ellipse 105px 90px at 110px 70px,rgba(232,224,246,.58),transparent 100%),radial-gradient(circle at calc(100% - 15px) 150px,rgba(231,239,248,.5),transparent 90px),#fff}}
 .collectionGenres{height:48px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
 .collectionGenres>button{position:relative;min-width:0;display:grid;place-content:center;gap:3px;padding:0 3px;border:0;border-right:1px solid #f2efed;background:transparent;color:#a09b97;text-align:center;cursor:pointer}
 .collectionGenres>button:last-child{border-right:0}.collectionGenres>button small{color:currentColor;font:italic 6px Georgia,serif;opacity:.65}.collectionGenres>button span{overflow:hidden;font-size:8.5px;font-weight:720;text-overflow:ellipsis;white-space:nowrap}
@@ -519,3 +528,13 @@
   .genreStatusFilters>button>span{font-size:7px}
   .genreStatusFilters>button>small{min-width:11px;font-size:6px}
 }
+
+/* Final lavender signature overrides (kept after legacy theme rules). */
+.profileCover{background:conic-gradient(from 205deg,#ddd2f1,#c7b4e5 20%,#aa91d2 43%,#8e75bd 66%,#9eb5dc 84%,#ddd2f1)}
+.profileCover:focus-visible,.modalBookCover:focus-visible,.coverLightboxClose:focus-visible{outline-color:#a88fce}
+.statsCategoryTabs>button.on{color:#826aa9}.statsCategoryTabs>button.on:after{background:#a88fce}
+.statsSection>header span:before{color:#a88fce}.statsCopy>i{color:#967dbb}
+.statsPage{background:radial-gradient(ellipse 145px 115px at 150px 95px,rgba(232,224,246,.55),transparent 100%),radial-gradient(circle at calc(100% - 55px) 210px,rgba(231,239,248,.5),transparent 120px),#fff}
+.statCard>span{background:#f0ebf7;color:#8d73b4}.yearTabs button.on{background:#f0ebf7;color:#8067a6}.statsListHead small{color:#896fac}
+.filterToggle i{background:#9b82c1}.filterOptions button.on i{border-color:#9b82c1;background:#9b82c1;box-shadow:0 0 0 3px #f0ebf7}
+@media(max-width:520px){.statsPage{background:radial-gradient(ellipse 105px 90px at 110px 70px,rgba(232,224,246,.58),transparent 100%),radial-gradient(circle at calc(100% - 15px) 150px,rgba(231,239,248,.5),transparent 90px),#fff}}
