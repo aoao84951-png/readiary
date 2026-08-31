@@ -2018,11 +2018,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
   );
 }
 
-function StatSection({ title, subtitle, items }: { title: string; subtitle: string; items: { name: string; works: number; volumes: number; paid: number }[] }) {
-  return <section className="statsSection"><header><span>{title}</span><small>{subtitle}</small></header><div className="statCards">{items.map((item, index) => <article className="statCard" key={item.name}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><strong>{item.paid.toLocaleString()}원</strong><small>{item.volumes}권 · {item.works}작품</small></article>)}</div></section>;
-}
-
-function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading"; purchaseMonth?: string; onClose: () => void }) {
+function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading" | "genre"; purchaseMonth?: string; onClose: () => void }) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
@@ -2040,7 +2036,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
     <div className="statsListShade" onMouseDown={onClose}>
       <section className="statsListModal" role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
         <header className="statsListHead">
-          <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>
+          <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : mode === "genre" ? "BY GENRE" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>
           <button type="button" onClick={onClose} aria-label="목록 닫기"><X size={17} /></button>
         </header>
         <div className="statsBookList">
@@ -2103,7 +2099,8 @@ function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange,
 function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
   const [purchaseYear, setPurchaseYear] = useState("");
   const [readingYear, setReadingYear] = useState("");
-  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading"; purchaseMonth?: string } | null>(null);
+  const [genreStatus, setGenreStatus] = useState("");
+  const [listModal, setListModal] = useState<{ title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading" | "genre"; purchaseMonth?: string } | null>(null);
   const won = (value: number) => `${value.toLocaleString()}원`;
   const paid = books.reduce((sum, book) => sum + (book.paid_price || 0), 0);
   const list = books.reduce((sum, book) => sum + (book.list_price || 0), 0);
@@ -2120,10 +2117,16 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
     all[name].paid += book.paid_price || 0;
     return all;
   }, {})).sort((a, b) => b.paid - a.paid || b.volumes - a.volumes);
-  const genres = group("category");
-  const platforms = group("platform");
   const recordedStatuses = group("status");
   const statuses = ["책바구니", "읽기 전", "읽는 중", "완독", "하차"].map(name => recordedStatuses.find(item => item.name === name) || { name, works: 0, volumes: 0, paid: 0 });
+  const genreBooks = books.filter(book => book.status !== "책바구니" && (!genreStatus || book.status === genreStatus));
+  const genreGroups = Object.values(genreBooks.reduce<Record<string, { name: string; books: Book[] }>>((all, book) => {
+    const name = book.category || "미분류";
+    all[name] ||= { name, books: [] };
+    all[name].books.push(book);
+    return all;
+  }, {})).sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name));
+  const largestGenreCount = genreGroups[0]?.books.length || 1;
   const purchaseEntries = books.flatMap(bookPurchaseEntries).filter(entry => entry.date);
   const months = [...new Set(purchaseEntries.map(entry => entry.date.slice(0, 7)))].map(name => {
     const entries = purchaseEntries.filter(entry => entry.date.startsWith(name));
@@ -2174,22 +2177,30 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
       <section className="statsSection readingYearSection">
         <header><span>MY READING YEAR</span><label className="purchaseYearSelect"><span>독서 연도 선택</span><select aria-label="독서 통계 연도 선택" value={activeReadingYear} onChange={(event) => setReadingYear(event.target.value)}>{readingYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header>
         <div className="readingYearTotals">
-          <div><small>완독한 작품</small><strong>{yearlyCompleted.length}<i>작품</i></strong></div>
-          <div><small>하차한 작품</small><strong>{yearlyDropped.length}<i>작품</i></strong></div>
+          <button type="button" onClick={() => setListModal({ title: `${activeReadingYear}년 완독`, subtitle: `${yearlyCompleted.length}작품`, books: yearlyCompleted, mode: "reading" })}><small>완독한 작품</small><strong>{yearlyCompleted.length}<i>작품</i></strong></button>
+          <button type="button" onClick={() => setListModal({ title: `${activeReadingYear}년 하차`, subtitle: `${yearlyDropped.length}작품`, books: yearlyDropped, mode: "reading" })}><small>하차한 작품</small><strong>{yearlyDropped.length}<i>작품</i></strong></button>
         </div>
         <div className="readingYearMonths">
           {readingMonths.map(item => <button type="button" className={item.books.length ? "hasReading" : ""} key={item.month} onClick={() => setListModal({ title: `${activeReadingYear}년 ${Number(item.month)}월`, subtitle: item.books.length ? `완독 ${item.completed}작품 · 하차 ${item.dropped}작품` : "완독·하차 기록 없음", books: item.books, mode: "reading" })}><span>{item.month}</span><div><i style={{ height: `${Math.max(item.completed ? 14 : 0, Math.min(54, item.completed * 12))}px` }} /><i style={{ height: `${Math.max(item.dropped ? 8 : 0, Math.min(54, item.dropped * 12))}px` }} /></div><small>{item.books.length ? `${item.completed} · ${item.dropped}` : "–"}</small></button>)}
         </div>
         <footer className="readingYearLegend"><span><i />완독</span><span><i />하차</span></footer>
       </section>
-      <div className="statsSummary spendingSummary">
-        <div><small>총 실구매액</small><strong>{won(paid)}</strong></div>
-        <div><small>절약한 금액</small><strong>{won(Math.max(0, list - paid))}</strong></div>
-      </div>
-      <div className="statsSplit">
-        <StatSection title="BY GENRE" subtitle="장르별 권수와 지출" items={genres} />
-        <StatSection title="BY PLATFORM" subtitle="플랫폼별 지출" items={platforms} />
-      </div>
+      <section className="statsSection genreStatsSection">
+        <header><span>BY GENRE</span><small>책바구니를 제외한 작품 분포</small></header>
+        <div className="genreStatusFilters" aria-label="장르 통계 독서 상태">
+          {["", "읽기 전", "읽는 중", "완독", "하차"].map(status => <button type="button" className={genreStatus === status ? "on" : ""} key={status || "all"} onClick={() => setGenreStatus(status)}>{status || "전체"}</button>)}
+        </div>
+        <div className="genreStatRows">
+          {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><i><em style={{ width: `${(item.books.length / largestGenreCount) * 100}%` }} /></i><strong>{item.books.length}<small>작품</small></strong></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
+        </div>
+      </section>
+      <section className="statsSection spendingSection">
+        <header><span>SPENDING</span><small>나의 전체 구매 기록</small></header>
+        <div className="statsSummary spendingSummary">
+          <div><small>총 실구매액</small><strong>{won(paid)}</strong></div>
+          <div><small>절약한 금액</small><strong>{won(Math.max(0, list - paid))}</strong></div>
+        </div>
+      </section>
       <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
       {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><label className="purchaseYearSelect"><span>연도 선택</span><select aria-label="구매 로그 연도 선택" value={activePurchaseYear} onChange={(event) => setPurchaseYear(event.target.value)}>{purchaseYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
         const month = String(index + 1).padStart(2, "0");
