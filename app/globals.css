@@ -428,6 +428,7 @@
 .statsSummary.spendingSummary>div:nth-child(2){border-right:0}
 .statsSummary.spendingSummary>div:nth-child(-n+2){border-bottom:0}
 .statsPage .profileStatsHeader{border-bottom:0}
+.statsPage{background:#fff}
 .statsPage .genreStatsSection>header{align-items:center;border-bottom:0}
 .genreStatsBody{overflow:hidden;border-top:1px solid #ecece8;border-bottom:1px solid #ecece8}
 .genreStatusFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#faf9f8}
