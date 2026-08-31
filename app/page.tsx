@@ -2187,11 +2187,16 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
       </section>
       <section className="statsSection genreStatsSection">
         <header><span>BY GENRE</span><small>책바구니를 제외한 작품 분포</small></header>
-        <div className="genreStatusFilters" aria-label="장르 통계 독서 상태">
-          {["", "읽기 전", "읽는 중", "완독", "하차"].map(status => <button type="button" className={genreStatus === status ? "on" : ""} key={status || "all"} onClick={() => setGenreStatus(status)}>{status || "전체"}</button>)}
-        </div>
-        <div className="genreStatRows">
-          {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><i><em style={{ width: `${(item.books.length / largestGenreCount) * 100}%` }} /></i><strong>{item.books.length}<small>작품</small></strong></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
+        <div className="genreStatsBody">
+          <div className="genreStatusFilters" aria-label="장르 통계 독서 상태">
+            {["", "읽기 전", "읽는 중", "완독", "하차"].map(status => {
+              const count = books.filter(book => book.status !== "책바구니" && (!status || book.status === status)).length;
+              return <button type="button" className={genreStatus === status ? "on" : ""} key={status || "all"} onClick={() => setGenreStatus(status)}><span>{status || "전체"}</span><small>{count}</small></button>;
+            })}
+          </div>
+          <div className="genreStatRows">
+            {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><span>{String(index + 1).padStart(2, "0")}</span><b>{item.name}</b><i><em style={{ width: `${(item.books.length / largestGenreCount) * 100}%` }} /></i><strong>{item.books.length}<small>작품</small></strong></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
+          </div>
         </div>
       </section>
       <section className="statsSection spendingSection">

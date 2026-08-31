@@ -420,21 +420,23 @@
 .statsSummary.spendingSummary>div:nth-child(-n+2){border-bottom:0}
 .statsPage .profileStatsHeader{border-bottom:0}
 .statsPage .genreStatsSection>header{align-items:center;border-bottom:0}
-.genreStatusFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:0 3px 14px}
-.genreStatusFilters>button{min-width:0;min-height:62px;padding:8px 3px;border:0;border-top:2px solid #aaa9a4;border-right:1px solid #ecece8;border-bottom:1px solid #ecece8;background:transparent;color:#777772;font-size:8.5px;font-weight:700;text-align:center;cursor:pointer}
-.genreStatusFilters>button:nth-child(1){border-top-color:#a6a6a1}
-.genreStatusFilters>button:nth-child(2){border-top-color:#93ad8a}
-.genreStatusFilters>button:nth-child(3){border-top-color:#d8ac46}
-.genreStatusFilters>button:nth-child(4){border-top-color:#7f9fc0}
-.genreStatusFilters>button:nth-child(5){border-top-color:#c9828a;border-right:0}
-.genreStatusFilters>button:hover,.genreStatusFilters>button:focus-visible{background:#fafaf8;outline:0}
-.genreStatusFilters>button.on{background:#faf6f7;color:#a4687e}
-.genreStatusFilters>button:nth-child(2).on{background:#f4f7f2;color:#718869}
-.genreStatusFilters>button:nth-child(3).on{background:#fbf8ef;color:#af8229}
-.genreStatusFilters>button:nth-child(4).on{background:#f2f6f9;color:#6484a7}
-.genreStatusFilters>button:nth-child(5).on{background:#faf2f3;color:#ae6971}
-.genreStatRows{border-top:1px solid #ecece8}
+.genreStatsBody{overflow:hidden;border-top:1px solid #ecece8;border-bottom:1px solid #ecece8}
+.genreStatusFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#faf9f8}
+.genreStatusFilters>button{position:relative;min-width:0;height:43px;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 3px;border:0;border-right:1px solid #efedeb;border-bottom:1px solid #e8e5e2;background:transparent;color:#99948f;cursor:pointer}
+.genreStatusFilters>button:last-child{border-right:0}
+.genreStatusFilters>button:after{content:'';position:absolute;right:18%;bottom:-1px;left:18%;height:2px;border-radius:2px;background:transparent}
+.genreStatusFilters>button>span{font-size:8px;font-weight:700;white-space:nowrap}
+.genreStatusFilters>button>small{min-width:15px;color:#bbb5b0;font:700 7px 'Courier New',monospace}
+.genreStatusFilters>button:hover,.genreStatusFilters>button:focus-visible{background:#f7f5f3;outline:0}
+.genreStatusFilters>button.on{background:#fff;color:#625e5a}
+.genreStatusFilters>button.on>small{color:#8e8883}
+.genreStatusFilters>button:nth-child(1).on:after{background:#a6a6a1}
+.genreStatusFilters>button:nth-child(2).on:after{background:#93ad8a}
+.genreStatusFilters>button:nth-child(3).on:after{background:#d8ac46}
+.genreStatusFilters>button:nth-child(4).on:after{background:#7f9fc0}
+.genreStatusFilters>button:nth-child(5).on:after{background:#c9828a}
 .genreStatRows>button{width:100%;min-height:59px;display:grid;grid-template-columns:26px minmax(90px,1fr) minmax(100px,2fr) 58px;align-items:center;gap:10px;padding:0 3px;border:0;border-bottom:1px solid #f0f0ed;background:transparent;text-align:left;cursor:pointer}
+.genreStatRows>button:last-child{border-bottom:0}
 .genreStatRows>button:hover,.genreStatRows>button:focus-visible{background:#fafaf8;outline:0}
 .genreStatRows>button>span{width:19px;height:19px;display:grid;place-items:center;border-radius:50%;background:#f8edf1;color:#bd8197;font:700 7px 'Courier New',monospace}
 .genreStatRows>button>b{overflow:hidden;color:#5b5b56;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
@@ -456,6 +458,7 @@
   .statsSummary.spendingSummary{grid-template-columns:repeat(2,1fr);margin-top:28px}
   .spendingSection .spendingSummary{margin-top:0}
   .genreStatRows>button{grid-template-columns:23px minmax(72px,1fr) minmax(70px,1.35fr) 50px;gap:7px}
-  .genreStatusFilters{padding-bottom:10px}
-  .genreStatusFilters>button{min-height:54px;padding:7px 2px;font-size:7px}
+  .genreStatusFilters>button{height:40px;gap:3px;padding:0 2px}
+  .genreStatusFilters>button>span{font-size:7px}
+  .genreStatusFilters>button>small{min-width:11px;font-size:6px}
 }
