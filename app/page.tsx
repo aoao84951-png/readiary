@@ -2844,7 +2844,6 @@ export default function FeedPage() {
       ) : view === "grid" ? (
         <>
         <section className="collectionIndex" aria-label="모아보기 필터">
-          <header><span>BY GENRE</span></header>
           <nav className="collectionGenres" aria-label="장르 선택">
             {[
               ["", "00", "전체", "all"],
@@ -2876,7 +2875,7 @@ export default function FeedPage() {
                   key={value || "all"}
                   onClick={() => setStatusFilters(value ? [value] : [])}
                 >
-                  <span>{label}</span><small>{count}</small>
+                  <i aria-hidden="true" /><span>{label}</span><small>{count}</small>
                 </button>
               );
             })}
@@ -2897,7 +2896,7 @@ export default function FeedPage() {
                 </span>
                 <span className="collectionBookInfo"><b>{book.title}</b><small>{book.author || "저자 미상"}</small></span>
                 <span className="collectionBookRating">
-                  <ClassicRating rating={book.rating} />
+                  <Rating rating={book.rating} />
                 </span>
               </button>
             );
