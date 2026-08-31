@@ -2097,6 +2097,7 @@ function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange,
 }
 
 function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; profileImage: string; onProfileImage: (file?: File) => void }) {
+  const [statsTab, setStatsTab] = useState<"reading" | "taste" | "spending">("reading");
   const [purchaseYear, setPurchaseYear] = useState("");
   const [readingYear, setReadingYear] = useState("");
   const [genreStatus, setGenreStatus] = useState("");
@@ -2174,6 +2175,12 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         </div>
         <div className="profileReadingBio"><b>나의 독서 통계</b><span>books, notes &amp; little memories</span></div>
       </header>
+      <nav className="statsCategoryTabs" role="tablist" aria-label="통계 분야">
+        <button type="button" role="tab" aria-selected={statsTab === "reading"} className={statsTab === "reading" ? "on" : ""} onClick={() => setStatsTab("reading")}>독서</button>
+        <button type="button" role="tab" aria-selected={statsTab === "taste"} className={statsTab === "taste" ? "on" : ""} onClick={() => setStatsTab("taste")}>취향</button>
+        <button type="button" role="tab" aria-selected={statsTab === "spending"} className={statsTab === "spending" ? "on" : ""} onClick={() => setStatsTab("spending")}>소비</button>
+      </nav>
+      {statsTab === "reading" && <div className="statsTabPanel" role="tabpanel">
       <section className="statsSection readingYearSection">
         <header><span>MY READING YEAR</span><label className="purchaseYearSelect"><span>독서 연도 선택</span><select aria-label="독서 통계 연도 선택" value={activeReadingYear} onChange={(event) => setReadingYear(event.target.value)}>{readingYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header>
         <div className="readingYearTotals">
@@ -2185,6 +2192,9 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         </div>
         <footer className="readingYearLegend"><span><i />완독</span><span><i />하차</span></footer>
       </section>
+      <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
+      </div>}
+      {statsTab === "taste" && <div className="statsTabPanel" role="tabpanel">
       <section className="statsSection genreStatsSection">
         <header><span>BY GENRE</span><small>책바구니를 제외한 작품 분포</small></header>
         <div className="genreStatsBody">
@@ -2199,6 +2209,8 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
           </div>
         </div>
       </section>
+      </div>}
+      {statsTab === "spending" && <div className="statsTabPanel" role="tabpanel">
       <section className="statsSection spendingSection">
         <header><span>SPENDING</span><small>나의 전체 구매 기록</small></header>
         <div className="statsSummary spendingSummary">
@@ -2206,7 +2218,6 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
           <div><small>절약한 금액</small><strong>{won(Math.max(0, list - paid))}</strong></div>
         </div>
       </section>
-      <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
       {months.length > 0 && <section className="statsSection purchaseLog"><header><span>PURCHASE LOG</span><label className="purchaseYearSelect"><span>연도 선택</span><select aria-label="구매 로그 연도 선택" value={activePurchaseYear} onChange={(event) => setPurchaseYear(event.target.value)}>{purchaseYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header><div className="purchaseMonths">{Array.from({ length: 12 }, (_, index) => {
         const month = String(index + 1).padStart(2, "0");
         const item = months.find(value => value.name === `${activePurchaseYear}-${month}`);
@@ -2214,6 +2225,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         const monthBooks = [...new Map(purchaseEntries.filter(entry => entry.date.startsWith(purchaseMonth)).map(entry => [entry.book.id, entry.book])).values()];
         return <button type="button" className={item ? "hasPurchase" : ""} key={month} onClick={() => setListModal({ title: `${activePurchaseYear}년 ${Number(month)}월`, subtitle: item ? `${item.volumes}권 · ${item.works}작품 구매` : "구매 기록 없음", books: monthBooks, mode: "purchase", purchaseMonth })}><span>{month}</span><strong>{item ? won(item.paid) : "–"}</strong><small>{item ? `${item.volumes}권 · ${item.works}작품` : "기록 없음"}</small></button>;
       })}</div></section>}
+      </div>}
       {listModal && <StatsListModal {...listModal} onClose={() => setListModal(null)} />}
     </section>
   );
