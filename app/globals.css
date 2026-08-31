@@ -539,3 +539,4 @@
 .filterToggle i{background:#9b82c1}.filterOptions button.on i{border-color:#9b82c1;background:#9b82c1;box-shadow:0 0 0 3px #f0ebf7}
 @media(max-width:520px){.statsPage{background:#fff}}
 .hallHero>small{color:#8f74b5}.hallHero h1::after{background:rgba(187,166,220,.4)}.hallHero>span{color:#ffc83d}.hallEmpty{color:#ffc83d}.hallBook>i{color:#8f74b5}
+.reviewNotes.liked .reviewLabel{color:#9278b8}

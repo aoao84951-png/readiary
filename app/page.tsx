@@ -1349,7 +1349,7 @@ function Notes({
       </span>
       {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
-          <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
+          <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-lavender.gif" : "/note-heart-blue.gif"} alt="" /></span>
           <p><FormattedNote value={note} /></p>
         </div>
       ))}
@@ -1531,7 +1531,7 @@ function NoteEditor({ label, notes, kind, onChange }: { label: string; notes: st
         <div className="savedNoteList">
           {notes.map((note, index) => note.trim() && (
             <div className={`savedNote ${editingIndex === index ? "editing" : ""}`} key={index}>
-              <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
+              <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-lavender.gif" : "/note-heart-blue.gif"} alt="" /></span>
               {editingIndex === index ? <div className="savedNoteEdit">
                 <RichNoteTextarea ariaLabel={`${label} ${index + 1} 수정`} value={editingDraft} onChange={setEditingDraft} />
                 <span><button type="button" onClick={cancelEditing}>취소</button><button type="button" disabled={!editingDraft.trim()} onClick={saveEditing}>수정 완료</button></span>
