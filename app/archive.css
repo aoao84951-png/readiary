@@ -2904,17 +2904,3 @@ html { scrollbar-gutter: stable; }
     font-size: var(--mobile-property-value-size);
   }
 }
-
-/* Lavender signature theme. Keep semantic status and genre colors intact. */
-.compactTopBar .topMenuToggle > i{background:#9b82c1}
-.topToolMenu button.selected{background:#f3eef9;color:#8067a6}.topToolMenu button small{background:#eee8f7;color:#8b73b0}
-.recordModeSwitch button.on{color:#9177b7}.recordModeSwitch button.on::after{background:#ad98cf}
-.bottomDock>button.active{color:#967bc0}
-.bottomDock .dockAdd{background:#eee7f7;box-shadow:0 6px 16px rgba(128,101,169,.18);color:#8068a8}
-.dockProfileRing{background:conic-gradient(from 205deg,#ddd2f1,#c7b4e5 20%,#aa91d2 43%,#8e75bd 66%,#9eb5dc 84%,#ddd2f1)}
-.profileImagePicker>span{background:conic-gradient(from 205deg,#ddd2f1,#c7b4e5 20%,#aa91d2 43%,#8e75bd 66%,#9eb5dc 84%,#ddd2f1)}
-.profileImagePicker>b{background:#9a83c2}.profileReadingBio span{color:#9278b8}
-.imageShareButton,.recordModalHead .modalHeadActions .imageShareButton{background:#f1ecf8;color:#866dac}
-.wizardProgress button.active i{background:#eee7f7;color:#826aa9}.wizardProgress button.active b{color:#826aa9}
-.draftResumeDialog>small{color:#9278b8}.advancedSearchToggle.open{color:#866dac}.advancedSearchFields select:focus{border-bottom-color:#b6a2d2}
-.multiOptionRow.selected .multiOptionToggle i{border-color:#9a83c2;background:#9a83c2}.recordForm .multiOptionMenu>label input{accent-color:#9279b7}
