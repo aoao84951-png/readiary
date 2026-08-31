@@ -2204,8 +2204,8 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
               return <button type="button" className={genreStatus === status ? "on" : ""} key={status || "all"} onClick={() => setGenreStatus(status)}><span>{status || "전체"}</span><small>{count}</small></button>;
             })}
           </div>
-          <div className="genreSealGrid">
-            {genreGroups.length ? genreGroups.map((item, index) => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><small>GENRE {String(index + 1).padStart(2, "0")}</small><span className="genreSealMark">{genreSeal(item.name) ? <img src={genreSeal(item.name)} alt="" /> : <i>{item.name.slice(0, 1)}</i>}</span><b>{item.name}</b><strong>{item.books.length}<em>작품</em></strong><span className="genreSealOpen">목록 보기 <i>↗</i></span></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
+          <div className="genreSealList">
+            {genreGroups.length ? genreGroups.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${genreStatus || "전체 상태"} · ${item.books.length}작품`, books: item.books, mode: "genre" })}><span className="genreSealIcon">{genreSeal(item.name) ? <img src={genreSeal(item.name)} alt="" /> : <i>{item.name.slice(0, 1)}</i>}</span><b>{item.name}</b><strong><i aria-hidden="true" />{item.books.length}<em>작품</em></strong></button>) : <p>해당 상태의 작품이 아직 없어요.</p>}
           </div>
         </div>
       </section>
