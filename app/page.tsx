@@ -2843,7 +2843,7 @@ export default function FeedPage() {
         <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
       ) : view === "grid" ? (
         <>
-        {(categoryFilters.length > 0 || statusFilters.length > 0) && <div className="collectionResult"><span>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체 장르"} · {statusFilters.length ? statusFilters.join(" · ") : "전체 상태"}</span><b>{visible.length}</b> 작품</div>}
+        <div className="collectionResult"><span>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체"} · {statusFilters.length ? statusFilters.join(" · ") : "전체"}</span><b>{visible.length}</b> 작품</div>
         <section className="bookGrid collectionGrid">
           {visible.map((book, index) => {
             return (
