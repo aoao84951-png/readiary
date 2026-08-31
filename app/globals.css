@@ -4,7 +4,8 @@
 @media(max-width:520px){.viewTabs{gap:2px}.viewTabs button{width:54px}.viewTabs button span{display:none}.bookGrid{gap:1.5px;padding:1.5px}.gridRating{right:5px;bottom:5px;padding:3px 5px 3px 4px}.post{padding-top:16px}.feedCover{border-radius:13px}.addDrawer{width:100%}.recordDetails dl{grid-template-columns:1fr}.calendarPage{padding:10px 5px 36px}.calendarGrid{gap:3px;padding-top:3px}.calendarDay{aspect-ratio:2/3;height:auto}.calendarCover{inset:1px;width:calc(100% - 2px)}.calendarRating{right:2px;bottom:2px;padding:1px 3px}.calendarRating .classicRating svg{width:8px;height:8px}.calendarRating .classicRating b{font-size:6px}.calendarCount{top:2px;right:2px}.dayNumber{top:2px;left:2px;font-size:7px;line-height:11px}}
 
 /* Editorial collection index and compact four-column shelf. */
-.collectionIndex{width:100%;margin:0 auto;background:#fff}
+.collectionIndex{position:sticky;z-index:19;top:43px;width:100%;margin:0 auto;background:rgba(255,255,255,.96);box-shadow:0 5px 12px rgba(54,48,44,.035);backdrop-filter:blur(12px)}
+.feedPage:has(>.searchBar) .collectionIndex{top:85px}
 .collectionGenres{height:48px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
 .collectionGenres>button{position:relative;min-width:0;display:grid;place-content:center;gap:3px;padding:0 3px;border:0;border-right:1px solid #f2efed;background:#fff;color:#a09b97;text-align:center;cursor:pointer}
 .collectionGenres>button:last-child{border-right:0}.collectionGenres>button small{color:currentColor;font:italic 6px Georgia,serif;opacity:.65}.collectionGenres>button span{overflow:hidden;font-size:8.5px;font-weight:720;text-overflow:ellipsis;white-space:nowrap}
