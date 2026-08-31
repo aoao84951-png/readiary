@@ -2144,6 +2144,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
   const yearlyFinishedBooks = finishedBooks.filter(book => book.finished_date?.startsWith(activeReadingYear));
   const yearlyCompleted = yearlyFinishedBooks.filter(book => book.status === "완독");
   const yearlyDropped = yearlyFinishedBooks.filter(book => book.status === "하차");
+  const currentYearCompleted = finishedBooks.filter(book => book.status === "완독" && book.finished_date?.startsWith(currentYear)).length;
   const readingMonths = Array.from({ length: 12 }, (_, index) => {
     const month = String(index + 1).padStart(2, "0");
     const monthBooks = yearlyFinishedBooks.filter(book => book.finished_date?.startsWith(`${activeReadingYear}-${month}`));
@@ -2163,8 +2164,9 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
           <b><Plus size={12} strokeWidth={1.7} /></b>
           <input type="file" accept="image/*" onChange={(event) => { onProfileImage(event.target.files?.[0]); event.target.value = ""; }} />
         </label>
-        <div className="profileNumbers profileNumbersCompact">
+        <div className="profileNumbers">
           <div><strong>{books.length}</strong><small>작품</small></div>
+          <div><strong>{currentYearCompleted}</strong><small>올해 완독</small></div>
           <div><strong>{averageRatingDisplay}</strong><small>평균 평점</small></div>
         </div>
         <div className="profileReadingBio"><b>나의 독서 통계</b><span>books, notes &amp; little memories</span></div>
