@@ -2181,6 +2181,7 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         <button type="button" role="tab" aria-selected={statsTab === "spending"} className={statsTab === "spending" ? "on" : ""} onClick={() => setStatsTab("spending")}>소비</button>
       </nav>
       {statsTab === "reading" && <div className="statsTabPanel" role="tabpanel">
+      <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
       <section className="statsSection readingYearSection">
         <header><span>MY READING YEAR</span><label className="purchaseYearSelect"><span>독서 연도 선택</span><select aria-label="독서 통계 연도 선택" value={activeReadingYear} onChange={(event) => setReadingYear(event.target.value)}>{readingYears.map(year => <option key={year} value={year}>{year}</option>)}</select></label></header>
         <div className="readingYearTotals">
@@ -2192,7 +2193,6 @@ function StatsView({ books, profileImage, onProfileImage }: { books: Book[]; pro
         </div>
         <footer className="readingYearLegend"><span><i />완독</span><span><i />하차</span></footer>
       </section>
-      <section className="statsSection"><header><span>READING STATUS</span><small>현재 독서 상태</small></header><div className="statusStats">{statuses.map(item => <button type="button" key={item.name} onClick={() => setListModal({ title: item.name, subtitle: `${item.works}작품`, books: books.filter(book => book.status === item.name), mode: "status" })}><small>{item.name}</small><b>{item.works}</b><i>작품</i></button>)}</div></section>
       </div>}
       {statsTab === "taste" && <div className="statsTabPanel" role="tabpanel">
       <section className="statsSection genreStatsSection">
