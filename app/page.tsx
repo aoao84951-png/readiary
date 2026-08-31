@@ -2282,6 +2282,7 @@ export default function FeedPage() {
   const [query, setQuery] = useState("");
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+  const [collectionQuickFilter, setCollectionQuickFilter] = useState<"genre" | "status" | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("created");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [loading, setLoading] = useState(true);
@@ -2728,6 +2729,7 @@ export default function FeedPage() {
     setSearchOpen(false);
     setFilterOpen(false);
     setTopMenuOpen(false);
+    setCollectionQuickFilter(null);
   }
   function beginSwipe(event: TouchEvent<HTMLElement>) {
     const target = event.target as HTMLElement;
@@ -2843,7 +2845,30 @@ export default function FeedPage() {
         <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
       ) : view === "grid" ? (
         <>
-        <div className="collectionResult"><span>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체"} · {statusFilters.length ? statusFilters.join(" · ") : "전체"}</span><b>{visible.length}</b> 작품</div>
+        <div className={`collectionResult ${collectionQuickFilter ? "open" : ""}`}>
+          <span className="collectionFilterSummary">
+            <button type="button" onClick={() => setCollectionQuickFilter(current => current === "genre" ? null : "genre")}>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체"}</button>
+            <i>·</i>
+            <button type="button" onClick={() => setCollectionQuickFilter(current => current === "status" ? null : "status")}>{statusFilters.length ? statusFilters.join(" · ") : "전체"}</button>
+          </span>
+          <b>{visible.length}</b> 작품
+          {collectionQuickFilter && <>
+            <button type="button" className="collectionQuickBackdrop" aria-label="빠른 필터 닫기" onClick={() => setCollectionQuickFilter(null)} />
+            <nav className={`collectionQuickPicker ${collectionQuickFilter}`} aria-label={collectionQuickFilter === "genre" ? "장르 빠른 선택" : "상태 빠른 선택"}>
+              {(collectionQuickFilter === "genre"
+                ? [["", "전체"], ["BL", "BL"], ["로맨스", "로맨스"], ["로맨스판타지", "로맨스판타지"], ["문학", "일반문학"], ["기타", "기타"]]
+                : [["", "전체"], ["책바구니", "책바구니"], ["읽기 전", "읽기 전"], ["읽는 중", "읽는 중"], ["완독", "완독"], ["하차", "하차"]]
+              ).map(([value, label]) => {
+                const selected = collectionQuickFilter === "genre" ? (value ? categoryFilters.includes(value) : categoryFilters.length === 0) : (value ? statusFilters.includes(value) : statusFilters.length === 0);
+                return <button type="button" className={selected ? "on" : ""} key={value || "all"} onClick={() => {
+                  if (collectionQuickFilter === "genre") setCategoryFilters(value ? [value] : []);
+                  else setStatusFilters(value ? [value] : []);
+                  setCollectionQuickFilter(null);
+                }}><i />{label}</button>;
+              })}
+            </nav>
+          </>}
+        </div>
         <section className="bookGrid collectionGrid">
           {visible.map((book, index) => {
             return (
