@@ -1564,6 +1564,34 @@ function Cover({ book }: { book: Book }) {
   );
 }
 
+function FeedArtwork({ book }: { book: Book }) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof IntersectionObserver === "undefined") {
+      setActive(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => setActive(entry.isIntersecting), { rootMargin: "1200px 0px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <span className="feedArtwork" ref={ref}>
+      {active && <>
+        {book.cover_url && <img className="coverBackdrop" src={book.cover_url} alt="" loading="lazy" decoding="async" />}
+        <span className="coverWash" />
+        <span className="coverMain">
+          {book.cover_url
+            ? <img className="frontCover" src={book.cover_url} alt="" loading="lazy" decoding="async" />
+            : <Cover book={book} />}
+        </span>
+      </>}
+    </span>
+  );
+}
+
 function RecordArchive({ books }: { books: Book[] }) {
   return (
     <section className="archiveList">
@@ -2321,7 +2349,8 @@ export default function FeedPage() {
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const [feedCoverBook, setFeedCoverBook] = useState<Book | null>(null);
   const [resumeDraft, setResumeDraft] = useState<{ form: BookRecord; step: "book" | "reading" | "purchase" | "notes"; readingDate: string } | null>(null);
-  const scrollRef = useRef(0);
+  const sectionScrollRef = useRef<Record<"grid" | "feed" | "record" | "stats", number>>({ grid: 0, feed: 0, record: 0, stats: 0 });
+  const scrollRestoreFrameRef = useRef<number | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
   const coverScrollRef = useRef(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -2432,14 +2461,28 @@ export default function FeedPage() {
         document.getElementById(pending)?.scrollIntoView({ block: "start" }),
       );
   }, [view, pending]);
+  useEffect(() => () => {
+    if (scrollRestoreFrameRef.current !== null) window.cancelAnimationFrame(scrollRestoreFrameRef.current);
+  }, []);
+  function restoreSectionScroll(section: "grid" | "feed" | "record" | "stats") {
+    if (scrollRestoreFrameRef.current !== null) window.cancelAnimationFrame(scrollRestoreFrameRef.current);
+    scrollRestoreFrameRef.current = window.requestAnimationFrame(() => {
+      scrollRestoreFrameRef.current = window.requestAnimationFrame(() => {
+        window.scrollTo(0, sectionScrollRef.current[section]);
+        scrollRestoreFrameRef.current = null;
+      });
+    });
+  }
   function openPost(book: Book, index: number) {
-    scrollRef.current = window.scrollY;
+    sectionScrollRef.current[currentSection as "grid" | "feed" | "record" | "stats"] = window.scrollY;
     setPending(`post-${book.id || index}`);
     setView("feed");
   }
   function showGrid() {
+    sectionScrollRef.current[currentSection as "grid" | "feed" | "record" | "stats"] = window.scrollY;
+    setPending(null);
     setView("grid");
-    requestAnimationFrame(() => window.scrollTo(0, scrollRef.current));
+    restoreSectionScroll("grid");
   }
   function openAdd() {
     setPurchaseOnlyEdit(false);
@@ -2744,15 +2787,16 @@ export default function FeedPage() {
     setView(next);
   }
   function navigateSection(section: "grid" | "feed" | "record" | "stats") {
+    sectionScrollRef.current[currentSection as "grid" | "feed" | "record" | "stats"] = window.scrollY;
     if (section === "grid") showGrid();
     else if (section === "record") setView(recordView);
     else {
       if (section === "feed") {
-        scrollRef.current = window.scrollY;
         setPending(null);
       }
       setView(section);
     }
+    if (section !== "grid") restoreSectionScroll(section);
     setSearchOpen(false);
     setFilterOpen(false);
     setTopMenuOpen(false);
@@ -2941,7 +2985,7 @@ export default function FeedPage() {
                 <span className="identity">
                   <button type="button" className="profileCover" disabled={!book.cover_url} onClick={() => setFeedCoverBook(book)} aria-label={book.cover_url ? `${book.title} 표지 전체보기` : undefined}>
                     {book.cover_url ? (
-                      <img src={book.cover_url} alt="" />
+                      <img src={book.cover_url} alt="" loading="lazy" decoding="async" />
                     ) : (
                       <span>📖</span>
                     )}
@@ -2952,22 +2996,7 @@ export default function FeedPage() {
                 <span className="postHeadTools"><ImageShareButton key={book.id} compact filename={`readiary-${book.title}-feed`} targetId={`post-${book.id || index}`} bookId={book.id} /><span className="postNumber">{String(index + 1).padStart(2, "0")}</span></span>
               </header>
               <button className="feedCover" onClick={() => setDetailBook(book)} aria-label={`${book.title} 상세 기록 열기`}>
-                {book.cover_url && (
-                  <img className="coverBackdrop" src={book.cover_url} alt="" />
-                )}
-                <span className="coverWash" />
-                <div className="coverMain">
-                  {book.cover_url ? (
-                    <div
-                      className="frontCover"
-                      style={{
-                        backgroundImage: `url("${book.cover_url.replace(/"/g, "%22")}")`,
-                      }}
-                    />
-                  ) : (
-                    <Cover book={book} />
-                  )}
-                </div>
+                <FeedArtwork book={book} />
               </button>
               <div className="postBody">
                 <div className="summary">
