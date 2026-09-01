@@ -45,7 +45,7 @@
 }
 .starUnit {
   position: relative;
-  width: 1em;
+  width: 0.92em;
   height: 1em;
   display: inline-block;
   font-size: 15px;
@@ -65,7 +65,7 @@
   left: 0;
   width: 1em;
   height: 1em;
-  display: block;
+  display: none;
   overflow: visible;
 }
 .starEmpty path {
@@ -76,7 +76,7 @@
   stroke-linejoin: round;
 }
 .starEmpty {
-  color: #9db3c6;
+  color: #e3e3df;
 }
 .starFill {
   overflow: hidden;
@@ -89,6 +89,19 @@
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+.feedPage.fontSummer .starUnit {
+  width: 1em;
+}
+.feedPage.fontSummer .starCharacter {
+  display: none;
+}
+.feedPage.fontSummer .starEmpty svg,
+.feedPage.fontSummer .starFill svg {
+  display: block;
+}
+.feedPage.fontSummer .starEmpty {
+  color: #9db3c6;
 }
 .gridRating .starUnit {
   font-size: 10px;
@@ -128,6 +141,9 @@
   border-color: #aaa;
 }
 .ratingControl:focus-within .starEmpty {
+  color: #d6d6d0;
+}
+.feedPage.fontSummer .ratingControl:focus-within .starEmpty {
   color: #8ea7bc;
 }
 @media (max-width: 520px) {
