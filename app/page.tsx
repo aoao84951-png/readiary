@@ -2293,6 +2293,7 @@ export default function FeedPage() {
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [collectionQuickFilter, setCollectionQuickFilter] = useState<"genre" | "status" | null>(null);
   const [fontMode, setFontMode] = useState<"default" | "summer">("default");
+  const [fontScale, setFontScale] = useState(100);
   const [sortMode, setSortMode] = useState<SortMode>("created");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [loading, setLoading] = useState(true);
@@ -2362,6 +2363,8 @@ export default function FeedPage() {
     const savedDirection = window.localStorage.getItem("readiary-sort-direction");
     if (savedDirection === "desc" || savedDirection === "asc") setSortDirection(savedDirection);
     if (window.localStorage.getItem("readiary-font-mode") === "summer") setFontMode("summer");
+    const savedFontScale = Number(window.localStorage.getItem("readiary-font-scale"));
+    if ([90, 95, 100, 105, 110, 115].includes(savedFontScale)) setFontScale(savedFontScale);
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; purchase_methods_customized?: boolean; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions(data.purchase_methods_customized ? (data.purchase_methods || []) : [...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
@@ -2370,6 +2373,10 @@ export default function FeedPage() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
+  useEffect(() => {
+    document.documentElement.style.setProperty("--font-scale", String(fontScale / 100));
+    window.localStorage.setItem("readiary-font-scale", String(fontScale));
+  }, [fontScale]);
   useEffect(() => {
     if (loading) return;
     void writeCachedBooks(books).catch(() => undefined);
@@ -2415,6 +2422,9 @@ export default function FeedPage() {
     setFontMode(next);
     window.localStorage.setItem("readiary-font-mode", next);
     setTopMenuOpen(false);
+  }
+  function adjustFontScale(direction: -1 | 1) {
+    setFontScale((current) => Math.min(115, Math.max(90, current + direction * 5)));
   }
   useEffect(() => {
     if (view === "feed" && pending)
@@ -2797,6 +2807,15 @@ export default function FeedPage() {
           <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
           <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
           <button onClick={toggleFontMode}><Type size={14} /><span>글꼴</span><small>{fontMode === "summer" ? "여름소리" : "기본"}</small></button>
+          <div className="fontSizeControl">
+            <Type size={14} />
+            <span>글자 크기</span>
+            <span className="fontSizeStepper">
+              <button type="button" onClick={() => adjustFontScale(-1)} disabled={fontScale <= 90} aria-label="글자 크기 줄이기">−</button>
+              <b>{fontScale}</b>
+              <button type="button" onClick={() => adjustFontScale(1)} disabled={fontScale >= 115} aria-label="글자 크기 키우기">+</button>
+            </span>
+          </div>
           <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
         </div>}
       </header>

@@ -11,17 +11,17 @@
 }
 .classicRating b {
   color: #5d5d58;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
   font-weight: 800;
 }
 .classicRating b.empty {
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   font-weight: 600;
 }
 .classicRating small {
   margin-left: -2px;
   color: #aaa9a4;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-weight: 650;
 }
 .gridRating .classicRating {
@@ -32,10 +32,10 @@
   height: 14px;
 }
 .gridRating .classicRating b {
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .gridRating .classicRating small {
-  font-size: 7px;
+  font-size:calc(7px * var(--font-scale, 1));
 }
 .starScale {
   display: inline-flex;
@@ -48,7 +48,7 @@
   width: 0.92em;
   height: 1em;
   display: inline-block;
-  font-size: 15px;
+  font-size:calc(15px * var(--font-scale, 1));
   line-height: 1;
 }
 .starEmpty,
@@ -117,11 +117,11 @@
   stroke: none;
 }
 .gridRating .starUnit {
-  font-size: 10px;
+  font-size:calc(10px * var(--font-scale, 1));
 }
 .recordHighlights .starUnit,
 .recordRow .starUnit {
-  font-size: 12px;
+  font-size:calc(12px * var(--font-scale, 1));
 }
 .ratingControl {
   position: relative;
@@ -139,7 +139,7 @@
   gap: 4px;
 }
 .ratingControl .starUnit {
-  font-size: 22px;
+  font-size:calc(22px * var(--font-scale, 1));
 }
 .ratingControl input[type="range"] {
   position: absolute !important;
@@ -164,6 +164,6 @@
     width: 128px;
   }
   .ratingControl .starUnit {
-    font-size: 20px;
+    font-size:calc(20px * var(--font-scale, 1));
   }
 }

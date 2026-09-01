@@ -74,7 +74,7 @@
   letter-spacing: 0.12em;
 }
 .archiveHead b {
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
 }
 .archiveItem {
   border-bottom: 1px solid #e8e8e5;
@@ -110,7 +110,7 @@
   display: block;
   overflow: hidden;
   color: #4d4d49;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,14 +119,14 @@
   display: block;
   margin-top: 4px;
   color: #999;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
 }
 .archiveStatus {
   display: grid;
   justify-items: end;
   gap: 5px;
   color: #7e7e78;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   font-weight: 750;
 }
 .archiveStatus small {
@@ -188,7 +188,7 @@
 }
 .recordHighlights > div > b {
   color: #5d5d58;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
 }
 .recordHighlights .statusHighlight.done > b { color: #6f8fb9; }
 .recordHighlights .statusHighlight.paused > b { color: #c97887; }
@@ -213,13 +213,13 @@
   cursor: pointer;
 }
 .statusQuickButton:disabled { cursor: default; }
-.statusQuickButton b { color: inherit; font-size: 11px; }
+.statusQuickButton b { color: inherit; font-size:calc(11px * var(--font-scale, 1)); }
 .statusHighlight.done .statusQuickButton b { color: #6f8fb9; }
 .statusHighlight.paused .statusQuickButton b { color: #c97887; }
 .statusHighlight.reading .statusQuickButton b { color: #c59b24; }
 .statusHighlight.before .statusQuickButton b { color: #6f9d7e; }
 .statusHighlight.basket .statusQuickButton b { color: #858580; }
-.statusQuickButton small { color: #aaa9a4; font-size: 7px; font-weight: 500; }
+.statusQuickButton small { color: #aaa9a4; font-size:calc(7px * var(--font-scale, 1)); font-weight: 500; }
 .statusQuickEditor {
   width: min(150px, calc(100% - 12px));
   display: grid;
@@ -235,7 +235,7 @@
   border-radius: 7px;
   background: #fff;
   color: #5d5d58;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   font-weight: 600;
   outline: 0;
 }
@@ -255,7 +255,7 @@
   grid-column: 1 / -1;
   max-width: 100%;
   color: #aaa9a4;
-  font-size: 6.5px;
+  font-size:calc(6.5px * var(--font-scale, 1));
   text-align: center;
 }
 .statusHighlight.editing { padding: 5px 0; }
@@ -285,12 +285,12 @@
 }
 .bookFacts small {
   color: #aaa;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
 }
 .bookFacts b {
   overflow: hidden;
   color: #5d5d58;
-  font-size: 9.5px;
+  font-size:calc(9.5px * var(--font-scale, 1));
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -305,19 +305,19 @@
   }
   .bookFacts > div:first-child { padding-left: 0; }
   .bookFacts > div:last-child { padding-right: 0; }
-  .bookFacts b { font-size: 8.5px; }
+  .bookFacts b { font-size:calc(8.5px * var(--font-scale, 1)); }
 }
 
 .recordHighlights small {
   color: #aaa;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
 }
 .recordHighlights .feedRating svg {
   width: 13px;
   height: 13px;
 }
 .recordHighlights .feedRating b {
-  font-size: 10px;
+  font-size:calc(10px * var(--font-scale, 1));
 }
 .recordGroup {
   margin-top: 22px;
@@ -353,12 +353,12 @@
 }
 .recordRow dt {
   color: #aaa;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
 }
 .recordRow dd {
   margin: 0;
   color: #5d5d58;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   font-weight: 650;
   text-align: right;
   word-break: break-all;
@@ -377,7 +377,7 @@
   height: 12px;
 }
 .recordRow .feedRating b {
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .groupProgress {
   position: relative;
@@ -401,17 +401,17 @@
   display: grid;
   gap: 5px;
   color: #6f8fb9;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
   font-weight: 780;
 }
 .groupProgress small {
   color: #999994;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-weight: 650;
 }
 .progressNumber {
   color: #6f8fb9;
-  font-size: 25px;
+  font-size:calc(25px * var(--font-scale, 1));
   font-weight: 760;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -419,7 +419,7 @@
 .progressNumber i {
   margin-left: 2px;
   color: #9b9b96;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-style: normal;
   font-weight: 650;
   letter-spacing: 0;
@@ -479,11 +479,11 @@
   padding-top: 10px;
   border-top: 1px solid #e6e9ec;
   color: #9a9a95;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
 }
 .groupProgress > p b {
   color: #6d6d68;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .groupProgress {
   min-height: 88px;
@@ -498,7 +498,7 @@
   gap: 6px;
 }
 .groupProgress > span b {
-  font-size: 12px;
+  font-size:calc(12px * var(--font-scale, 1));
 }
 .groupProgress > p {
   grid-column: 2;
@@ -511,10 +511,10 @@
 }
 .groupProgress > p span {
   color: #aaa9a4;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
 }
 .groupProgress > p b {
-  font-size: 10px;
+  font-size:calc(10px * var(--font-scale, 1));
 }
 @media (max-width: 520px) {
   .groupProgress {
@@ -522,10 +522,10 @@
     padding: 12px 13px;
   }
   .groupProgress > span b {
-    font-size: 11px;
+    font-size:calc(11px * var(--font-scale, 1));
   }
   .groupProgress > p b {
-    font-size: 9px;
+    font-size:calc(9px * var(--font-scale, 1));
   }
 }
 .priceLine {
@@ -542,15 +542,15 @@
 }
 .priceLine small {
   color: #aaa;
-  font-size: 7px;
+  font-size:calc(7px * var(--font-scale, 1));
 }
 .priceLine s {
   color: #aaa;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
 }
 .priceLine > b {
   color: #5d5d58;
-  font-size: 12px;
+  font-size:calc(12px * var(--font-scale, 1));
 }
 .priceLine em {
   margin-left: auto;
@@ -611,11 +611,11 @@
 }
 .purchaseDetailModal > header > span { display: grid; gap: 4px; }
 .purchaseDetailModal > header small { color: #b99099; font: 7px "Courier New", monospace; letter-spacing: .12em; }
-.purchaseDetailModal > header b { color: #514e4b; font-size: 11px; }
+.purchaseDetailModal > header b { color: #514e4b; font-size:calc(11px * var(--font-scale, 1)); }
 .purchaseDetailModal > header > div { display: flex; align-items: center; gap: 6px; }
 .purchaseDetailModal > header button { height: 31px; border: 0; cursor: pointer; }
 .purchaseDetailAdd { display: flex; align-items: center; gap: 5px; padding: 0 10px; border-radius: 8px; background: #686863; color: #fff; }
-.purchaseDetailAdd span { font-size: 7.5px; font-weight: 750; }
+.purchaseDetailAdd span { font-size:calc(7.5px * var(--font-scale, 1)); font-weight: 750; }
 .purchaseDetailClose { width: 31px; display: grid; place-items: center; padding: 0; border-radius: 50%; background: #f3f2f0; color: #89847f; }
 .purchaseDetailTable { min-height: 0; flex: 1 1 auto; overflow: auto; padding: 0 17px; }
 .purchaseDetailHead,
@@ -626,18 +626,18 @@
   gap: 8px;
   text-align: center;
 }
-.purchaseDetailHead { min-height: 34px; color: #b2aca8; font-size: 6.5px; font-weight: 700; }
+.purchaseDetailHead { min-height: 34px; color: #b2aca8; font-size:calc(6.5px * var(--font-scale, 1)); font-weight: 700; }
 .purchaseDetailRow { min-height: 53px; border-top: 1px solid #f0ecea; }
-.purchaseDetailRow b { color: #5c5855; font-size: 9px; overflow-wrap: anywhere; }
-.purchaseDetailRow span { color: #8e7b75; font-size: 7.5px; white-space: nowrap; }
-.purchaseDetailRow s { color: #aaa39e; font-size: 7.5px; }
-.purchaseDetailRow strong { color: #585451; font-size: 9px; }
-.purchaseDetailRow em { min-width: 0; overflow: hidden; color: #8e7b75; font-size: 7.5px; font-style: normal; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.purchaseDetailRow b { color: #5c5855; font-size:calc(9px * var(--font-scale, 1)); overflow-wrap: anywhere; }
+.purchaseDetailRow span { color: #8e7b75; font-size:calc(7.5px * var(--font-scale, 1)); white-space: nowrap; }
+.purchaseDetailRow s { color: #aaa39e; font-size:calc(7.5px * var(--font-scale, 1)); }
+.purchaseDetailRow strong { color: #585451; font-size:calc(9px * var(--font-scale, 1)); }
+.purchaseDetailRow em { min-width: 0; overflow: hidden; color: #8e7b75; font-size:calc(7.5px * var(--font-scale, 1)); font-style: normal; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
 .purchaseDetailModal > footer { min-height: 58px; flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 28px; padding: 10px 17px; border-top: 1px solid #eeeae8; background: #fbf9f8; }
 .purchaseDetailModal > footer span { display: grid; gap: 3px; text-align: right; }
-.purchaseDetailModal > footer small { color: #aaa39f; font-size: 6.5px; }
-.purchaseDetailModal > footer s { color: #aaa39f; font-size: 8px; }
-.purchaseDetailModal > footer b { color: #575350; font-size: 10px; }
+.purchaseDetailModal > footer small { color: #aaa39f; font-size:calc(6.5px * var(--font-scale, 1)); }
+.purchaseDetailModal > footer s { color: #aaa39f; font-size:calc(8px * var(--font-scale, 1)); }
+.purchaseDetailModal > footer b { color: #575350; font-size:calc(10px * var(--font-scale, 1)); }
 @media (max-width: 520px) {
   .purchaseDetailShade { place-items: center; padding: 14px; }
   .purchaseDetailModal { width: 100%; max-height: calc(100dvh - 28px); border-width: 1px; border-radius: 16px; }
@@ -645,10 +645,10 @@
   .purchaseDetailTable { padding: 0 10px; }
   .purchaseDetailHead,
   .purchaseDetailRow { grid-template-columns: minmax(38px,.65fr) minmax(62px,1fr) minmax(48px,.75fr) minmax(52px,.85fr) minmax(58px,1.15fr); gap: 2px; }
-  .purchaseDetailHead { min-height: 29px; font-size: 5.8px; }
+  .purchaseDetailHead { min-height: 29px; font-size:calc(5.8px * var(--font-scale, 1)); }
   .purchaseDetailRow { min-height: 49px; }
-  .purchaseDetailRow b,.purchaseDetailRow strong { font-size: 8.5px; }
-  .purchaseDetailRow span,.purchaseDetailRow s,.purchaseDetailRow em { font-size: 6.8px; }
+  .purchaseDetailRow b,.purchaseDetailRow strong { font-size:calc(8.5px * var(--font-scale, 1)); }
+  .purchaseDetailRow span,.purchaseDetailRow s,.purchaseDetailRow em { font-size:calc(6.8px * var(--font-scale, 1)); }
   .purchaseDetailModal > footer { min-height: 52px; gap: 20px; padding: 8px 12px; }
 }
 .archiveNotes {
@@ -679,7 +679,7 @@
   margin: 0;
   padding: 14px 0;
   color: #aaa;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
 }
 .notesGroup {
   padding-bottom: 2px;
@@ -705,10 +705,10 @@
 /* Give the archive index a more readable, book-forward scale. */
 .modalArchive > .archiveHead {
   padding-bottom: 14px;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .modalArchive > .archiveHead b {
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .modalArchive > .archiveListButton {
   min-height: 94px;
@@ -731,27 +731,27 @@
 }
 .modalArchive > .archiveListButton .archiveIdentity > b {
   font-family: "Archive Pretendard", "Apple SD Gothic Neo", sans-serif;
-  font-size: 13px;
+  font-size:calc(13px * var(--font-scale, 1));
   font-weight: 600;
 }
 .modalArchive > .archiveListButton .archiveIdentity small {
   margin-top: 5px;
-  font-size: 9.5px;
+  font-size:calc(9.5px * var(--font-scale, 1));
 }
 .modalArchive > .archiveListButton .archiveStatus {
   gap: 6px;
-  font-size: 10.5px;
+  font-size:calc(10.5px * var(--font-scale, 1));
 }
 .modalArchive > .archiveListButton .archiveStatus small {
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
 }
 @media (max-width: 520px) {
   .modalArchive > .archiveHead {
     padding-bottom: 13px;
-    font-size: 8.5px;
+    font-size:calc(8.5px * var(--font-scale, 1));
   }
   .modalArchive > .archiveHead b {
-    font-size: 8.5px;
+    font-size:calc(8.5px * var(--font-scale, 1));
   }
   .modalArchive > .archiveListButton {
     min-height: 98px;
@@ -769,13 +769,13 @@
     height: 70px;
   }
   .modalArchive > .archiveListButton .archiveIdentity > b {
-    font-size: 12px;
+    font-size:calc(12px * var(--font-scale, 1));
   }
   .modalArchive > .archiveListButton .archiveIdentity small {
-    font-size: 9px;
+    font-size:calc(9px * var(--font-scale, 1));
   }
   .modalArchive > .archiveListButton .archiveStatus {
-    font-size: 10px;
+    font-size:calc(10px * var(--font-scale, 1));
   }
 }
 .recordModalShade {
@@ -845,13 +845,13 @@
 .recordModalHead b {
   overflow: hidden;
   color: #474743;
-  font-size: 11.5px;
+  font-size:calc(11.5px * var(--font-scale, 1));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .recordModalHead em {
   color: #999;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   font-style: normal;
 }
 .modalHeadActions {
@@ -884,7 +884,7 @@
   color: #b78186;
 }
 .editRecordButton span {
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   font-weight: 750;
 }
 .deleteConfirm {
@@ -908,11 +908,11 @@
   text-align: center;
 }
 .deleteConfirm small { color: #c3999d; font: 7px "Courier New", monospace; letter-spacing: .12em; }
-.deleteConfirm b { display: block; margin-top: 10px; color: #53534f; font-size: 12px; }
-.deleteConfirm p { margin: 7px 0 18px; color: #aaa29f; font-size: 8.5px; }
-.deleteConfirm em { display: block; margin: -8px 0 12px; color: #b36f79; font-size: 8px; font-style: normal; }
+.deleteConfirm b { display: block; margin-top: 10px; color: #53534f; font-size:calc(12px * var(--font-scale, 1)); }
+.deleteConfirm p { margin: 7px 0 18px; color: #aaa29f; font-size:calc(8.5px * var(--font-scale, 1)); }
+.deleteConfirm em { display: block; margin: -8px 0 12px; color: #b36f79; font-size:calc(8px * var(--font-scale, 1)); font-style: normal; }
 .deleteConfirm > div > span { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-.deleteConfirm > div button { height: 34px; border: 0; border-radius: 10px; background: #f3f3f0; color: #777; font-size: 9px; font-weight: 750; }
+.deleteConfirm > div button { height: 34px; border: 0; border-radius: 10px; background: #f3f3f0; color: #777; font-size:calc(9px * var(--font-scale, 1)); font-weight: 750; }
 .deleteConfirm > div .confirmDeleteButton { background: #b77f84; color: #fff; }
 .deleteConfirm button:disabled { opacity: .55; }
 .recordModalBody {
@@ -1015,13 +1015,13 @@
 .groupProgress > span small,
 .groupProgress > p span {
   color: #aaa9a4;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-weight: 600;
 }
 .groupProgress > span b,
 .groupProgress > p b {
   color: #676762;
-  font-size: 9.5px;
+  font-size:calc(9.5px * var(--font-scale, 1));
   font-weight: 760;
 }
 .groupProgress.done > span b { color: #6f8fb9; }
@@ -1048,11 +1048,11 @@
   }
   .groupProgress > span small,
   .groupProgress > p span {
-    font-size: 7.5px;
+    font-size:calc(7.5px * var(--font-scale, 1));
   }
   .groupProgress > span b,
   .groupProgress > p b {
-    font-size: 8.5px;
+    font-size:calc(8.5px * var(--font-scale, 1));
   }
 }
 
@@ -1085,8 +1085,8 @@
     gap: 5px;
     padding: 6px 5px;
   }
-  .bookFacts small { font-size: 7px; }
-  .bookFacts b { font-size: 8px; }
+  .bookFacts small { font-size:calc(7px * var(--font-scale, 1)); }
+  .bookFacts b { font-size:calc(8px * var(--font-scale, 1)); }
 }
 
 /* Entry form sections mirror the quiet hierarchy of the record detail. */
@@ -1141,7 +1141,7 @@
   background: #f4f2f0;
   color: #aaa6a2;
   font-style: normal;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
 }
 .wizardProgress button.done::before,
 .wizardProgress button.done i,
@@ -1316,9 +1316,9 @@
     padding-top: 11px;
     padding-bottom: 8px;
   }
-  .wizardProgress button { gap: 7px; font-size: 7.5px; }
+  .wizardProgress button { gap: 7px; font-size:calc(7.5px * var(--font-scale, 1)); }
   .wizardProgress button::before { top: 10px; }
-  .wizardProgress i { width: 21px; height: 21px; font-size: 8px; }
+  .wizardProgress i { width: 21px; height: 21px; font-size:calc(8px * var(--font-scale, 1)); }
   .wizardPage { margin-top: 16px; }
   .recordForm .wizardPage > label,
   .wizardBookPage .bookMetaFields > label,
@@ -1345,7 +1345,7 @@
   height: 43px;
   border: 0;
   border-radius: 11px;
-  font-size: 10px;
+  font-size:calc(10px * var(--font-scale, 1));
   font-weight: 800;
   cursor: pointer;
   outline: 0;
@@ -1374,10 +1374,10 @@
   text-align: center;
 }
 .draftResumeDialog > small { color: #c1849b; font: 700 7px "Courier New", monospace; letter-spacing: .16em; }
-.draftResumeDialog h2 { margin: 10px 0 8px; color: #514e4a; font-size: 15px; }
-.draftResumeDialog p { margin: 0; color: #8f8a85; font-size: 10px; line-height: 1.65; word-break: keep-all; }
+.draftResumeDialog h2 { margin: 10px 0 8px; color: #514e4a; font-size:calc(15px * var(--font-scale, 1)); }
+.draftResumeDialog p { margin: 0; color: #8f8a85; font-size:calc(10px * var(--font-scale, 1)); line-height: 1.65; word-break: keep-all; }
 .draftResumeDialog > div { display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px; margin-top: 20px; }
-.draftResumeDialog button { height: 40px; border: 0; border-radius: 11px; background: #f4f2f0; color: #85817d; font-size: 9px; font-weight: 800; }
+.draftResumeDialog button { height: 40px; border: 0; border-radius: 11px; background: #f4f2f0; color: #85817d; font-size:calc(9px * var(--font-scale, 1)); font-weight: 800; }
 .draftResumeDialog button.primary { background: #5d5d58; color: #fff; }
 .recordForm .formTopTitle,
 .recordForm .formSectionTitle {
@@ -1458,14 +1458,14 @@
   text-align: left;
   cursor: pointer;
 }
-.advancedSearchToggle span { font-size: 9px; font-weight: 700; }
+.advancedSearchToggle span { font-size:calc(9px * var(--font-scale, 1)); font-weight: 700; }
 .advancedSearchToggle.open { color: #b27489; }
 .searchSecondaryActions .manual {
   width: auto;
   margin: 0;
   padding: 0;
   color: #aaa6a2;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   text-align: right;
 }
 .advancedSearchFields {
@@ -1487,7 +1487,7 @@
   outline: none;
   background: transparent;
   color: #56524f;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
 }
 .advancedSearchFields input:focus,
 .advancedSearchFields select:focus { border-bottom-color: #cf9cad; }
@@ -1515,7 +1515,7 @@
   background: rgba(255,255,255,.9);
   box-shadow: 0 2px 8px rgba(40,40,35,.1);
   color: #706e69;
-  font-size: 7px;
+  font-size:calc(7px * var(--font-scale, 1));
   font-weight: 750;
   backdrop-filter: blur(6px);
   pointer-events: none;
@@ -1525,7 +1525,7 @@
   border: 0;
   background: transparent;
   color: #b18a91;
-  font-size: 7px;
+  font-size:calc(7px * var(--font-scale, 1));
   cursor: pointer;
 }
 .recordForm .fields {
@@ -1594,12 +1594,12 @@
   align-items: center;
   padding: 4px 2px;
   color: #99958f;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   font-weight: 700;
 }
 .purchaseItemDate > span:first-child {
   color: #99958f;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   font-weight: 700;
 }
 .purchaseItemDate .datePropertyValue {
@@ -1622,7 +1622,7 @@
   min-height: 28px;
   padding: 3px 18px 3px 0;
   color: #514f4c;
-  font-size: 10px;
+  font-size:calc(10px * var(--font-scale, 1));
 }
 .purchaseEntryActions {
   display: flex;
@@ -1638,7 +1638,7 @@
   border-radius: 8px;
   background: #f2f0ee;
   color: #8c8681;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-weight: 750;
 }
 .purchaseEntryActions button.primary { background: #676762; color: #fff; }
@@ -1659,18 +1659,18 @@
 .savedPurchaseHead {
   min-height: 32px;
   color: #b0aaa5;
-  font-size: 6.5px;
+  font-size:calc(6.5px * var(--font-scale, 1));
   font-weight: 700;
 }
 .savedPurchaseItem {
   min-height: 55px;
   border-top: 1px solid #f2efed;
 }
-.savedPurchaseVolume { min-width: 0; color: #5a5753; font-size: 9.5px; line-height: 1.45; overflow-wrap: anywhere; }
-.savedPurchaseDate { color: #8f7c76; font-size: 8px; white-space: nowrap; }
-.savedPurchaseListPrice { color: #aaa49e; font-size: 8px; white-space: nowrap; }
-.savedPurchasePaidPrice { color: #5b5754; font-size: 9.5px; white-space: nowrap; }
-.savedPurchaseMethods { min-width: 0; color: #8f7c76; font-size: 8px; line-height: 1.45; overflow-wrap: anywhere; }
+.savedPurchaseVolume { min-width: 0; color: #5a5753; font-size:calc(9.5px * var(--font-scale, 1)); line-height: 1.45; overflow-wrap: anywhere; }
+.savedPurchaseDate { color: #8f7c76; font-size:calc(8px * var(--font-scale, 1)); white-space: nowrap; }
+.savedPurchaseListPrice { color: #aaa49e; font-size:calc(8px * var(--font-scale, 1)); white-space: nowrap; }
+.savedPurchasePaidPrice { color: #5b5754; font-size:calc(9.5px * var(--font-scale, 1)); white-space: nowrap; }
+.savedPurchaseMethods { min-width: 0; color: #8f7c76; font-size:calc(8px * var(--font-scale, 1)); line-height: 1.45; overflow-wrap: anywhere; }
 .savedPurchaseActions {
   display: flex;
   justify-content: center;
@@ -1695,7 +1695,7 @@
 .volumePurchaseHead {
   padding: 0 2px 2px;
   color: #aaa;
-  font-size: 7px;
+  font-size:calc(7px * var(--font-scale, 1));
   font-weight: 700;
 }
 .volumePurchaseRow {
@@ -1708,7 +1708,7 @@
   margin: 0;
   padding: 4px 2px;
   border-bottom: 0;
-  font-size: 9.5px;
+  font-size:calc(9.5px * var(--font-scale, 1));
   text-align: right;
 }
 .recordForm .volumePurchaseRow input:first-child { text-align: left; }
@@ -1732,7 +1732,7 @@
   border-radius: 999px;
   background: #f4f2ef;
   color: #827d78;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   font-weight: 750;
 }
 .purchaseTotals {
@@ -1745,14 +1745,14 @@
   background: #faf7f6;
 }
 .purchaseTotals span { min-width: 0; display: grid; gap: 5px; }
-.purchaseTotals small { color: #aaa19f; font-size: 7px; }
-.purchaseTotals b { color: #5d5957; font-size: 10px; white-space: nowrap; }
+.purchaseTotals small { color: #aaa19f; font-size:calc(7px * var(--font-scale, 1)); }
+.purchaseTotals b { color: #5d5957; font-size:calc(10px * var(--font-scale, 1)); white-space: nowrap; }
 .purchaseTotals span:last-child b { color: #c17c8e; }
 .purchaseBreakdown { margin: -2px 0 8px; }
 .purchaseBreakdown summary {
   padding: 8px 2px;
   color: #aaa19f;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   cursor: pointer;
   list-style: none;
 }
@@ -1760,9 +1760,9 @@
 .purchaseBreakdown > div { display: grid; padding: 4px 11px 9px; border-radius: 10px; background: #fcf9f8; }
 .purchaseBreakdown > div > span { min-height: 28px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px; border-bottom: 1px solid #f0eae8; }
 .purchaseBreakdown > div > span:last-child { border-bottom: 0; }
-.purchaseBreakdown span b { color: #77716e; font-size: 8px; }
-.purchaseBreakdown span small { color: #aaa19f; font-size: 7.5px; text-decoration: line-through; }
-.purchaseBreakdown span em { color: #665f5c; font-size: 8.5px; font-style: normal; font-weight: 700; }
+.purchaseBreakdown span b { color: #77716e; font-size:calc(8px * var(--font-scale, 1)); }
+.purchaseBreakdown span small { color: #aaa19f; font-size:calc(7.5px * var(--font-scale, 1)); text-decoration: line-through; }
+.purchaseBreakdown span em { color: #665f5c; font-size:calc(8.5px * var(--font-scale, 1)); font-style: normal; font-weight: 700; }
 .recordForm .countField > span {
   display: grid;
   grid-template-columns: 1fr 48px;
@@ -1774,7 +1774,7 @@
 .editableSelect {
   min-width: 0;
   color: #999;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   font-weight: 700;
 }
 .recordForm .editableSelect > select {
@@ -1788,7 +1788,7 @@
   outline: 0;
   background: transparent;
   color: #4d4d49;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
 }
 
 /* Keep form selects visually identical on iOS instead of using its rounded
@@ -1830,7 +1830,7 @@
   border-radius: 7px;
   background: #f0efec;
   color: #77736f;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   font-weight: 750;
 }
 .newOptionField button:last-child { padding: 0; display: grid; place-items: center; background: transparent; color: #aaa; }
@@ -1892,7 +1892,7 @@
   overflow-y: auto;
   outline: 0;
   color: #4d4d49;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1924,7 +1924,7 @@
   background: transparent;
   color: #57524e;
   font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
-  font-size: 14px;
+  font-size:calc(14px * var(--font-scale, 1));
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1947,7 +1947,7 @@
   place-items: center;
   width: 17px;
   height: 19px;
-  font-size: 13px;
+  font-size:calc(13px * var(--font-scale, 1));
   font-weight: 550;
 }
 .noteColorPalette {
@@ -1979,7 +1979,7 @@
   border-radius: 7px;
   background: #f3efed;
   color: #967b80;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   font-weight: 750;
 }
 .noteComposer > button:disabled { opacity: .4; }
@@ -1997,7 +1997,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   line-height: 1.62;
   resize: none;
   overflow: hidden;
@@ -2021,7 +2021,7 @@
   border: 0;
   background: transparent;
   color: #53514e;
-  font-size: 11px;
+  font-size:calc(11px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.62;
   text-align: left;
@@ -2044,20 +2044,20 @@
   border: 1px solid #e7dfdc;
   border-radius: 7px;
   background: #fcfaf9;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   line-height: 1.62;
 }
 .savedNoteEdit .richNoteEditor:focus { border-color: #d9bdc6; background: #fff; }
 .recordForm .savedNoteEdit textarea:focus { border-color: #d9bdc6; background: #fff; }
 .savedNoteEdit > span { display: flex; justify-content: flex-end; gap: 5px; }
-.savedNoteEdit > span button { min-height: 25px; padding: 0 8px; border: 0; border-radius: 6px; background: #f1efec; color: #85807c; font-size: 7.5px; font-weight: 700; cursor: pointer; }
+.savedNoteEdit > span button { min-height: 25px; padding: 0 8px; border: 0; border-radius: 6px; background: #f1efec; color: #85807c; font-size:calc(7.5px * var(--font-scale, 1)); font-weight: 700; cursor: pointer; }
 .savedNoteEdit > span button:last-child { background: #716f69; color: #fff; }
 .savedNoteEdit > span button:disabled { opacity: .4; cursor: default; }
 .noteEditor.liked .noteComposer > button { color: #bd7d94; }
 .noteEditor.disliked .noteComposer > button { color: #7799bc; }
 .basketNotes { display: grid; gap: 8px; }
 .basketNotes .reviewLabel { color: #9b8b76; }
-.basketNotes > p { margin: 0; color: #555551; font-size: 10.5px; font-weight: 550; line-height: 1.62; white-space: pre-wrap; }
+.basketNotes > p { margin: 0; color: #555551; font-size:calc(10.5px * var(--font-scale, 1)); font-weight: 550; line-height: 1.62; white-space: pre-wrap; }
 .basketNoteImages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .basketNoteImages button { display: block; padding: 0; overflow: hidden; border: 0; border-radius: 7px; background: #f2f1ef; cursor: zoom-in; }
 .basketNoteImages img { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; }
@@ -2076,10 +2076,10 @@
 .basketImageEditor > span img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .basketImageEditor > span button { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.9); color: #8f8883; }
 .recordForm .addBasketImage { display: grid; place-content: center; justify-items: center; gap: 3px; margin: 0; color: #97918d; cursor: pointer; }
-.addBasketImage b { font-size: 7.5px; }
-.addBasketImage small { color: #bbb4af; font-size: 6.5px; }
+.addBasketImage b { font-size:calc(7.5px * var(--font-scale, 1)); }
+.addBasketImage small { color: #bbb4af; font-size:calc(6.5px * var(--font-scale, 1)); }
 .recordForm .addBasketImage input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
-.basketImageError { margin: -3px 0 0; color: #bd7680; font-size: 7.5px; }
+.basketImageError { margin: -3px 0 0; color: #bd7680; font-size:calc(7.5px * var(--font-scale, 1)); }
 .noteImageLightbox {
   position: fixed;
   z-index: 100;
@@ -2156,13 +2156,13 @@
     column-gap: 2px;
     text-align: center;
   }
-  .savedPurchaseHead { min-height: 28px; font-size: 5.8px; }
+  .savedPurchaseHead { min-height: 28px; font-size:calc(5.8px * var(--font-scale, 1)); }
   .savedPurchaseItem { min-height: 49px; padding: 0; }
-  .savedPurchaseVolume { font-size: 8.5px; }
-  .savedPurchaseDate { font-size: 6.8px; letter-spacing: -.02em; }
-  .savedPurchaseListPrice { display: block; font-size: 7px; text-decoration: line-through; }
-  .savedPurchasePaidPrice { font-size: 8.5px; }
-  .savedPurchaseMethods { overflow: hidden; font-size: 6.8px; text-overflow: ellipsis; white-space: nowrap; }
+  .savedPurchaseVolume { font-size:calc(8.5px * var(--font-scale, 1)); }
+  .savedPurchaseDate { font-size:calc(6.8px * var(--font-scale, 1)); letter-spacing: -.02em; }
+  .savedPurchaseListPrice { display: block; font-size:calc(7px * var(--font-scale, 1)); text-decoration: line-through; }
+  .savedPurchasePaidPrice { font-size:calc(8.5px * var(--font-scale, 1)); }
+  .savedPurchaseMethods { overflow: hidden; font-size:calc(6.8px * var(--font-scale, 1)); text-overflow: ellipsis; white-space: nowrap; }
   .savedPurchaseActions button { width: 22px; height: 25px; }
 }
 .multiEditableSelect summary {
@@ -2175,7 +2175,7 @@
   border: 0;
   background: transparent;
   color: #847975;
-  font-size: 7.7px;
+  font-size:calc(7.7px * var(--font-scale, 1));
   font-weight: 700;
   cursor: pointer;
   list-style: none;
@@ -2185,12 +2185,12 @@
   content: "⌄";
   margin-left: auto;
   color: #bbb3af;
-  font-size: 9px;
+  font-size:calc(9px * var(--font-scale, 1));
   font-weight: 400;
   transform: translateY(-1px);
 }
 .multiEditableSelect[open] summary::after { content: "⌃"; transform: translateY(2px); }
-.multiEditableSelect summary small { flex: none; color: #c1b7b2; font-size: 6.8px; font-weight: 500; }
+.multiEditableSelect summary small { flex: none; color: #c1b7b2; font-size:calc(6.8px * var(--font-scale, 1)); font-weight: 500; }
 .multiOptionMenu {
   position: absolute;
   z-index: 12;
@@ -2230,7 +2230,7 @@
   border: 0 !important;
   background: transparent !important;
   color: #5e5a57;
-  font-size: 8.5px;
+  font-size:calc(8.5px * var(--font-scale, 1));
   outline: 0;
 }
 .multiOptionList { max-height: 220px; overflow-y: auto; overscroll-behavior: contain; }
@@ -2260,21 +2260,21 @@
   border: 0;
   background: transparent;
   color: #67625f;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   text-align: left;
   cursor: pointer;
 }
 .multiOptionToggle span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .multiOptionToggle i { width: 11px; height: 11px; display: grid; place-items: center; border: 1px solid #d8d3cf; border-radius: 3px; }
 .multiOptionRow.selected .multiOptionToggle i { border-color: #b88495; background: #b88495; }
-.multiOptionRow.selected .multiOptionToggle i::after { content: "✓"; color: #fff; font-size: 7px; font-style: normal; line-height: 1; }
+.multiOptionRow.selected .multiOptionToggle i::after { content: "✓"; color: #fff; font-size:calc(7px * var(--font-scale, 1)); font-style: normal; line-height: 1; }
 .multiOptionActions { display: flex; align-items: center; padding-right: 3px; opacity: .38; transition: opacity .15s ease; }
 .multiOptionRow:hover .multiOptionActions,.multiOptionRow:focus-within .multiOptionActions { opacity: 1; }
 .multiOptionActions button { width: 22px; height: 24px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 5px; background: transparent; color: #aaa39e; cursor: pointer; }
 .multiOptionActions button:hover:not(:disabled) { background: #eeeae7; color: #746d69; }
 .multiOptionActions button:last-child:hover:not(:disabled) { color: #b76f76; }
 .multiOptionActions button:disabled { opacity: .2; cursor: default; }
-.multiOptionEmpty { margin: 0; padding: 18px 8px; color: #aaa49f; font-size: 8px; text-align: center; }
+.multiOptionEmpty { margin: 0; padding: 18px 8px; color: #aaa49f; font-size:calc(8px * var(--font-scale, 1)); text-align: center; }
 .multiOptionMenu > label {
   min-height: 29px;
   display: flex;
@@ -2283,18 +2283,18 @@
   padding: 4px 7px;
   border-radius: 6px;
   color: #67625f;
-  font-size: 8px;
+  font-size:calc(8px * var(--font-scale, 1));
   cursor: pointer;
 }
 .multiOptionMenu > label:hover { background: #f8f6f4; }
 .recordForm .multiOptionMenu > label input { width: 13px; height: 13px; margin: 0; padding: 0; accent-color: #aa7f89; }
 .newMultiOption { display: grid; grid-template-columns: 1fr auto; gap: 5px; margin-top: 4px; }
-.recordForm .newMultiOption input { min-width: 0; margin: 0; padding: 6px 7px; font-size: 8px; }
+.recordForm .newMultiOption input { min-width: 0; margin: 0; padding: 6px 7px; font-size:calc(8px * var(--font-scale, 1)); }
 .newMultiOption button,
-.openNewMultiOption { border: 0; border-radius: 6px; background: #f2efec; color: #817a76; font-size: 7.5px; font-weight: 700; }
+.openNewMultiOption { border: 0; border-radius: 6px; background: #f2efec; color: #817a76; font-size:calc(7.5px * var(--font-scale, 1)); font-weight: 700; }
 .newMultiOption button { padding: 0 9px; }
 .openNewMultiOption { width: 100%; min-height: 28px; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; }
-.purchaseBreakdown span i { grid-column: 1 / -1; margin: -3px 0 6px; color: #a48680; font-size: 7px; font-style: normal; }
+.purchaseBreakdown span i { grid-column: 1 / -1; margin: -3px 0 6px; color: #a48680; font-size:calc(7px * var(--font-scale, 1)); font-style: normal; }
 
 /* Compact app navigation */
 .dockLayout { padding-bottom: 88px; }
@@ -2336,7 +2336,7 @@
   z-index: 31;
   top: 100%;
   right: 10px;
-  width: 144px;
+  width: 174px;
   padding: 5px;
   border: 1px solid rgba(80,72,67,.09);
   border-radius: 12px;
@@ -2344,12 +2344,18 @@
   box-shadow: 0 10px 28px rgba(52,47,43,.12);
   backdrop-filter: blur(16px);
 }
-.topToolMenu button { width: 100%; height: 34px; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 5px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: #77736f; font-size: 8.5px; font-weight: 700; text-align: left; cursor: pointer; }
+.topToolMenu button { width: 100%; height: 34px; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 5px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: #77736f; font-size:calc(8.5px * var(--font-scale, 1)); font-weight: 700; text-align: left; cursor: pointer; }
 .topToolMenu button:hover { background: #f7f5f3; }
 .topToolMenu button.selected { background: #faf3f5; color: #a9677e; }
 .topToolMenu button.selected svg { stroke-width: 2.2; }
-.topToolMenu button small { min-width: 17px; padding: 2px 5px; border-radius: 999px; background: #f4e9ed; color: #b77d91; font-size: 6.5px; text-align: center; }
+.topToolMenu button small { min-width: 17px; padding: 2px 5px; border-radius: 999px; background: #f4e9ed; color: #b77d91; font-size:calc(6.5px * var(--font-scale, 1)); text-align: center; }
 .topToolMenu button.loading svg { animation: spin .8s linear infinite; }
+.topToolMenu .fontSizeControl { min-height: 38px; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 5px; padding: 0 8px; color: #77736f; font-size:calc(8.5px * var(--font-scale, 1)); font-weight: 700; }
+.fontSizeStepper { height: 25px; display: grid; grid-template-columns: 23px 29px 23px; align-items: center; overflow: hidden; border: 1px solid #ece7e4; border-radius: 8px; background: #faf9f7; }
+.topToolMenu .fontSizeStepper button { width: 23px; height: 23px; display: grid; grid-template-columns: 1fr; place-items: center; gap: 0; padding: 0; border-radius: 0; color: #8b817c; font-size:calc(12px * var(--font-scale, 1)); text-align: center; }
+.topToolMenu .fontSizeStepper button:hover:not(:disabled) { background: #f2edef; color: #a9677e; }
+.topToolMenu .fontSizeStepper button:disabled { opacity: .3; cursor: default; }
+.fontSizeStepper b { color: #69635f; font-size:calc(7px * var(--font-scale, 1)); font-weight: 750; text-align: center; }
 .dockLayout > .searchBar { top: 50px; }
 .dockLayout > .refreshNotice { top: 51px; }
 .recordModeSwitch {
@@ -2372,7 +2378,7 @@
   background: transparent;
   color: #b7b2ae;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: .18em;
   cursor: pointer;
@@ -2443,7 +2449,7 @@ html { scrollbar-gutter: stable; }
   border-radius: 999px;
   background: #f7edf1;
   color: #b4778e;
-  font-size: 7.5px;
+  font-size:calc(7.5px * var(--font-scale, 1));
   font-weight: 750;
   white-space: nowrap;
   cursor: pointer;
@@ -2489,13 +2495,13 @@ html { scrollbar-gutter: stable; }
   border-radius: 8px;
   outline: none;
   color: #514d49;
-  font-size: 12px;
+  font-size:calc(12px * var(--font-scale, 1));
 }
 .calendarYearInput input:focus { border-color: #d8a1b2; }
-.calendarYearInput button { border-radius: 8px; background: #f8eef2; color: #b16e86; font-size: 9px; font-weight: 700; }
+.calendarYearInput button { border-radius: 8px; background: #f8eef2; color: #b16e86; font-size:calc(9px * var(--font-scale, 1)); font-weight: 700; }
 .calendarYearOptions { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; max-height: 210px; overflow-y: auto; overscroll-behavior: contain; }
 .calendarYearOptions button,
-.calendarMonthPopover button { min-height: 34px; border-radius: 7px; font-size: 10px; }
+.calendarMonthPopover button { min-height: 34px; border-radius: 7px; font-size:calc(10px * var(--font-scale, 1)); }
 .calendarYearOptions button:hover,
 .calendarMonthPopover button:hover { background: #f8f3f4; }
 .calendarYearOptions button.selected,
@@ -2553,7 +2559,7 @@ html { scrollbar-gutter: stable; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel button:hover { background: #f8f5f4; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .imageShareButton { color: #ad7288; }
 .recordModalHead .modalHeadActions .recordActionMenuPanel .deleteRecordButton { color: #b57b80; }
-.recordActionMenuPanel button span { display: inline; font-size: 8px; font-weight: 720; }
+.recordActionMenuPanel button span { display: inline; font-size:calc(8px * var(--font-scale, 1)); font-weight: 720; }
 .recordModal.imageExporting {
   position: relative;
   max-height: none !important;
@@ -2620,10 +2626,10 @@ html { scrollbar-gutter: stable; }
 .profileImagePicker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .profileNumbers { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
 .profileNumbers div { display: grid; justify-items: center; gap: 4px; }
-.profileNumbers strong { color: #55514e; font-size: 14px; font-weight: 760; }
-.profileNumbers small { color: #9e9995; font-size: 7.5px; font-weight: 650; white-space: nowrap; }
+.profileNumbers strong { color: #55514e; font-size:calc(14px * var(--font-scale, 1)); font-weight: 760; }
+.profileNumbers small { color: #9e9995; font-size:calc(7.5px * var(--font-scale, 1)); font-weight: 650; white-space: nowrap; }
 .profileReadingBio { grid-column: 1 / -1; display: grid; gap: 5px; margin-top: -5px; }
-.profileReadingBio b { color: #55514e; font-size: 11px; }
+.profileReadingBio b { color: #55514e; font-size:calc(11px * var(--font-scale, 1)); }
 .profileReadingBio span { color: #c1849b; font: italic 8.5px Georgia, serif; letter-spacing: .02em; }
 @media (max-width: 520px) {
   .profileStatsHeader { grid-template-columns: 76px minmax(0,1fr); gap: 15px 18px; padding: 5px 7px 24px; }
@@ -2632,8 +2638,8 @@ html { scrollbar-gutter: stable; }
   .profileImagePicker img,
   .profileImagePicker i { width: 66px; height: 66px; }
   .profileImagePicker > b { width: 22px; height: 22px; }
-  .profileNumbers strong { font-size: 13px; }
-  .profileNumbers small { font-size: 7px; }
+  .profileNumbers strong { font-size:calc(13px * var(--font-scale, 1)); }
+  .profileNumbers small { font-size:calc(7px * var(--font-scale, 1)); }
 }
 .bottomDock .dockAdd {
   align-self: center;
@@ -2657,7 +2663,7 @@ html { scrollbar-gutter: stable; }
   .compactTopBar { height: 43px; padding-inline: 10px; }
   .addDrawer .recordForm label,
   .addDrawer .editableSelect {
-    font-size: 11px;
+    font-size:calc(11px * var(--font-scale, 1));
   }
   .addDrawer .recordForm input,
   .addDrawer .recordForm select,
@@ -2668,14 +2674,14 @@ html { scrollbar-gutter: stable; }
     padding-top: 0;
     padding-bottom: 0;
     color: #55514e;
-    font-size: 11.5px;
+    font-size:calc(11.5px * var(--font-scale, 1));
     font-weight: 500;
     line-height: 40px;
   }
   .addDrawer .recordForm textarea {
     margin-top: 5px;
     padding: 8px 0;
-    font-size: 11.5px;
+    font-size:calc(11.5px * var(--font-scale, 1));
     font-weight: 500;
     line-height: 1.55;
   }
@@ -2699,11 +2705,11 @@ html { scrollbar-gutter: stable; }
     margin-top: 4px;
   }
   .addDrawer .volumePurchaseHead {
-    font-size: 9px;
+    font-size:calc(9px * var(--font-scale, 1));
   }
   .addDrawer .volumePurchaseRow input,
   .addDrawer .multiEditableSelect summary {
-    font-size: 11.5px;
+    font-size:calc(11.5px * var(--font-scale, 1));
   }
   .addDrawer .recordForm .savedNote {
     align-items: start;
@@ -2712,7 +2718,7 @@ html { scrollbar-gutter: stable; }
     min-height: 0;
     margin: 0;
     padding: 0;
-    font-size: 11px;
+    font-size:calc(11px * var(--font-scale, 1));
     line-height: 1.62;
     transform: none;
   }
@@ -2720,7 +2726,7 @@ html { scrollbar-gutter: stable; }
     padding: 7px 8px;
     border: 1px solid #e7dfdc;
   }
-  .addDrawer .recordForm .savedNoteText { font-size: 11px; }
+  .addDrawer .recordForm .savedNoteText { font-size:calc(11px * var(--font-scale, 1)); }
   .addDrawer .recordForm .savedNote .noteHeart {
     margin-top: 4px;
   }
@@ -2793,8 +2799,8 @@ html { scrollbar-gutter: stable; }
     border-bottom: 0;
   }
   .readingSnapshot > div:last-child { border-right: 0; }
-  .readingSnapshot small { font-size: 7px; white-space: nowrap; }
-  .readingSnapshot b { font-size: 8.5px; white-space: nowrap; }
+  .readingSnapshot small { font-size:calc(7px * var(--font-scale, 1)); white-space: nowrap; }
+  .readingSnapshot b { font-size:calc(8.5px * var(--font-scale, 1)); white-space: nowrap; }
 
   .statsSplit {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2804,7 +2810,7 @@ html { scrollbar-gutter: stable; }
   .statsSplit .statsSection > header { gap: 6px; }
   .statsSplit .statsSection > header span,
   .statsSplit .statsSection > header small { white-space: nowrap; }
-  .statsSplit .statsSection > header small { font-size: 6.5px; }
+  .statsSplit .statsSection > header small { font-size:calc(6.5px * var(--font-scale, 1)); }
 }
 
 /* Final wizard overrides: keep Notion-like property rows borderless and flat. */
