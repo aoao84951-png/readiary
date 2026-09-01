@@ -2660,7 +2660,16 @@ html { scrollbar-gutter: stable; }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
   .dockLayout { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
-  .compactTopBar { height: 43px; padding-inline: 10px; }
+  .compactTopBar {
+    height: 43px;
+    padding-inline: 10px;
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+  }
   .addDrawer .recordForm label,
   .addDrawer .editableSelect {
     font-size:calc(11px * var(--font-scale, 1));
