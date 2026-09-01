@@ -45,7 +45,7 @@
 }
 .starUnit {
   position: relative;
-  width: 0.92em;
+  width: 1em;
   height: 1em;
   display: inline-block;
   font-size: 15px;
@@ -58,13 +58,37 @@
   display: block;
   line-height: 1;
 }
+.starEmpty svg,
+.starFill svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1em;
+  display: block;
+  overflow: visible;
+}
+.starEmpty path {
+  fill: #fffdf8;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .starEmpty {
-  color: #e3e3df;
+  color: #9db3c6;
 }
 .starFill {
   overflow: hidden;
   color: #ffbd32;
   white-space: nowrap;
+}
+.starFill path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .gridRating .starUnit {
   font-size: 10px;
@@ -104,7 +128,7 @@
   border-color: #aaa;
 }
 .ratingControl:focus-within .starEmpty {
-  color: #d6d6d0;
+  color: #8ea7bc;
 }
 @media (max-width: 520px) {
   .ratingControl {
