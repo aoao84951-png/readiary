@@ -2364,7 +2364,7 @@ export default function FeedPage() {
     if (savedDirection === "desc" || savedDirection === "asc") setSortDirection(savedDirection);
     if (window.localStorage.getItem("readiary-font-mode") === "summer") setFontMode("summer");
     const savedFontScale = Number(window.localStorage.getItem("readiary-font-scale"));
-    if ([90, 95, 100, 105, 110, 115].includes(savedFontScale)) setFontScale(savedFontScale);
+    if (savedFontScale >= 80 && savedFontScale <= 150 && savedFontScale % 5 === 0) setFontScale(savedFontScale);
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; purchase_methods_customized?: boolean; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions(data.purchase_methods_customized ? (data.purchase_methods || []) : [...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
@@ -2374,7 +2374,7 @@ export default function FeedPage() {
     return () => { active = false; };
   }, []);
   useEffect(() => {
-    document.documentElement.style.setProperty("--font-scale", String(fontScale / 100));
+    document.documentElement.style.setProperty("--font-scale", String((fontScale / 100) * 1.1));
     window.localStorage.setItem("readiary-font-scale", String(fontScale));
   }, [fontScale]);
   useEffect(() => {
@@ -2424,7 +2424,7 @@ export default function FeedPage() {
     setTopMenuOpen(false);
   }
   function adjustFontScale(direction: -1 | 1) {
-    setFontScale((current) => Math.min(115, Math.max(90, current + direction * 5)));
+    setFontScale((current) => Math.min(150, Math.max(80, current + direction * 5)));
   }
   useEffect(() => {
     if (view === "feed" && pending)
@@ -2811,9 +2811,9 @@ export default function FeedPage() {
             <Type size={14} />
             <span>글자 크기</span>
             <span className="fontSizeStepper">
-              <button type="button" onClick={() => adjustFontScale(-1)} disabled={fontScale <= 90} aria-label="글자 크기 줄이기">−</button>
+              <button type="button" onClick={() => adjustFontScale(-1)} disabled={fontScale <= 80} aria-label="글자 크기 줄이기">−</button>
               <b>{fontScale}</b>
-              <button type="button" onClick={() => adjustFontScale(1)} disabled={fontScale >= 115} aria-label="글자 크기 키우기">+</button>
+              <button type="button" onClick={() => adjustFontScale(1)} disabled={fontScale >= 150} aria-label="글자 크기 키우기">+</button>
             </span>
           </div>
           <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
