@@ -2441,11 +2441,9 @@ export default function FeedPage() {
   function adjustFontScale(direction: -1 | 1) {
     setFontScale((current) => Math.min(150, Math.max(80, current + direction * 5)));
   }
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (view === "feed" && pending)
-      requestAnimationFrame(() =>
-        document.getElementById(pending)?.scrollIntoView({ block: "start" }),
-      );
+      document.getElementById(pending)?.scrollIntoView({ block: "start" });
   }, [view, pending]);
   function restoreSectionScroll(section: "grid" | "feed" | "record" | "stats") {
     scrollRestoreTargetRef.current = section;
@@ -2907,9 +2905,9 @@ export default function FeedPage() {
       ) : view === "records" || view === "stats" ? null
       : view === "calendar" ? (
         <CalendarView books={visible} onOpen={(book) => openPost(book, visible.indexOf(book))} />
-      ) : view === "grid" ? (
+      ) : (
         <>
-        <div className={`collectionResult ${collectionQuickFilter ? "open" : ""}`}>
+        <div className={`collectionResult ${collectionQuickFilter ? "open" : ""}`} hidden={view !== "grid"}>
           <span className="collectionFilterSummary">
             <button type="button" onClick={() => setCollectionQuickFilter(current => current === "genre" ? null : "genre")}>{categoryFilters.length ? categoryFilters.map(value => value === "문학" ? "일반문학" : value).join(" · ") : "전체"}</button>
             <i>·</i>
@@ -2933,7 +2931,7 @@ export default function FeedPage() {
             </nav>
           </>}
         </div>
-        <section className="bookGrid collectionGrid">
+        <section className="bookGrid collectionGrid" hidden={view !== "grid"}>
           {visible.map((book, index) => {
             return (
               <button
@@ -2953,9 +2951,7 @@ export default function FeedPage() {
             );
           })}
         </section>
-        </>
-      ) : (
-        <section className="feedList">
+        <section className="feedList" hidden={view !== "feed"}>
           {visible.map((book, index) => (
             <article
               id={`post-${book.id || index}`}
@@ -3004,6 +3000,7 @@ export default function FeedPage() {
             </article>
           ))}
         </section>
+        </>
       )}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList summerFont={fontMode === "summer"} />}
       {feedCoverBook?.cover_url && <CoverLightbox src={feedCoverBook.cover_url} title={feedCoverBook.title} onClose={() => setFeedCoverBook(null)} />}
