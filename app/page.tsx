@@ -1795,7 +1795,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false, summerFont = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean; summerFont?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -2027,7 +2027,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       />
                     </dl>
                   </section>
-                  {purchaseDetailsOpen && createPortal(<div className="purchaseDetailShade imageExportExclude" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPurchaseDetailsOpen(false); }}>
+                  {purchaseDetailsOpen && createPortal(<div className={`purchaseDetailShade imageExportExclude ${summerFont ? "fontSummer" : ""}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPurchaseDetailsOpen(false); }}>
                     <section className="purchaseDetailModal" role="dialog" aria-modal="true" aria-label={`${book.title} 권별 구매 내역`}>
                       <header>
                         <span><small>PURCHASE DETAILS</small><b>권별 구매 내역</b></span>
@@ -2115,7 +2115,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
   );
 }
 
-function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete }: { books: Book[]; onEdit: (book: Book) => void; onAddPurchase: (book: Book) => void; onEditNotes: (book: Book) => void; onStatusChange: (book: Book, status: string) => Promise<Book>; onDelete: (book: Book) => Promise<void> }) {
+function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, summerFont = false }: { books: Book[]; onEdit: (book: Book) => void; onAddPurchase: (book: Book) => void; onEditNotes: (book: Book) => void; onStatusChange: (book: Book, status: string) => Promise<Book>; onDelete: (book: Book) => Promise<void>; summerFont?: boolean }) {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const favorites = books.filter((book) => book.rating === 5);
   return (
@@ -2139,7 +2139,7 @@ function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange,
         <div className="hallEmpty"><Star size={20} strokeWidth={1.2} /><b>첫 번째 인생책을 기다리고 있어요</b><small>별점 5점을 준 책이 이곳에 전시됩니다.</small></div>
       )}
       <footer className="hallCount"><span>{String(favorites.length).padStart(2, "0")} FAVORITES</span></footer>
-      {selectedBook && <ModalRecordArchive books={favorites} openBook={selectedBook} onClose={() => setSelectedBook(null)} onEdit={onEdit} onAddPurchase={onAddPurchase} onEditNotes={onEditNotes} onStatusChange={onStatusChange} onDelete={onDelete} hideList />}
+      {selectedBook && <ModalRecordArchive books={favorites} openBook={selectedBook} onClose={() => setSelectedBook(null)} onEdit={onEdit} onAddPurchase={onAddPurchase} onEditNotes={onEditNotes} onStatusChange={onStatusChange} onDelete={onDelete} hideList summerFont={summerFont} />}
     </section>
   );
 }
@@ -2853,9 +2853,9 @@ export default function FeedPage() {
           <button className={profileView === "hall" ? "on" : ""} onClick={() => setProfileView("hall")}>HALL OF FAME</button>
         </nav>
       )}
-      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} />}
+      {view === "records" && <ModalRecordArchive books={visible} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} summerFont={fontMode === "summer"} />}
       {view === "stats" && profileView === "stats" && <StatsView books={books} profileImage={profileImage} onProfileImage={(file) => void changeProfileImage(file)} />}
-      {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} />}
+      {view === "stats" && profileView === "hall" && <HallOfFame books={books} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} summerFont={fontMode === "summer"} />}
       {loading && books.length === 0 ? (
         <div className="state">피드를 불러오는 중...</div>
       ) : view === "records" || view === "stats" ? null
@@ -2974,7 +2974,7 @@ export default function FeedPage() {
           ))}
         </section>
       )}
-      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList />}
+      {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList summerFont={fontMode === "summer"} />}
       {feedCoverBook?.cover_url && <CoverLightbox src={feedCoverBook.cover_url} title={feedCoverBook.title} onClose={() => setFeedCoverBook(null)} />}
       <nav className="bottomDock" aria-label="주요 화면">
         <button className={currentSection === "grid" ? "active" : ""} onClick={() => navigateSection("grid")} aria-label="모아보기"><LayoutGrid size={18} strokeWidth={1.4} /></button>

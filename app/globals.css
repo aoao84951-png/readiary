@@ -523,3 +523,4 @@
 @font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSori.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 .feedPage.fontSummer{font-family:'Aa Yeoreum Sori',-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif}
 .feedPage.fontSummer .metaActions .genreText,.feedPage.fontSummer .metaActions .statusText,.feedPage.fontSummer .purchaseDetailShade,.feedPage.fontSummer .modalArchive>.archiveListButton .archiveIdentity>b,.feedPage.fontSummer .spendingSummary strong{font-family:'Aa Yeoreum Sori',-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif}
+.purchaseDetailShade.fontSummer{font-family:'Aa Yeoreum Sori',-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif}
