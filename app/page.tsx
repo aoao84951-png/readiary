@@ -20,6 +20,7 @@ import {
   ArrowDownUp,
   Star,
   Trash2,
+  Type,
   X,
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
@@ -2283,6 +2284,7 @@ export default function FeedPage() {
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [collectionQuickFilter, setCollectionQuickFilter] = useState<"genre" | "status" | null>(null);
+  const [fontMode, setFontMode] = useState<"default" | "summer">("default");
   const [sortMode, setSortMode] = useState<SortMode>("created");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [loading, setLoading] = useState(true);
@@ -2351,6 +2353,7 @@ export default function FeedPage() {
     if (savedSort === "created" || savedSort === "purchase") setSortMode(savedSort);
     const savedDirection = window.localStorage.getItem("readiary-sort-direction");
     if (savedDirection === "desc" || savedDirection === "asc") setSortDirection(savedDirection);
+    if (window.localStorage.getItem("readiary-font-mode") === "summer") setFontMode("summer");
     fetch("/api/options", { cache: "no-store" }).then((response) => response.json() as Promise<{ platforms?: string[]; purchase_methods?: string[]; purchase_methods_customized?: boolean; profile_image?: string }>).then((data) => {
       setPlatformOptions([...new Set([...defaultPlatforms, ...(data.platforms || [])])]);
       setPurchaseMethodOptions(data.purchase_methods_customized ? (data.purchase_methods || []) : [...new Set([...defaultPurchaseMethods, ...(data.purchase_methods || [])])]);
@@ -2398,6 +2401,12 @@ export default function FeedPage() {
     setSortDirection(nextDirection);
     window.localStorage.setItem("readiary-sort-mode", mode);
     window.localStorage.setItem("readiary-sort-direction", nextDirection);
+  }
+  function toggleFontMode() {
+    const next = fontMode === "default" ? "summer" : "default";
+    setFontMode(next);
+    window.localStorage.setItem("readiary-font-mode", next);
+    setTopMenuOpen(false);
   }
   useEffect(() => {
     if (view === "feed" && pending)
@@ -2751,7 +2760,7 @@ export default function FeedPage() {
     if (sections[next]) navigateSection(sections[next]);
   }
   return (
-    <main className="feedPage dockLayout" onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
+    <main className={`feedPage dockLayout ${fontMode === "summer" ? "fontSummer" : ""}`} onTouchStart={beginSwipe} onTouchEnd={finishSwipe}>
       <header className={`compactTopBar ${topMenuOpen ? "menuOpen" : ""}`}>
         <button
           className={`searchToggle ${searchOpen ? "on" : ""}`}
@@ -2779,6 +2788,7 @@ export default function FeedPage() {
           <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
           <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
           <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
+          <button onClick={toggleFontMode}><Type size={14} /><span>글꼴</span><small>{fontMode === "summer" ? "여름소리" : "기본"}</small></button>
           <button className={loading ? "loading" : ""} onClick={() => { setTopMenuOpen(false); void load(true); }} disabled={loading}><RefreshCw size={14} /><span>새로고침</span></button>
         </div>}
       </header>
