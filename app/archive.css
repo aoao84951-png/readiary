@@ -2659,8 +2659,17 @@ html { scrollbar-gutter: stable; }
 }
 .dockLayout > .filterPanel { top: 50px; }
 @media (max-width: 520px) {
-  .dockLayout { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
+  .dockLayout {
+    padding-top: 43px;
+    padding-bottom: calc(54px + env(safe-area-inset-bottom));
+  }
   .compactTopBar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 40;
+    width: 100%;
     height: 43px;
     padding-inline: 10px;
     background: #fff;
@@ -2668,7 +2677,6 @@ html { scrollbar-gutter: stable; }
     backdrop-filter: none;
     backface-visibility: hidden;
     transform: translateZ(0);
-    will-change: transform;
   }
   .addDrawer .recordForm label,
   .addDrawer .editableSelect {
