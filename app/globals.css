@@ -202,7 +202,7 @@
 .recordForm .flexDateTrigger{appearance:none;border:0;background:transparent;width:100%;min-height:32px;padding:0;display:flex;align-items:center;color:#53514e;font:inherit;font-size:var(--property-font);font-weight:600;line-height:1.35;text-align:left;cursor:pointer}
 .recordForm .flexDateTrigger.isEmpty{color:var(--property-muted);font-weight:500}
 .recordForm .datePropertyValue.hasValue .flexDateTrigger{padding-right:25px}
-.recordForm .flexDatePopover{position:absolute;z-index:120;top:calc(100% + 8px);left:0;width:min(310px,calc(100vw - 32px));padding:12px;border:1px solid #dedbd7;border-radius:14px;background:#fff;box-shadow:0 14px 38px rgba(55,50,45,.18);color:#4e4b47}
+.recordForm .flexDatePopover{position:absolute;z-index:120;top:calc(100% + 8px);left:0;width:min(310px,calc(100vw - 32px));padding:12px;border:1px solid #dedbd7;border-radius:14px;background:#fff;box-shadow:0 14px 38px rgba(55,50,45,.18);color:#4e4b47;font-weight:600}
 .recordForm .notionDateProperty .flexDatePopover{left:0;right:auto}
 .recordForm .flexDateHeader{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:6px}
 .recordForm .flexDateHeader>button{appearance:none;border:0;background:transparent;width:32px;height:32px;display:grid;place-items:center;color:#77716c;cursor:pointer}

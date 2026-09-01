@@ -1282,6 +1282,7 @@
   z-index: 1;
   transform: translateY(-50%);
   color: #b7b4b0;
+  font-weight: 500;
   pointer-events: none;
 }
 .recordForm .wizardPage .readingDatesField.dateIsEmpty .dateAdder:focus-within::after { display: none; }
