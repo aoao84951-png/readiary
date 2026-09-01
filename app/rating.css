@@ -101,7 +101,20 @@
   display: block;
 }
 .feedPage.fontSummer .starEmpty {
-  color: #9db3c6;
+  z-index: 2;
+  color: #93aec4;
+  pointer-events: none;
+}
+.feedPage.fontSummer .starEmpty path {
+  fill: none;
+  stroke-width: 1.75;
+}
+.feedPage.fontSummer .starFill {
+  z-index: 1;
+  color: #fff0a8;
+}
+.feedPage.fontSummer .starFill path {
+  stroke: none;
 }
 .gridRating .starUnit {
   font-size: 10px;
