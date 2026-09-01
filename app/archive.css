@@ -1837,22 +1837,22 @@
 .newOptionField button:disabled { opacity: .45; }
 .noteHeart {
   position: relative;
-  width: 10px;
-  height: 10px;
+  width: calc(10px * var(--font-scale, 1));
+  height: calc(10px * var(--font-scale, 1));
   display: block;
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: calc(4px * var(--font-scale, 1));
 }
 .noteHeart img {
   position: absolute;
-  width: 17px;
-  height: 17px;
-  left: -3.5px;
-  top: -3.5px;
+  width: calc(17px * var(--font-scale, 1));
+  height: calc(17px * var(--font-scale, 1));
+  left: calc(-3.5px * var(--font-scale, 1));
+  top: calc(-3.5px * var(--font-scale, 1));
   object-fit: contain;
 }
-.reviewNote { grid-template-columns: 11px minmax(0, 1fr); gap: 7px; }
-.reviewNote .noteHeart { margin-top: 3px; }
+.reviewNote { grid-template-columns: calc(11px * var(--font-scale, 1)) minmax(0, 1fr); gap: calc(7px * var(--font-scale, 1)); }
+.reviewNote .noteHeart { margin-top: calc(3.5px * var(--font-scale, 1)); }
 .reviewNote p strong,
 .savedNoteText strong { font-weight: 800; }
 .reviewNote p u,
@@ -1986,12 +1986,12 @@
 .savedNoteList { display: grid; gap: 9px; padding-top: 4px; }
 .savedNote {
   display: grid;
-  grid-template-columns: 11px minmax(0, 1fr) 18px;
+  grid-template-columns: calc(11px * var(--font-scale, 1)) minmax(0, 1fr) 18px;
   align-items: start;
-  gap: 7px;
+  gap: calc(7px * var(--font-scale, 1));
   padding: 1px 0;
 }
-.savedNote .noteHeart { margin-top: 4px; }
+.savedNote .noteHeart { margin-top: calc(4px * var(--font-scale, 1)); }
 .recordForm .savedNote textarea {
   min-height: 0;
   margin: 0;
@@ -2728,7 +2728,7 @@ html { scrollbar-gutter: stable; }
   }
   .addDrawer .recordForm .savedNoteText { font-size:calc(11px * var(--font-scale, 1)); }
   .addDrawer .recordForm .savedNote .noteHeart {
-    margin-top: 4px;
+    margin-top: calc(4px * var(--font-scale, 1));
   }
   .bottomDock {
     bottom: 0;
