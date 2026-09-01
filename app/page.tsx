@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, TouchEvent, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { FormEvent, TouchEvent, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
@@ -1565,29 +1565,15 @@ function Cover({ book }: { book: Book }) {
 }
 
 function FeedArtwork({ book }: { book: Book }) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const [active, setActive] = useState(false);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element || typeof IntersectionObserver === "undefined") {
-      setActive(true);
-      return;
-    }
-    const observer = new IntersectionObserver(([entry]) => setActive(entry.isIntersecting), { rootMargin: "1200px 0px" });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
   return (
-    <span className="feedArtwork" ref={ref}>
-      {active && <>
-        {book.cover_url && <img className="coverBackdrop" src={book.cover_url} alt="" loading="lazy" decoding="async" />}
-        <span className="coverWash" />
-        <span className="coverMain">
-          {book.cover_url
-            ? <img className="frontCover" src={book.cover_url} alt="" loading="lazy" decoding="async" />
-            : <Cover book={book} />}
-        </span>
-      </>}
+    <span className="feedArtwork">
+      {book.cover_url && <img className="coverBackdrop" src={book.cover_url} alt="" loading="lazy" decoding="async" />}
+      <span className="coverWash" />
+      <span className="coverMain">
+        {book.cover_url
+          ? <img className="frontCover" src={book.cover_url} alt="" loading="lazy" decoding="async" />
+          : <Cover book={book} />}
+      </span>
     </span>
   );
 }
@@ -2350,7 +2336,7 @@ export default function FeedPage() {
   const [feedCoverBook, setFeedCoverBook] = useState<Book | null>(null);
   const [resumeDraft, setResumeDraft] = useState<{ form: BookRecord; step: "book" | "reading" | "purchase" | "notes"; readingDate: string } | null>(null);
   const sectionScrollRef = useRef<Record<"grid" | "feed" | "record" | "stats", number>>({ grid: 0, feed: 0, record: 0, stats: 0 });
-  const scrollRestoreFrameRef = useRef<number | null>(null);
+  const scrollRestoreTargetRef = useRef<"grid" | "feed" | "record" | "stats" | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
   const coverScrollRef = useRef(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -2461,17 +2447,8 @@ export default function FeedPage() {
         document.getElementById(pending)?.scrollIntoView({ block: "start" }),
       );
   }, [view, pending]);
-  useEffect(() => () => {
-    if (scrollRestoreFrameRef.current !== null) window.cancelAnimationFrame(scrollRestoreFrameRef.current);
-  }, []);
   function restoreSectionScroll(section: "grid" | "feed" | "record" | "stats") {
-    if (scrollRestoreFrameRef.current !== null) window.cancelAnimationFrame(scrollRestoreFrameRef.current);
-    scrollRestoreFrameRef.current = window.requestAnimationFrame(() => {
-      scrollRestoreFrameRef.current = window.requestAnimationFrame(() => {
-        window.scrollTo(0, sectionScrollRef.current[section]);
-        scrollRestoreFrameRef.current = null;
-      });
-    });
+    scrollRestoreTargetRef.current = section;
   }
   function openPost(book: Book, index: number) {
     sectionScrollRef.current[currentSection as "grid" | "feed" | "record" | "stats"] = window.scrollY;
@@ -2782,6 +2759,12 @@ export default function FeedPage() {
     ? Math.max(0, Math.round((1 - form.paid_price / form.list_price) * 100))
     : 0;
   const currentSection = view === "calendar" || view === "records" ? "record" : view;
+  useLayoutEffect(() => {
+    const target = scrollRestoreTargetRef.current;
+    if (!target || target !== currentSection) return;
+    window.scrollTo(0, sectionScrollRef.current[target]);
+    scrollRestoreTargetRef.current = null;
+  }, [currentSection]);
   function selectRecordView(next: "calendar" | "records") {
     setRecordView(next);
     setView(next);
