@@ -2611,7 +2611,10 @@ html { scrollbar-gutter: stable; }
   pointer-events: none;
 }
 .recordModal.imageExporting .noteHeart,
-.post.imageExporting .noteHeart { overflow: visible; }
+.post.imageExporting .noteHeart {
+  overflow: visible;
+  transform: translateY(calc(-2px * var(--font-scale, 1)));
+}
 .profileStatsHeader {
   display: grid;
   grid-template-columns: 92px minmax(0,1fr);
