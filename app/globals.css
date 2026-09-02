@@ -535,7 +535,7 @@
 .feedPage.fontSummer .reviewNote p{font-size:calc(11.5px * var(--font-scale, 1));font-weight:400;line-height:1.68}
 .feedPage.fontSummer .richNoteEditor strong,
 .feedPage.fontSummer .reviewNote p strong,
-.feedPage.fontSummer .savedNoteText strong{font-weight:550}
+.feedPage.fontSummer .savedNoteText strong{font-weight:600}
 .feedPage.fontSummer .reviewNote .noteHeart{margin-top:calc(4.65px * var(--font-scale, 1))}
   .feedPage.fontSummer .collectionBookInfo>b{font-weight:600}
   .feedPage.fontSummer .feedList .identity>b{font-weight:600}
