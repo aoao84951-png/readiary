@@ -1459,7 +1459,7 @@
   text-align: left;
   cursor: pointer;
 }
-.advancedSearchToggle span { font-size:calc(9px * var(--font-scale, 1)); font-weight: 700; }
+.advancedSearchToggle span { font-size:calc(9px * var(--font-scale, 1)); font-weight: 500; }
 .advancedSearchToggle.open { color: #b27489; }
 .searchSecondaryActions .manual {
   width: auto;
@@ -1467,6 +1467,7 @@
   padding: 0;
   color: #aaa6a2;
   font-size:calc(8.5px * var(--font-scale, 1));
+  font-weight: 500;
   text-align: right;
 }
 .advancedSearchFields {

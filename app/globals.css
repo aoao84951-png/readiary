@@ -570,6 +570,8 @@
   .feedPage.fontSummer .filterPanel button.on{font-weight:600!important}
 
   .feedPage.fontSummer .addDrawer button{font-weight:550!important}
+  .feedPage.fontSummer .addDrawer .advancedSearchToggle span,
+  .feedPage.fontSummer .addDrawer .searchSecondaryActions .manual{font-weight:500!important}
   .feedPage.fontSummer .addDrawer label{font-weight:550!important}
   .feedPage.fontSummer .addDrawer b,
   .feedPage.fontSummer .addDrawer strong,
