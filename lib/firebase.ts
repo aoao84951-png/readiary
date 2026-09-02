@@ -91,11 +91,19 @@ async function request(path: string, init?: RequestInit) {
 export const firebaseConfigured = () => Boolean(config());
 
 export async function listDocuments(collection: string) {
-  const response = await request(`${collection}?pageSize=200`);
-  if (!response) return null;
-  if (!response.ok) throw new Error(await response.text());
-  const data = await response.json() as { documents?: FirestoreDocument[] };
-  return (data.documents || []).map(record);
+  const documents: FirestoreDocument[] = [];
+  let pageToken = '';
+  do {
+    const params = new URLSearchParams({ pageSize: '200' });
+    if (pageToken) params.set('pageToken', pageToken);
+    const response = await request(`${collection}?${params.toString()}`);
+    if (!response) return null;
+    if (!response.ok) throw new Error(await response.text());
+    const data = await response.json() as { documents?: FirestoreDocument[]; nextPageToken?: string };
+    documents.push(...(data.documents || []));
+    pageToken = data.nextPageToken || '';
+  } while (pageToken);
+  return documents.map(record);
 }
 
 export async function createDocument(collection: string, data: Record<string, unknown>) {
