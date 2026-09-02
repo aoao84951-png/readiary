@@ -654,16 +654,31 @@ function MultiEditableSelect({ values, options, onChange, onAdd, onOptionsChange
   const all = [...new Set([...orderedOptions, ...values])];
   const filtered = all.filter((option) => option.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   useEffect(() => {
-    function closeOnOutsidePointer(event: PointerEvent) {
+    function closeMenu() {
       const details = detailsRef.current;
-      if (!details?.open || !(event.target instanceof Node) || details.contains(event.target)) return;
+      if (!details?.open) return false;
       details.open = false;
       setCreating(false);
       setDraft("");
       setQuery("");
+      return true;
+    }
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const details = detailsRef.current;
+      if (!details?.open || !(event.target instanceof Node) || details.contains(event.target)) return;
+      closeMenu();
+    }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape" || !closeMenu()) return;
+      event.preventDefault();
+      event.stopPropagation();
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape, true);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape, true);
+    };
   }, []);
   async function commit() {
     const clean = draft.trim();
