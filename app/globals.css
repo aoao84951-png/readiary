@@ -579,6 +579,33 @@
   .feedPage.fontSummer .addDrawer .wizardActions button,
   .feedPage.fontSummer .addDrawer .wizardNext,
   .feedPage.fontSummer .addDrawer .draftResumeDialog button{font-weight:600!important}
+
+  .feedPage.fontSummer .statsIntro h1,
+  .feedPage.fontSummer .statsCopy h1,
+  .feedPage.fontSummer .statCard>b,
+  .feedPage.fontSummer .genreChapterName>b,
+  .feedPage.fontSummer .statsListHead>b,
+  .feedPage.fontSummer .statsListHead b,
+  .feedPage.fontSummer .statsBookItem .archiveIdentity>b,
+  .feedPage.fontSummer .profileReadingBio>b{font-weight:600!important}
+  .feedPage.fontSummer .statsCategoryTabs>button,
+  .feedPage.fontSummer .statsIntro>span,
+  .feedPage.fontSummer .statsCopy>span,
+  .feedPage.fontSummer .statsSection>header span,
+  .feedPage.fontSummer .genreStatusFilters>button>span,
+  .feedPage.fontSummer .genreChapterIndex>small,
+  .feedPage.fontSummer .readingYearMonths>button>span,
+  .feedPage.fontSummer .yearTabs button,
+  .feedPage.fontSummer .purchaseYearSelect select,
+  .feedPage.fontSummer .purchaseMonths>button>span,
+  .feedPage.fontSummer .statsListHead small,
+  .feedPage.fontSummer .statsListModal>footer span{font-weight:550!important}
+  .feedPage.fontSummer .statsSummary small,
+  .feedPage.fontSummer .readingSnapshot small,
+  .feedPage.fontSummer .statusStats small,
+  .feedPage.fontSummer .readingYearTotals small,
+  .feedPage.fontSummer .genreChapterMeta>strong>small,
+  .feedPage.fontSummer .profileNumbers small{font-weight:500!important}
 }
 .frontCover{width:100%;height:100%;display:block;object-fit:contain}
 .feedArtwork{position:absolute;inset:0;display:block;isolation:isolate;pointer-events:none}
