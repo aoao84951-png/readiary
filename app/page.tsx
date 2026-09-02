@@ -2145,7 +2145,7 @@ function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange,
     <section className="hallPage">
       <header className="hallHero">
         <h1>명예의 전당</h1>
-        <span aria-label="별점 5점"><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></span>
+        <span aria-label="별점 5점">{summerFont ? <StarScale value={5} /> : <><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></>}</span>
       </header>
       {favorites.length ? (
         <div className="hallShelf">

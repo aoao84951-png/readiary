@@ -123,6 +123,12 @@
 .recordRow .starUnit {
   font-size:calc(12px * var(--font-scale, 1));
 }
+.hallHero .starScale {
+  gap: 4px;
+}
+.hallHero .starUnit {
+  font-size:calc(12px * var(--font-scale, 1));
+}
 .ratingControl {
   position: relative;
   width: 138px;
