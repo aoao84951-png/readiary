@@ -252,6 +252,10 @@ async function prepareServerExportResources(source: HTMLElement, clone: HTMLElem
   cloneNodes.forEach((cloneNode, index) => {
     const sourceNode = sourceNodes[index];
     if (!sourceNode) return;
+    const computedStyle = getComputedStyle(sourceNode);
+    cloneNode.style.fontFamily = computedStyle.fontFamily;
+    cloneNode.style.fontWeight = computedStyle.fontWeight;
+    cloneNode.style.fontStyle = computedStyle.fontStyle;
     if (cloneNode instanceof HTMLImageElement && sourceNode instanceof HTMLImageElement) {
       const url = sourceNode.currentSrc || sourceNode.src || sourceNode.getAttribute("src") || "";
       if (url) cloneNode.src = serverExportImageUrl(url);
@@ -294,6 +298,11 @@ async function inlineExportResources(source: HTMLElement, clone: HTMLElement) {
   await Promise.all(cloneNodes.map(async (cloneNode, index) => {
     const sourceNode = sourceNodes[index];
     if (!sourceNode) return;
+
+    const computedStyle = getComputedStyle(sourceNode);
+    cloneNode.style.fontFamily = computedStyle.fontFamily;
+    cloneNode.style.fontWeight = computedStyle.fontWeight;
+    cloneNode.style.fontStyle = computedStyle.fontStyle;
 
     if (cloneNode instanceof HTMLImageElement && sourceNode instanceof HTMLImageElement) {
       const url = sourceNode.currentSrc || sourceNode.src || sourceNode.getAttribute("src") || "";

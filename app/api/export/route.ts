@@ -85,12 +85,17 @@ export async function POST(request: NextRequest) {
     @font-face{font-family:Pretendard;src:url('${allowedOrigin}/fonts/Pretendard-ExtraBold.ttf') format('truetype');font-weight:701 900;font-display:block}
     @font-face{font-family:'Courier Prime';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
     @font-face{font-family:'Courier New';src:url('${allowedOrigin}/fonts/CourierPrime-Bold.ttf') format('truetype');font-weight:700;font-display:block}
+    @font-face{font-family:'Aa Yeoreum Sori';src:url('${allowedOrigin}/fonts/AaYeoreumSoriMedium.ttf') format('truetype');font-weight:400;font-display:block}
+    @font-face{font-family:'Aa Yeoreum Sori';src:url('${allowedOrigin}/fonts/AaYeoreumSori500.woff2') format('woff2');font-weight:500;font-display:block}
+    @font-face{font-family:'Aa Yeoreum Sori';src:url('${allowedOrigin}/fonts/AaYeoreumSori550.woff2') format('woff2');font-weight:550;font-display:block}
+    @font-face{font-family:'Aa Yeoreum Sori';src:url('${allowedOrigin}/fonts/AaYeoreumSoriSemiBold.woff2') format('woff2');font-weight:600;font-display:block}
+    @font-face{font-family:'Aa Yeoreum Sori';src:url('${allowedOrigin}/fonts/AaYeoreumSoriBold.woff2') format('woff2');font-weight:700;font-display:block}
   `;
   const exportFixCss = `
     html,body{margin:0!important;padding:0!important;width:max-content!important;min-width:0!important;background:transparent!important;overflow:visible!important}
     body{display:block!important}.imageExporting{margin:0!important;animation:none!important}
     .imageExporting .metaActions{align-items:center!important;gap:7px!important}
-    .imageExporting .genreText,.imageExporting .statusText{display:inline-flex!important;align-items:center!important;height:14px!important;font-family:Pretendard,sans-serif!important;font-size:10px!important;font-weight:700!important;line-height:14px!important;letter-spacing:0!important;vertical-align:middle!important}
+    .imageExporting .genreText,.imageExporting .statusText{display:inline-flex!important;align-items:center!important;height:14px!important;font-size:10px!important;line-height:14px!important;letter-spacing:0!important;vertical-align:middle!important}
     .imageExporting .statusText{transform:translateY(-.15px)}
   `;
   const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${escapeAttribute(allowedOrigin)}/"><style>${fontCss}${safeCss}${exportFixCss}</style></head><body>${input.html}</body></html>`;
