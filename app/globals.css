@@ -133,6 +133,7 @@
 }
 .hallHero > span {
   margin-top: 16px;
+  color: #ffbd32;
 }
 @media (max-width: 520px) {
   .hallPage {

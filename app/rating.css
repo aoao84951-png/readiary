@@ -129,32 +129,6 @@
 .hallHero .starUnit {
   font-size:calc(12px * var(--font-scale, 1));
 }
-.feedPage:not(.fontSummer) .hallHero .starUnit {
-  width: 1em;
-}
-.feedPage:not(.fontSummer) .hallHero .starCharacter {
-  display: none;
-}
-.feedPage:not(.fontSummer) .hallHero .starEmpty svg,
-.feedPage:not(.fontSummer) .hallHero .starFill svg {
-  display: block;
-}
-.feedPage:not(.fontSummer) .hallHero .starEmpty {
-  z-index: 2;
-  color: #d98aa2;
-  pointer-events: none;
-}
-.feedPage:not(.fontSummer) .hallHero .starEmpty path {
-  fill: none;
-  stroke-width: 1.75;
-}
-.feedPage:not(.fontSummer) .hallHero .starFill {
-  z-index: 1;
-  color: #fff0a8;
-}
-.feedPage:not(.fontSummer) .hallHero .starFill path {
-  stroke: none;
-}
 .ratingControl {
   position: relative;
   width: 138px;
