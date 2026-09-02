@@ -522,6 +522,7 @@
 
 @font-face{font-family:'Aa Yeoreum Sori Regular';src:url('/fonts/AaYeoreumSori.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 @font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSoriMedium.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSori500.woff2') format('woff2');font-style:normal;font-weight:500;font-display:swap}
 @font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSori550.woff2') format('woff2');font-style:normal;font-weight:550;font-display:swap}
 @font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSoriSemiBold.woff2') format('woff2');font-style:normal;font-weight:600;font-display:swap}
 @font-face{font-family:'Aa Yeoreum Sori';src:url('/fonts/AaYeoreumSoriBold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
@@ -531,6 +532,30 @@
 .feedPage.fontSummer .collectionFilterSummary{font-family:'Aa Yeoreum Sori',-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif}
 .feedPage.fontSummer .reviewNote p{font-weight:550}
 @media(max-width:520px){.feedPage.fontSummer .reviewNote p{font-size:calc(11.5px * var(--font-scale, 1));font-weight:400;line-height:1.68}.feedPage.fontSummer .reviewNote .noteHeart{margin-top:calc(4.65px * var(--font-scale, 1))}}
+@media(max-width:520px){
+  .feedPage.fontSummer .modalArchive>.archiveListButton .archiveIdentity>b,
+  .feedPage.fontSummer .statusQuickEditor select,
+  .feedPage.fontSummer .groupProgress>span small,
+  .feedPage.fontSummer .groupProgress>p span,
+  .feedPage.fontSummer .savedNoteText,
+  .feedPage.fontSummer .genreChapterMeta>strong>small,
+  .feedPage.fontSummer .recordForm .wizardPage label,
+  .feedPage.fontSummer .recordForm .wizardPage .editableSelect>span,
+  .feedPage.fontSummer .recordForm .wizardPage .purchaseMethodProperty>span,
+  .feedPage.fontSummer .recordForm .wizardPage .purchaseEntryComposer label>span,
+  .feedPage.fontSummer .recordForm .wizardPage .purchaseItemDate>span:first-child,
+  .feedPage.fontSummer .recordForm .wizardPage input,
+  .feedPage.fontSummer .recordForm .wizardPage select,
+  .feedPage.fontSummer .recordForm .wizardPage textarea,
+  .feedPage.fontSummer .recordForm .wizardPage .multiEditableSelect summary,
+  .feedPage.fontSummer .recordForm .wizardPage>.notionDateProperty,
+  .feedPage.fontSummer .recordForm .dateDisplay,
+  .feedPage.fontSummer .recordForm .readingDatesField>.propertyLabel,
+  .feedPage.fontSummer .recordForm .countField .countNumber,
+  .feedPage.fontSummer .recordForm .countField .countUnit,
+  .feedPage.fontSummer .recordForm .flexDateTrigger,
+  .feedPage.fontSummer .recordForm .flexDatePopover{font-weight:550!important}
+}
 .frontCover{width:100%;height:100%;display:block;object-fit:contain}
 .feedArtwork{position:absolute;inset:0;display:block;isolation:isolate;pointer-events:none}
 .feedPage [hidden]{display:none!important}
