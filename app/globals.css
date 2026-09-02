@@ -535,6 +535,7 @@
 @media(max-width:520px){
   .feedPage.fontSummer .collectionBookInfo>b{font-weight:600}
   .feedPage.fontSummer .feedList .identity>b{font-weight:600}
+  .feedPage.fontSummer .feedList .identity>small{font-weight:500}
   .feedPage.fontSummer .modalArchive>.archiveListButton .archiveIdentity>b,
   .feedPage.fontSummer .statusQuickEditor select,
   .feedPage.fontSummer .groupProgress>span small,
@@ -557,6 +558,25 @@
   .feedPage.fontSummer .recordForm .countField .countUnit,
   .feedPage.fontSummer .recordForm .flexDateTrigger,
   .feedPage.fontSummer .recordForm .flexDatePopover{font-weight:550!important}
+
+  .feedPage.fontSummer .topToolMenu button,
+  .feedPage.fontSummer .topToolMenu .fontSizeControl,
+  .feedPage.fontSummer .topToolMenu .fontSizeStepper b{font-weight:550!important}
+  .feedPage.fontSummer>.searchBar input,
+  .feedPage.fontSummer .filterPanel .searchBar input{font-weight:500!important}
+  .feedPage.fontSummer .filterPanel b,
+  .feedPage.fontSummer .filterPanel button,
+  .feedPage.fontSummer .filterPanel small{font-weight:550!important}
+  .feedPage.fontSummer .filterPanel button.on{font-weight:600!important}
+
+  .feedPage.fontSummer .addDrawer button{font-weight:550!important}
+  .feedPage.fontSummer .addDrawer label{font-weight:550!important}
+  .feedPage.fontSummer .addDrawer b,
+  .feedPage.fontSummer .addDrawer strong,
+  .feedPage.fontSummer .addDrawer .save,
+  .feedPage.fontSummer .addDrawer .wizardActions button,
+  .feedPage.fontSummer .addDrawer .wizardNext,
+  .feedPage.fontSummer .addDrawer .draftResumeDialog button{font-weight:600!important}
 }
 .frontCover{width:100%;height:100%;display:block;object-fit:contain}
 .feedArtwork{position:absolute;inset:0;display:block;isolation:isolate;pointer-events:none}
