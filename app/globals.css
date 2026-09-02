@@ -534,7 +534,7 @@
 @media(max-width:520px){.feedPage.fontSummer .reviewNote p{font-size:calc(11.5px * var(--font-scale, 1));font-weight:400;line-height:1.68}.feedPage.fontSummer .reviewNote .noteHeart{margin-top:calc(4.65px * var(--font-scale, 1))}}
 @media(max-width:520px){
   .feedPage.fontSummer .collectionBookInfo>b{font-weight:600}
-  .feedPage.fontSummer .feedList .identity>b{font-weight:700}
+  .feedPage.fontSummer .feedList .identity>b{font-weight:600}
   .feedPage.fontSummer .modalArchive>.archiveListButton .archiveIdentity>b,
   .feedPage.fontSummer .statusQuickEditor select,
   .feedPage.fontSummer .groupProgress>span small,
