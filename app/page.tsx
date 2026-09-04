@@ -2381,6 +2381,7 @@ export default function FeedPage() {
   const sectionScrollRef = useRef<Record<"grid" | "feed" | "record" | "stats", number>>({ grid: 0, feed: 0, record: 0, stats: 0 });
   const scrollRestoreTargetRef = useRef<"grid" | "feed" | "record" | "stats" | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
+  const addSearchInputRef = useRef<HTMLInputElement | null>(null);
   const topMenuRef = useRef<HTMLDivElement | null>(null);
   const topMenuToggleRef = useRef<HTMLButtonElement | null>(null);
   const coverScrollRef = useRef(0);
@@ -2454,6 +2455,21 @@ export default function FeedPage() {
       document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
     };
   }, [topMenuOpen]);
+  useEffect(() => {
+    if (!adding) return;
+    function closeAddOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setAdding(false);
+    }
+    document.addEventListener("keydown", closeAddOnEscape);
+    return () => document.removeEventListener("keydown", closeAddOnEscape);
+  }, [adding]);
+  useEffect(() => {
+    if (!adding || step !== "search") return;
+    const frame = requestAnimationFrame(() => addSearchInputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [adding, step]);
   useEffect(() => {
     if (loading) return;
     void writeCachedBooks(books).catch(() => undefined);
@@ -3104,6 +3120,8 @@ export default function FeedPage() {
                 <form className="addSearch" onSubmit={findBooks}>
                   <Search size={15} />
                   <input
+                    ref={addSearchInputRef}
+                    autoFocus
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="책 제목 검색"
