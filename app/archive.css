@@ -2952,6 +2952,17 @@ html { scrollbar-gutter: stable; }
   box-shadow: none;
   animation: statsDetailIn .18s ease-out;
 }
+.embeddedRecordModalShade .recordModalHead {
+  min-height: 78px;
+  flex: 0 0 auto;
+}
+.embeddedRecordModalShade .recordModalBody {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 @keyframes statsDetailIn {
   from { opacity: 0; transform: translateX(12px); }
 }
