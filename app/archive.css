@@ -2906,6 +2906,9 @@ html { scrollbar-gutter: stable; }
 .statsBookItem:hover,
 .statsBookItem:focus-visible { background: #fafaf8; outline: 0; }
 .statsListHead.showingDetail { min-height: 58px; padding-top: 10px; padding-bottom: 10px; }
+.statsListModal.showingDetail {
+  height: min(720px, calc(100dvh - 40px));
+}
 .statsListHead > .statsListBack {
   width: auto;
   max-width: calc(100% - 46px);
@@ -2957,14 +2960,22 @@ html { scrollbar-gutter: stable; }
   flex: 0 0 auto;
 }
 .embeddedRecordModalShade .recordModalBody {
+  height: 0;
   min-height: 0;
   flex: 1 1 auto;
   overflow-y: auto;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 @keyframes statsDetailIn {
   from { opacity: 0; transform: translateX(12px); }
+}
+
+@media (max-width: 520px) {
+  .statsListModal.showingDetail {
+    height: calc(100dvh - max(20px, env(safe-area-inset-top)) - max(20px, env(safe-area-inset-bottom)));
+  }
 }
 
 /* Mobile record typography: only scale the property editor itself.

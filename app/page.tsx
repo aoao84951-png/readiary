@@ -2139,7 +2139,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
   const monthlyTotal = books.reduce((sum, book) => sum + monthlyEntries(book).reduce((bookSum, entry) => bookSum + (entry.item.paid_price || 0), 0), 0);
   return (
     <div className="statsListShade" onMouseDown={onClose}>
-      <section className="statsListModal" role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
+      <section className={`statsListModal ${selectedBook ? "showingDetail" : ""}`} role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
         <header className={`statsListHead ${selectedBook ? "showingDetail" : ""}`}>
           {selectedBook ? <button type="button" className="statsListBack" onClick={returnToList}><ChevronLeft size={17} /><span>{title} 목록</span></button> : <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : mode === "genre" ? "BY GENRE" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>}
           <button type="button" onClick={onClose} aria-label="목록 닫기"><X size={17} /></button>
