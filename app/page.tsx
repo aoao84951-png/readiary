@@ -1833,7 +1833,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false, summerFont = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean; summerFont?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false, summerFont = false, embedded = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean; summerFont?: boolean; embedded?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -1882,7 +1882,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
             ? "before"
             : "basket";
   return (
-    <section className="archiveList modalArchive">
+    <section className={`archiveList modalArchive ${embedded ? "embeddedArchive" : ""}`}>
       {!hideList && <header className="archiveHead">
         <span>MY BOOK RECORDS</span>
         <b>{String(books.length).padStart(2, "0")}</b>
@@ -1936,7 +1936,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
             : Boolean(book.liked_notes.some((note) => note.trim()) || book.disliked_notes.some((note) => note.trim()));
           return (
             <div
-              className="recordModalShade"
+              className={`recordModalShade ${embedded ? "embeddedRecordModalShade" : ""}`}
               onMouseDown={closeSelected}
             >
               <section
@@ -1974,9 +1974,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                         {onDelete && <button className="deleteRecordButton" onClick={() => setConfirmingDelete(true)}><Trash2 size={13} /><span>기록 삭제</span></button>}
                       </div>
                     </details>
-                    <button onClick={closeSelected} aria-label="상세 기록 닫기">
-                      <X size={17} />
-                    </button>
+                    {!embedded && <button onClick={closeSelected} aria-label="상세 기록 닫기"><X size={17} /></button>}
                   </div>
                 </header>
                 {confirmingDelete && (
@@ -2105,34 +2103,55 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
 }
 
 function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }: { title: string; subtitle: string; books: Book[]; mode: "status" | "purchase" | "reading" | "genre"; purchaseMonth?: string; onClose: () => void }) {
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const listScrollRef = useRef(0);
+  const shouldRestoreScrollRef = useRef(false);
+  function openDetail(book: Book) {
+    listScrollRef.current = listRef.current?.scrollTop || 0;
+    setSelectedBook(book);
+  }
+  function returnToList() {
+    shouldRestoreScrollRef.current = true;
+    setSelectedBook(null);
+  }
+  useLayoutEffect(() => {
+    if (selectedBook || !shouldRestoreScrollRef.current) return;
+    shouldRestoreScrollRef.current = false;
+    if (listRef.current) listRef.current.scrollTop = listScrollRef.current;
+  }, [selectedBook]);
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (selectedBook) returnToList();
+      else onClose();
+    };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [onClose]);
+  }, [onClose, selectedBook]);
   const statusClass = (status: string) => status === "완독" ? "done" : status === "하차" ? "paused" : status === "읽는 중" ? "reading" : status === "읽기 전" ? "before" : "basket";
   const monthlyEntries = (book: Book) => mode === "purchase" && purchaseMonth ? bookPurchaseEntries(book).filter(entry => entry.date.startsWith(purchaseMonth)) : [];
   const monthlyTotal = books.reduce((sum, book) => sum + monthlyEntries(book).reduce((bookSum, entry) => bookSum + (entry.item.paid_price || 0), 0), 0);
   return (
     <div className="statsListShade" onMouseDown={onClose}>
       <section className="statsListModal" role="dialog" aria-modal="true" aria-label={`${title} 목록`} onMouseDown={(event) => event.stopPropagation()}>
-        <header className="statsListHead">
-          <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : mode === "genre" ? "BY GENRE" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>
+        <header className={`statsListHead ${selectedBook ? "showingDetail" : ""}`}>
+          {selectedBook ? <button type="button" className="statsListBack" onClick={returnToList}><ChevronLeft size={17} /><span>{title} 목록</span></button> : <span><small>{mode === "status" ? "READING STATUS" : mode === "reading" ? "MY READING YEAR" : mode === "genre" ? "BY GENRE" : "PURCHASE LOG"}</small><b>{title}</b><em>{subtitle}</em></span>}
           <button type="button" onClick={onClose} aria-label="목록 닫기"><X size={17} /></button>
         </header>
-        <div className="statsBookList">
+        {selectedBook ? <ModalRecordArchive books={books} openBook={selectedBook} onClose={returnToList} hideList embedded /> : <><div ref={listRef} className="statsBookList">
           {books.length ? books.map((book) => {
             const entries = monthlyEntries(book);
             const labels = entries.map(entry => entry.item.label);
             const days = [...new Set(entries.map(entry => entry.date.slice(8, 10)).filter(Boolean))];
             const monthPaid = entries.reduce((sum, entry) => sum + (entry.item.paid_price || 0), 0);
             return (
-            <article className="statsBookItem" key={book.id}>
+            <button type="button" className="statsBookItem" key={book.id} onClick={() => openDetail(book)} aria-label={`${book.title} 상세 기록 열기`}>
               <span className="archiveCover">{book.cover_url ? <img src={book.cover_url} alt="" /> : <span>▦</span>}</span>
               <span className="archiveIdentity">
                 <b>{book.title}</b>
@@ -2144,10 +2163,10 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
               ) : (
                 <span className="statsPurchaseAmount"><b>{monthPaid.toLocaleString()}원</b><small>{days.length ? `${days.map(day => `${Number(day)}일`).join(" · ")} · ` : ""}{book.platform || "플랫폼 미기록"}</small></span>
               )}
-            </article>
+            </button>
           );}) : <div className="statsListEmpty">해당하는 기록이 아직 없어요.</div>}
         </div>
-        <footer><span>{String(books.length).padStart(2, "0")} BOOKS</span>{mode === "purchase" && <b>합계 {monthlyTotal.toLocaleString()}원</b>}</footer>
+        <footer><span>{String(books.length).padStart(2, "0")} BOOKS</span>{mode === "purchase" && <b>합계 {monthlyTotal.toLocaleString()}원</b>}</footer></>}
       </section>
     </div>
   );

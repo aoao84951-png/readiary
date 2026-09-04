@@ -2894,6 +2894,68 @@ html { scrollbar-gutter: stable; }
 }
 .recordForm input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
 
+/* Statistics drill-down keeps the list dialog in place while showing a book. */
+.statsBookItem {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.statsBookItem:hover,
+.statsBookItem:focus-visible { background: #fafaf8; outline: 0; }
+.statsListHead.showingDetail { min-height: 58px; padding-top: 10px; padding-bottom: 10px; }
+.statsListHead > .statsListBack {
+  width: auto;
+  max-width: calc(100% - 46px);
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 0 8px 0 4px;
+  border-radius: 9px;
+  background: transparent;
+  color: #776f6b;
+  font-size: calc(9px * var(--font-scale, 1));
+  font-weight: 750;
+}
+.statsListBack span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.statsListHead > .statsListBack:hover,
+.statsListHead > .statsListBack:focus-visible { background: #f7f4f2; outline: 0; }
+.statsListModal > .embeddedArchive {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  padding: 0;
+  overflow: hidden;
+}
+.embeddedArchive > .embeddedRecordModalShade {
+  position: static;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  animation: none;
+}
+.embeddedRecordModalShade > .recordModal {
+  width: 100%;
+  max-height: none;
+  min-height: 0;
+  flex: 1 1 auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: statsDetailIn .18s ease-out;
+}
+@keyframes statsDetailIn {
+  from { opacity: 0; transform: translateX(12px); }
+}
+
 /* Mobile record typography: only scale the property editor itself.
    Keep the wizard progress, navigation and action buttons at their existing
    size; iOS previously enlarged several value controls again because their
