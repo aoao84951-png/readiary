@@ -181,7 +181,7 @@
 .recordForm .countField .countNumber>span,.recordForm .countField .countUnit>span{display:block!important;line-height:32px!important;white-space:nowrap!important}
 .recordForm .countField .countNumber>input,
 .recordForm .countField .countUnit>select{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;cursor:pointer!important}
-.recordForm .countField .countNumber>input{cursor:text!important}
+.recordForm .countField .countNumber>input{opacity:1!important;color:transparent!important;caret-color:#a9677e!important;cursor:text!important}
 .recordForm .categoryProperty>.propertyLabel,.recordForm .categoryProperty>select{height:32px!important;min-height:32px!important;margin:0!important;padding-top:0!important;padding-bottom:0!important;line-height:32px!important}
 .recordForm .categoryProperty>.propertyLabel{display:flex!important;align-items:center!important}
 .recordForm .wizardPurchasePage>.notionDateProperty,.recordForm .wizardPurchasePage .purchaseEntryComposer>label,.recordForm .wizardPurchasePage .purchaseItemDate,.recordForm .wizardPurchasePage .purchaseMethodProperty{height:43px!important;min-height:43px!important;margin:0!important;padding-top:4px!important;padding-bottom:4px!important}
