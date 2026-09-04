@@ -2362,6 +2362,8 @@ export default function FeedPage() {
   const sectionScrollRef = useRef<Record<"grid" | "feed" | "record" | "stats", number>>({ grid: 0, feed: 0, record: 0, stats: 0 });
   const scrollRestoreTargetRef = useRef<"grid" | "feed" | "record" | "stats" | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
+  const topMenuRef = useRef<HTMLDivElement | null>(null);
+  const topMenuToggleRef = useRef<HTMLButtonElement | null>(null);
   const coverScrollRef = useRef(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   async function load(show = false) {
@@ -2416,6 +2418,23 @@ export default function FeedPage() {
     document.documentElement.style.setProperty("--font-scale", String((fontScale / 100) * 1.1));
     window.localStorage.setItem("readiary-font-scale", String(fontScale));
   }, [fontScale]);
+  useEffect(() => {
+    if (!topMenuOpen) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setTopMenuOpen(false);
+    }
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const target = event.target as Node;
+      if (topMenuRef.current?.contains(target) || topMenuToggleRef.current?.contains(target)) return;
+      setTopMenuOpen(false);
+    }
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer, true);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
+    };
+  }, [topMenuOpen]);
   useEffect(() => {
     if (loading) return;
     void writeCachedBooks(books).catch(() => undefined);
@@ -2841,6 +2860,7 @@ export default function FeedPage() {
           <Search size={15} />
         </button>
         <button
+          ref={topMenuToggleRef}
           className={`topMenuToggle ${topMenuOpen || filterOpen ? "on" : ""}`}
           onClick={() => {
             setTopMenuOpen((open) => !open);
@@ -2851,7 +2871,7 @@ export default function FeedPage() {
           <Ellipsis size={18} />
           {(statusFilters.length > 0 || categoryFilters.length > 0) && <i aria-hidden="true" />}
         </button>
-        {topMenuOpen && <div className="topToolMenu">
+        {topMenuOpen && <div ref={topMenuRef} className="topToolMenu">
           <button onClick={() => { setTopMenuOpen(false); setFilterOpen(true); }}><SlidersHorizontal size={14} /><span>필터</span>{(statusFilters.length + categoryFilters.length) > 0 && <small>{statusFilters.length + categoryFilters.length}</small>}</button>
           <button className={sortMode === "created" ? "selected" : ""} onClick={() => selectSort("created")}><ArrowDownUp size={14} /><span>생성일순</span>{sortMode === "created" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
           <button className={sortMode === "purchase" ? "selected" : ""} onClick={() => selectSort("purchase")}><ArrowDownUp size={14} /><span>구매일순</span>{sortMode === "purchase" && <small>{sortDirection === "desc" ? "최신순" : "오래된순"}</small>}</button>
