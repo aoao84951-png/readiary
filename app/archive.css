@@ -2936,10 +2936,15 @@ html { scrollbar-gutter: stable; }
 }
 .embeddedArchive > .embeddedRecordModalShade {
   position: static;
+  width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  place-items: stretch;
   padding: 0;
   background: transparent;
   backdrop-filter: none;
@@ -2947,9 +2952,11 @@ html { scrollbar-gutter: stable; }
 }
 .embeddedRecordModalShade > .recordModal {
   width: 100%;
+  height: 100%;
   max-height: none;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 0 0 100%;
+  align-self: stretch;
   border: 0;
   border-radius: 0;
   box-shadow: none;
