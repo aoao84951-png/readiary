@@ -13,7 +13,7 @@ export type BookRecord = {
   status: string; purchase_date: string | null; platform: string; cover_url: string;
   purchase_year?: number | null; finished_date: string | null; rating: number | null;
   read_count: number; list_price: number; paid_price: number; purchase_method: string;
-  purchase_items?: VolumePurchase[];
+  purchase_items?: VolumePurchase[]; sales_discontinued?: boolean;
   liked_notes: string[]; disliked_notes: string[]; reading_dates?: string[]; source_url?: string; created_at?: string;
   content_forgotten?: boolean; about_keywords?: string; about_summary?: string; about_url?: string; about_characters?: BookCharacter[];
   basket_reason?: string; basket_images?: string[];

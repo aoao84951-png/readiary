@@ -1801,7 +1801,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 </div>
               </div>
               <section className="recordGroup purchaseGroup">
-                <h3>PURCHASE</h3>
+                <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">판매 중단</span>}</h3>
                 <div className="priceLine">
                   <span>
                     <small>총 판매가</small>
@@ -2042,7 +2042,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                     </div>
                   </div>
                   <section className="recordGroup purchaseGroup">
-                    <h3>PURCHASE</h3>
+                    <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">판매 중단</span>}</h3>
                     <button type="button" className="priceLine purchaseSummaryButton" onClick={() => setPurchaseDetailsOpen(true)} aria-label="권별 구매 상세 보기">
                       <span>
                         <small>총 판매가</small>
@@ -3077,6 +3077,7 @@ export default function FeedPage() {
                     >
                       #{book.status}
                     </span>
+                    {book.sales_discontinued && <span className="statusText memoryTag">#판중</span>}
                     {book.content_forgotten && <span className="statusText memoryTag">#기억안남</span>}
                   </div>
                   <ClassicRating rating={book.rating} />
@@ -3338,6 +3339,7 @@ export default function FeedPage() {
                 </div>}
                 {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
+                  <div className="salesDiscontinuedField full"><label><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} aria-describedby="salesDiscontinuedHelp" />판매 중단된 작품</label><p id="salesDiscontinuedHelp">기록한 구매처 기준</p></div>
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>

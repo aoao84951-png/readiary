@@ -44,9 +44,13 @@ test('book updates preserve about data along with previous reading notes', async
     'next/server': { NextResponse: { json: body => body } },
     '@/lib/firebase': { firebaseConfigured: () => true, setDocument: async (_, id, data) => { saved = { id, ...data }; return saved; } },
   });
-  const payload = { ...book, id: 'test', title: '기록', liked_notes: ['예전 감상'], content_forgotten: true, about_keywords: '#현대물', about_summary: '짧은 소개' };
+  const payload = { ...book, id: 'test', title: '기록', sales_discontinued: true, liked_notes: ['예전 감상'], content_forgotten: true, about_keywords: '#현대물', about_summary: '짧은 소개' };
   await api.PATCH({ json: async () => payload });
   assert.equal(saved.content_forgotten, true);
+  assert.equal(saved.sales_discontinued, true);
   assert.deepEqual(saved.about_characters, payload.about_characters);
+  assert.deepEqual(saved.liked_notes, ['예전 감상']);
+  await api.PATCH({ json: async () => ({ ...payload, sales_discontinued: false }) });
+  assert.equal(saved.sales_discontinued, false);
   assert.deepEqual(saved.liked_notes, ['예전 감상']);
 });
