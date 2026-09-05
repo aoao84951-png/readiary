@@ -42,6 +42,13 @@ export default function BookExcerpts({ bookId, title }: { bookId: string; title:
   const [reload, setReload] = useState(0);
   const busy = useRef(false);
   const dialog = useRef<HTMLDivElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  function slide(direction: number) {
+    const element = strip.current;
+    if (!element) return;
+    const card = element.firstElementChild as HTMLElement | null;
+    element.scrollBy({ left: direction * ((card?.offsetWidth || element.clientWidth) + 10), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }
   const touchStart = useRef<number | null>(null);
   const index = items.findIndex(item => item.id === active);
   const current = items[index];
@@ -131,7 +138,7 @@ export default function BookExcerpts({ bookId, title }: { bookId: string; title:
 
   return <section className="bookExcerpts imageExportExclude" aria-label="발췌 이미지">
     <header><h3>발췌 <span>{items.length || ''}</span></h3><label className="excerptAdd"><ImagePlus size={15} />{progress || '이미지 추가'}<input type="file" accept="image/*" multiple disabled={loading || !!progress} onChange={event => { void add(event.target.files); event.target.value = ''; }} /></label></header>
-    {loading ? <p role="status">발췌를 불러오는 중…</p> : items.length ? <div className="excerptGrid">{items.map((item, position) => <button type="button" key={item.id} onClick={() => { setActive(item.id); setConfirmDelete(false); }} aria-label={`발췌 ${position + 1} 크게 보기`}><img src={item.image} alt={`${title} 발췌 ${position + 1}`} loading="lazy" /></button>)}</div> : !error && <p>간직하고 싶은 문장을 이미지로 모아두세요.</p>}
+    {loading ? <p role="status">발췌를 불러오는 중…</p> : items.length ? <div className="excerptCarousel"><div className="excerptGrid" ref={strip} role="region" aria-label="발췌 이미지 슬라이드" tabIndex={0} onKeyDown={event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); slide(event.key === 'ArrowRight' ? 1 : -1); } }}>{items.map((item, position) => <button type="button" key={item.id} onClick={() => { setActive(item.id); setConfirmDelete(false); }} aria-label={`발췌 ${position + 1} 크게 보기`}><img src={item.image} alt={`${title} 발췌 ${position + 1}`} loading="lazy" /></button>)}</div>{items.length > 1 && <div className="excerptNavigation"><button type="button" onClick={() => slide(-1)} aria-label="발췌 왼쪽으로 넘기기"><ChevronLeft size={15} /></button><button type="button" onClick={() => slide(1)} aria-label="발췌 오른쪽으로 넘기기"><ChevronRight size={15} /></button></div>}</div> : !error && <p>간직하고 싶은 문장을 이미지로 모아두세요.</p>}
     {!!progress && <p role="status">{progress}</p>}
     {error && <p role="alert" className="excerptError">{error} <button type="button" disabled={!!progress} onClick={() => setReload(value => value + 1)}>다시 불러오기</button></p>}
     {current && createPortal(<div className="excerptLightbox" ref={dialog} role="dialog" aria-modal="true" aria-label={`${title} 발췌 크게 보기`} tabIndex={-1} onMouseDown={event => { if (event.target === event.currentTarget) close(); }}>
