@@ -3047,7 +3047,11 @@ html { scrollbar-gutter: stable; }
 .addDrawer, .addDrawer .recordForm { overscroll-behavior: none; }
 .drawerShade { overscroll-behavior: none; }
 @media (max-width: 520px) {
+  .recordForm .wizardBookPage .bookMetaFields > .salesDiscontinuedField,
   .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
-    grid-template-columns: 131px minmax(0, 1fr) !important;
+    grid-column: 1 / -1 !important;
+  }
+  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
+    grid-template-columns: 92px minmax(0, 1fr) !important;
   }
 }
