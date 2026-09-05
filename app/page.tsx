@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
 import BookExcerpts from './book-excerpts';
+import { BookAbout, BookAboutEditor } from './book-about';
 
 type Book = BookRecord & { id: string };
 type SearchBook = {
@@ -1821,7 +1822,8 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                   <Row label="구매방법" value={book.purchase_method || "–"} />
                 </dl>
               </section>
-              <section className="recordGroup notesGroup">
+              <BookAbout book={book} />
+                  <section className="recordGroup notesGroup">
                 <div className="archiveNotes">
                   <BookNotes book={book} showEmpty />
                 </div>
@@ -2086,6 +2088,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       <footer><span><small>총 판매가</small><s>{book.list_price.toLocaleString()}원</s></span><span><small>총 실구매가</small><b>{book.paid_price.toLocaleString()}원</b></span></footer>
                     </section>
                   </div>, document.body)}
+                  <BookAbout book={book} />
                   <section className="recordGroup notesGroup">
                     {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
                     {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
@@ -3370,6 +3373,7 @@ export default function FeedPage() {
                   </div>
                 </div>}
                 {step === "notes" && <div className="fields wizardPage wizardNotesPage">
+                  <BookAboutEditor book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
                   <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
                   {form.status === "책바구니" ? (
                     <>

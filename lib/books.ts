@@ -1,3 +1,4 @@
+import type { BookCharacter } from './book-about';
 export type VolumePurchase = {
   label: string;
   purchase_date?: string | null;
@@ -14,5 +15,6 @@ export type BookRecord = {
   read_count: number; list_price: number; paid_price: number; purchase_method: string;
   purchase_items?: VolumePurchase[];
   liked_notes: string[]; disliked_notes: string[]; reading_dates?: string[]; source_url?: string; created_at?: string;
+  content_forgotten?: boolean; about_keywords?: string; about_summary?: string; about_url?: string; about_characters?: BookCharacter[];
   basket_reason?: string; basket_images?: string[];
 };

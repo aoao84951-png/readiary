@@ -1,0 +1,22 @@
+.bookAbout { font-size: calc(8.5px * var(--font-scale, 1)); }
+.bookAbout p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 8px 0; }
+.aboutKeywords { display: flex; flex-wrap: wrap; gap: 4px 9px; color: #99828b; line-height: 1.7; overflow-wrap: anywhere; }
+.aboutPreview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bookAbout details { margin-top: 10px; }
+.bookAbout summary { color: #99918d; cursor: pointer; width: fit-content; }
+.bookAbout:has(details[open]) .aboutPreview { display: none; }
+.bookAbout a { display: inline-block; margin-top: 10px; color: #9c7484; }
+.aboutPerson { margin-top: 14px; }
+.aboutPerson > b { display: block; margin-bottom: 5px; }
+.memoryBadge { display: inline-block; margin-bottom: 12px; padding: 4px 8px; border-radius: 6px; background: #f4f1ee; color: #998c82; font-size: calc(8px * var(--font-scale, 1)); }
+.aboutEditor { min-width: 0; margin-bottom: 18px; }
+.aboutEditor > label { display: block; margin: 14px 0; }
+.aboutEditor .aboutHint { color: #aaa; font-size: calc(8.5px * var(--font-scale, 1)); }
+.aboutEditor .memoryCheck { display: flex; align-items: center; gap: 7px; color: #8b7c73; }
+.aboutEditor .memoryCheck input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
+.aboutEditor fieldset { min-width: 0; margin: 16px 0; padding: 12px; border: 1px solid #eee7e9; border-radius: 10px; }
+.aboutEditor legend { color: #99828b; font-size: calc(8px * var(--font-scale, 1)); }
+.aboutEditor fieldset > label { display: block; margin-top: 12px; }
+.aboutPersonHead { display: grid; grid-template-columns: 55px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.aboutEditor button { border: 1px solid #e7dde1; border-radius: 7px; background: transparent; padding: 6px 9px; color: #99828b; font-size: calc(8.5px * var(--font-scale, 1)); cursor: pointer; }
+.aboutAddButtons { display: flex; gap: 8px; margin: 12px 0; }
