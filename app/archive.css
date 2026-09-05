@@ -3031,19 +3031,6 @@ html { scrollbar-gutter: stable; }
 
 .recordForm .wizardBookPage .bookMetaFields .salesDiscontinuedField input { width: 14px; height: 14px; min-height: 0; margin: 0; padding: 0; justify-self: start; accent-color: #bc8296; cursor: pointer; }
 
-/* Keep the introduction row aligned with the other mobile book properties. */
-.recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
-  display: grid !important;
-  grid-template-columns: 92px minmax(0, 1fr) !important;
-  align-items: center;
-}
-.recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty > .aboutPropertyButton {
-  justify-self: start;
-  margin: 0;
-}
-@media (max-width: 520px) {
-  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 78px minmax(0, 1fr) !important; }
-}
 .addDrawer, .addDrawer .recordForm { overscroll-behavior: none; }
 .drawerShade { overscroll-behavior: none; }
 @media (max-width: 520px) {
@@ -3051,8 +3038,4 @@ html { scrollbar-gutter: stable; }
   .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
     grid-column: 1 / -1 !important;
   }
-  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
-    grid-template-columns: 92px minmax(0, 1fr) !important;
-  }
-  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty > .aboutPropertyButton { margin-left: 14px; }
 }
