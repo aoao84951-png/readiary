@@ -1839,7 +1839,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
   );
 }
 
-function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false, summerFont = false, embedded = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book) => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean; summerFont?: boolean; embedded?: boolean }) {
+function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, hideList = false, summerFont = false, embedded = false }: { books: Book[]; openBook?: Book | null; onClose?: () => void; onEdit?: (book: Book, initialStep?: "about") => void; onAddPurchase?: (book: Book) => void; onEditNotes?: (book: Book) => void; onStatusChange?: (book: Book, status: string) => Promise<Book>; onDelete?: (book: Book) => Promise<void>; hideList?: boolean; summerFont?: boolean; embedded?: boolean }) {
   const [selected, setSelected] = useState<{
     book: Book;
     index: number;
@@ -2091,7 +2091,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       <footer><span><small>총 판매가</small><s>{book.list_price.toLocaleString()}원</s></span><span><small>총 실구매가</small><b>{book.paid_price.toLocaleString()}원</b></span></footer>
                     </section>
                   </div>, document.body)}
-                  <BookAbout book={book} />
+                  <BookAbout book={book} onEdit={onEdit ? () => { closeSelected(); onEdit(book, "about"); } : undefined} />
                   <section className="recordGroup notesGroup">
                     {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
                     {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
@@ -2180,7 +2180,7 @@ function StatsListModal({ title, subtitle, books, mode, purchaseMonth, onClose }
   );
 }
 
-function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, summerFont = false }: { books: Book[]; onEdit: (book: Book) => void; onAddPurchase: (book: Book) => void; onEditNotes: (book: Book) => void; onStatusChange: (book: Book, status: string) => Promise<Book>; onDelete: (book: Book) => Promise<void>; summerFont?: boolean }) {
+function HallOfFame({ books, onEdit, onAddPurchase, onEditNotes, onStatusChange, onDelete, summerFont = false }: { books: Book[]; onEdit: (book: Book, initialStep?: "about") => void; onAddPurchase: (book: Book) => void; onEditNotes: (book: Book) => void; onStatusChange: (book: Book, status: string) => Promise<Book>; onDelete: (book: Book) => Promise<void>; summerFont?: boolean }) {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const favorites = books.filter((book) => book.rating === 5);
   return (
@@ -2364,6 +2364,7 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
+  const [openAboutOnEntry, setOpenAboutOnEntry] = useState(false);
   const [step, setStep] = useState<"search" | "book" | "reading" | "purchase" | "notes">("search");
   const [search, setSearch] = useState("");
   const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
@@ -2466,7 +2467,7 @@ export default function FeedPage() {
   useEffect(() => {
     if (!adding) return;
     function closeAddOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
+      if (event.key !== "Escape" || event.defaultPrevented || document.querySelector(".aboutEntryDialog[open]")) return;
       event.preventDefault();
       setAdding(false);
     }
@@ -2614,7 +2615,7 @@ export default function FeedPage() {
     setEditingPurchaseIndex(null);
     setAdding(true);
   }
-  function openEdit(book: Book, initialStep: "book" | "reading" | "purchase" | "notes" = "book") {
+  function openEdit(book: Book, initialStep: "book" | "reading" | "purchase" | "notes" | "about" = "book") {
     const { id, ...record } = book;
     const purchaseItems = purchaseItemsByDate(record.purchase_items?.length
       ? record.purchase_items.map((item) => ({ ...item, purchase_date: item.purchase_date || record.purchase_date || null, methods: item.methods || [] }))
@@ -2630,7 +2631,8 @@ export default function FeedPage() {
     setPurchaseDraft({ label: `${purchaseItems.length + 1}${record.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setMessage("");
-    setStep(initialStep);
+    setOpenAboutOnEntry(initialStep === "about");
+    setStep(initialStep === "about" ? "book" : initialStep);
     setDetailBook(null);
     setAdding(true);
   }
@@ -3255,7 +3257,7 @@ export default function FeedPage() {
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                     <label className="salesDiscontinuedField"><span className="propertyLabel">판매중단</span><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} title="기록한 구매처 기준" /></label>
-                    <BookAboutField book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
+                    <BookAboutField autoOpen={openAboutOnEntry} onOpened={() => setOpenAboutOnEntry(false)} book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
                   </div>
                 </div>
                 </div>}

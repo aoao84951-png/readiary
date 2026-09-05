@@ -60,3 +60,5 @@
 .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 92px minmax(0, 1fr); }
 
 .recordForm .wizardPage .bookAboutProperty > .propertyLabel { color: var(--property-label) !important; font-size: var(--property-font) !important; font-weight: 600 !important; line-height: 1.35 !important; }
+
+.aboutSectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

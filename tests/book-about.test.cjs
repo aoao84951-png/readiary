@@ -54,3 +54,43 @@ test('book updates preserve about data along with previous reading notes', async
   assert.equal(saved.sales_discontinued, false);
   assert.deepEqual(saved.liked_notes, ['예전 감상']);
 });
+
+test('ABOUT offers editing only when content and an edit action are available', () => {
+  const record = { category: '문학', about_summary: '소개' };
+  const editable = renderToStaticMarkup(React.createElement(BookAbout, { book: record, onEdit() {} }));
+  assert.match(editable, /aria-label="작품 소개 수정"/);
+  assert.doesNotMatch(render(BookAbout, record), /aria-label="작품 소개 수정"/);
+  assert.equal(renderToStaticMarkup(React.createElement(BookAbout, { book: { category: '문학' }, onEdit() {} })), '');
+});
+
+test('introduction dialog consumes Escape and dismisses only a complete outside press', () => {
+  const refs = [];
+  const { BookAboutField } = load('app/book-about.tsx', {
+    '@/lib/book-about': helpers,
+    react: { ...React, useEffect() {}, useRef(value) { const ref = { current: value }; refs.push(ref); return ref; } },
+  });
+  const tree = BookAboutField({ book: { category: '문학' }, onChange() {} });
+  const dialog = tree.props.children.find(child => child.type === 'dialog');
+  let closes = 0;
+  const element = { close() { closes++; }, getBoundingClientRect: () => ({ left: 20, right: 320, top: 20, bottom: 500 }) };
+  refs[0].current = element;
+  const event = (x, target = element) => ({ target, clientX: x, clientY: 100, stopPropagation() { this.stopped = true; }, preventDefault() { this.prevented = true; } });
+  const escape = { ...event(100), key: 'Escape' };
+  dialog.props.onKeyDown(escape);
+  assert.equal(closes, 1);
+  assert.equal(escape.stopped, true);
+  assert.equal(escape.prevented, true);
+  dialog.props.onPointerDown(event(100));
+  dialog.props.onPointerUp(event(0));
+  assert.equal(closes, 1, 'dragging from the dialog to its backdrop must not close it');
+  dialog.props.onPointerDown(event(100, {}));
+  dialog.props.onPointerUp(event(100, {}));
+  assert.equal(closes, 1, 'clicking an input must not close it');
+  dialog.props.onPointerDown(event(0));
+  dialog.props.onPointerCancel();
+  dialog.props.onPointerUp(event(0));
+  assert.equal(closes, 1, 'cancelled gestures must not close it');
+  dialog.props.onPointerDown(event(0));
+  dialog.props.onPointerUp(event(0));
+  assert.equal(closes, 2);
+});

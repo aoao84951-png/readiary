@@ -1,6 +1,6 @@
 'use client';
-import { ChevronRight, X } from 'lucide-react';
-import { useRef } from 'react';
+import { ChevronRight, Plus, X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type { BookRecord } from '@/lib/books';
 import { characterRoles, introductionLink, keywordList, type BookCharacter } from '@/lib/book-about';
 import './book-about.css';
@@ -8,14 +8,14 @@ import './book-about.css';
 function Keywords({ value }: { value?: string }) {
   return <div className="aboutKeywords">{keywordList(value).map(word => <span key={word}>#{word}</span>)}</div>;
 }
-export function BookAbout({ book }: { book: BookRecord }) {
+export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => void }) {
   const roles = characterRoles(book.category);
   const characters = (book.about_characters || []).filter(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim()));
   const link = introductionLink(book.about_url);
   const hasAbout = keywordList(book.about_keywords).length || book.about_summary?.trim() || characters.length || link;
   if (!hasAbout) return null;
   return <section className="recordGroup bookAbout">
-    {!!hasAbout && <><h3>ABOUT</h3><Keywords value={book.about_keywords} />
+    {!!hasAbout && <><div className="aboutSectionHeading"><h3>ABOUT</h3>{onEdit && <div className="notesEmptyHead imageExportExclude"><button type="button" aria-label="작품 소개 수정" title="작품 소개 수정" onClick={onEdit}><Plus size={9} /></button></div>}</div><Keywords value={book.about_keywords} />
       {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
       {(characters.length > 0 || book.about_summary?.trim() || link) && <details><summary>인물·소개 펼치기</summary>
         {book.about_summary?.trim() && <p>{book.about_summary}</p>}
@@ -43,7 +43,7 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
   </section>;
 }
 
-export function BookAboutField({ book, onChange }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void }) {
+export function BookAboutField({ book, onChange, autoOpen = false, onOpened }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void; autoOpen?: boolean; onOpened?: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
@@ -53,12 +53,25 @@ export function BookAboutField({ book, onChange }: { book: BookRecord; onChange:
     heading.current?.focus({ preventScroll: true });
     if (body.current) body.current.scrollTop = 0;
   };
+  useEffect(() => {
+    if (autoOpen) {
+      openDialog();
+      onOpened?.();
+    }
+  }, [autoOpen, onOpened]);
+  const backdropPress = useRef(false);
+  const isOutside = (event: { target: EventTarget; clientX: number; clientY: number }) => {
+    const element = dialog.current;
+    if (!element || event.target !== element) return false;
+    const rect = element.getBoundingClientRect();
+    return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+  };
   const roles = characterRoles(book.category);
   const filled = Boolean(book.about_summary?.trim() || keywordList(book.about_keywords).length || book.about_url?.trim() || book.about_characters?.some(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim())));
   return <div className="bookAboutProperty">
     <span className="propertyLabel">작품소개</span>
     <button type="button" className={`aboutPropertyButton${filled ? ' isFilled' : ''}`} aria-label={`작품소개 ${filled ? '작성됨' : '비어 있음'}`} aria-haspopup="dialog" onClick={openDialog}>{filled ? '작성됨' : '비어 있음'}<ChevronRight size={12} aria-hidden="true" /></button>
-    <dialog className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
+    <dialog className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onPointerDown={event => { event.stopPropagation(); backdropPress.current = isOutside(event); }} onPointerUp={event => { event.stopPropagation(); if (backdropPress.current && isOutside(event)) dialog.current?.close(); backdropPress.current = false; }} onPointerCancel={() => { backdropPress.current = false; }} onClick={event => event.stopPropagation()} onMouseDown={event => event.stopPropagation()} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); dialog.current?.close(); } if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
       <header><h2 ref={heading} tabIndex={-1}>작품 소개</h2><button type="button" aria-label="작품 소개 닫기" onClick={() => dialog.current?.close()}><X size={18} /></button></header>
       <div className="aboutEntryBody" ref={body}><BookAboutEditor book={book} onChange={onChange} /></div>
       <footer><span>기록 저장 시 함께 저장됩니다.</span><button type="button" onClick={() => dialog.current?.close()}>완료</button></footer>
