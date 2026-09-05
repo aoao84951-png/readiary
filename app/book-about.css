@@ -13,6 +13,8 @@
 .aboutEditorFields > label { margin: 12px 0; }
 .aboutEditorFields textarea,
 .aboutEditor fieldset textarea { min-height: 0; height: auto; margin-top: 4px; padding: 3px 0 4px; line-height: 1.5; resize: none; }
+.recordForm .wizardPage .aboutEditorFields textarea,
+.recordForm .wizardPage .aboutEditor fieldset textarea { min-height: 0 !important; height: auto !important; field-sizing: content; }
 .aboutEditorFields input,
 .aboutEditor fieldset input,
 .aboutEditor fieldset select { margin-top: 4px; padding-top: 3px; padding-bottom: 4px; border-bottom: 0 !important; }
