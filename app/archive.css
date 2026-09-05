@@ -3026,8 +3026,6 @@ html { scrollbar-gutter: stable; }
 
 .purchaseSectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .recordGroup .purchaseSectionHeading .salesDiscontinuedLabel { color: #aaa09a; font-family: 'Apple SD Gothic Neo', 'Pretendard', sans-serif; font-size: calc(8px * var(--font-scale, 1)); font-weight: 400; letter-spacing: normal; white-space: nowrap; }
-.salesDiscontinuedField { margin: 0 0 12px; }
-.recordForm .salesDiscontinuedField label { display: flex; align-items: center; gap: 7px; }
-.recordForm .salesDiscontinuedField input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
-.salesDiscontinuedField p { margin: 5px 0 0 21px; color: #aaa; font-size: calc(8px * var(--font-scale, 1)); }
 .fontSummer .recordGroup .salesDiscontinuedLabel { font-family: 'Aa Yeoreum Sori', sans-serif; }
+
+.recordForm .wizardBookPage .bookMetaFields .salesDiscontinuedField input { width: 14px; height: 14px; min-height: 0; margin: 0; padding: 0; justify-self: start; accent-color: #bc8296; cursor: pointer; }

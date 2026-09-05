@@ -3254,6 +3254,7 @@ export default function FeedPage() {
                       </select>
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
+                    <label className="salesDiscontinuedField"><span className="propertyLabel">판매중단</span><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} title="기록한 구매처 기준" /></label>
                   </div>
                 </div>
                 </div>}
@@ -3339,7 +3340,6 @@ export default function FeedPage() {
                 </div>}
                 {step === "purchase" && <div className="fields wizardPage wizardPurchasePage">
                   <h3 className="formSectionTitle purchaseTitle">PURCHASE</h3>
-                  <div className="salesDiscontinuedField full"><label><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} aria-describedby="salesDiscontinuedHelp" />판매 중단된 작품</label><p id="salesDiscontinuedHelp">기록한 구매처 기준</p></div>
                   <div className="volumePurchases full">
                     <div className="purchaseEntryComposer">
                       <label><span>{form.count_unit || "권"} 정보</span><input value={purchaseDraft.label} onChange={(event) => setPurchaseDraft((prev) => ({ ...prev, label: event.target.value }))} placeholder={`예: 1${form.count_unit || "권"}`} /></label>
