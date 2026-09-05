@@ -15,7 +15,12 @@
 .aboutEditor fieldset textarea { min-height: 0; height: auto; margin-top: 4px; padding: 3px 0 4px; line-height: 1.5; resize: none; }
 .aboutEditorFields input,
 .aboutEditor fieldset input,
-.aboutEditor fieldset select { margin-top: 4px; padding-top: 3px; padding-bottom: 4px; }
+.aboutEditor fieldset select { margin-top: 4px; padding-top: 3px; padding-bottom: 4px; border-bottom: 0 !important; }
+.aboutEditorFields textarea,
+.aboutEditorFields input,
+.aboutEditor fieldset textarea,
+.aboutEditor fieldset input,
+.aboutEditor fieldset select { border-bottom: 0 !important; }
 .aboutEditor .memoryCheck { display: flex; align-items: center; gap: 7px; color: #8b7c73; }
 .aboutEditor .memoryCheck input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
 .aboutEditor fieldset { min-width: 0; margin: 16px 0; padding: 12px; border: 1px solid #eee7e9; border-radius: 10px; }
