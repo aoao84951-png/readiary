@@ -1,6 +1,6 @@
 .bookExcerpts { margin-top: 22px; padding-top: 20px; border-top: 1px solid #eee7e9; }
 .bookExcerpts > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.bookExcerpts h3 { margin: 0; font-size: calc(8px * var(--font-scale, 1)); font-weight: inherit; color: #aaa; letter-spacing: normal; }
+.bookExcerpts h3 { margin: 0; color: #aaa7a3; font: 700 8px "Courier New", monospace; letter-spacing: .14em; }
 .bookExcerpts h3 span { margin-left: 5px; color: #99828b; font-size: 8px; }
 .excerptAdd { position: relative; display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid #e7dde1; border-radius: 8px; font-size: calc(8.5px * var(--font-scale, 1)); cursor: pointer; }
 .excerptAdd svg { width: 11px; height: 11px; }
