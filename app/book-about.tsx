@@ -45,14 +45,22 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
 
 export function BookAboutField({ book, onChange }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const body = useRef<HTMLDivElement>(null);
+  const openDialog = () => {
+    dialog.current?.showModal();
+    // Start on static content without highlighting Close or opening the keyboard.
+    heading.current?.focus({ preventScroll: true });
+    if (body.current) body.current.scrollTop = 0;
+  };
   const roles = characterRoles(book.category);
   const filled = Boolean(book.about_summary?.trim() || keywordList(book.about_keywords).length || book.about_url?.trim() || book.about_characters?.some(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim())));
   return <div className="bookAboutProperty">
     <span className="propertyLabel">작품소개</span>
-    <button type="button" className="aboutPropertyButton" aria-label={`작품소개 ${filled ? '작성됨' : '비어 있음'}`} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>{filled ? '작성됨' : '비어 있음'}<ChevronRight size={12} aria-hidden="true" /></button>
+    <button type="button" className="aboutPropertyButton" aria-label={`작품소개 ${filled ? '작성됨' : '비어 있음'}`} aria-haspopup="dialog" onClick={openDialog}>{filled ? '작성됨' : '비어 있음'}<ChevronRight size={12} aria-hidden="true" /></button>
     <dialog className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
-      <header><h2>작품 소개</h2><button type="button" aria-label="작품 소개 닫기" onClick={() => dialog.current?.close()}><X size={18} /></button></header>
-      <div className="aboutEntryBody"><BookAboutEditor book={book} onChange={onChange} /></div>
+      <header><h2 ref={heading} tabIndex={-1}>작품 소개</h2><button type="button" aria-label="작품 소개 닫기" onClick={() => dialog.current?.close()}><X size={18} /></button></header>
+      <div className="aboutEntryBody" ref={body}><BookAboutEditor book={book} onChange={onChange} /></div>
       <footer><span>기록 저장 시 함께 저장됩니다.</span><button type="button" onClick={() => dialog.current?.close()}>완료</button></footer>
     </dialog>
   </div>;
