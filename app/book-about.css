@@ -40,6 +40,7 @@
 
 .wizardBookPage .bookMetaFields > .bookAboutProperty { display: grid; grid-template-columns: 160px minmax(0, 1fr); align-items: center; min-height: 43px; padding: 4px 2px; color: #9a9691; font-size: calc(8.5px * var(--font-scale, 1)); }
 .aboutPropertyButton { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 5px 8px; border: 0; border-radius: 5px; background: #f5f3f1; color: #99918d; font: inherit; cursor: pointer; }
+.aboutPropertyButton.isFilled { background: #f5e5ec; color: #a65f7a; }
 .aboutEntryDialog { width: min(540px, calc(100vw - 32px)); max-height: 85dvh; padding: 0; border: 1px solid #eee7e9; border-radius: 16px; color: #514f4c; background: white; overflow: hidden; overscroll-behavior: none; }
 /* Keep the dialog shell still; only the middle row scrolls. */
 .aboutEntryDialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
