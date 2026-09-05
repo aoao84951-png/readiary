@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
+import BookExcerpts from './book-excerpts';
 
 type Book = BookRecord & { id: string };
 type SearchBook = {
@@ -2092,6 +2093,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       <BookNotes book={book} showEmpty />
                     </div>
                   </section>
+                  <BookExcerpts key={book.id} bookId={book.id} title={book.title} />
                 </div>
                 {coverOpen && book.cover_url && <CoverLightbox src={book.cover_url} title={book.title} onClose={() => setCoverOpen(false)} />}
               </section>

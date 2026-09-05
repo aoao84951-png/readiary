@@ -54,6 +54,10 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: '삭제할 기록을 찾지 못했습니다.' }, { status: 400 });
   if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
   try {
+    const excerpts = await listDocuments(`books/${encodeURIComponent(id)}/excerpts`);
+    for (const excerpt of excerpts || []) {
+      if (excerpt.id) await deleteDocument(`books/${encodeURIComponent(id)}/excerpts`, excerpt.id);
+    }
     await deleteDocument('books', id);
     return NextResponse.json({ id });
   } catch (error) {
