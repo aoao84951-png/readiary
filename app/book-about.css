@@ -10,11 +10,18 @@
 .aboutPerson > b { display: block; margin-bottom: 5px; }
 .aboutEditor { min-width: 0; margin-bottom: 18px; }
 .aboutEditor > label, .aboutEditorFields > label { display: block; margin: 14px 0; }
+.aboutEditorFields > label { margin: 12px 0; }
+.aboutEditorFields textarea,
+.aboutEditor fieldset textarea { min-height: 0; height: auto; margin-top: 4px; padding: 3px 0 4px; line-height: 1.5; resize: none; }
+.aboutEditorFields input,
+.aboutEditor fieldset input,
+.aboutEditor fieldset select { margin-top: 4px; padding-top: 3px; padding-bottom: 4px; }
 .aboutEditor .memoryCheck { display: flex; align-items: center; gap: 7px; color: #8b7c73; }
 .aboutEditor .memoryCheck input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
 .aboutEditor fieldset { min-width: 0; margin: 16px 0; padding: 12px; border: 1px solid #eee7e9; border-radius: 10px; }
 .aboutEditor legend { color: #99828b; font-size: calc(8px * var(--font-scale, 1)); }
 .aboutEditor fieldset > label { display: block; margin-top: 12px; }
+.aboutEditor fieldset > label { margin-top: 10px; }
 .aboutPersonHead { display: grid; grid-template-columns: 55px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .aboutEditor button { border: 1px solid #e7dde1; border-radius: 7px; background: transparent; padding: 6px 9px; color: #99828b; font-size: calc(8.5px * var(--font-scale, 1)); cursor: pointer; }
 .aboutAddButtons { display: flex; gap: 8px; margin: 12px 0; }
