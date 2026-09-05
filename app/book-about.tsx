@@ -1,5 +1,6 @@
 'use client';
-import { ChevronDown } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
+import { useRef } from 'react';
 import type { BookRecord } from '@/lib/books';
 import { characterRoles, introductionLink, keywordList, type BookCharacter } from '@/lib/book-about';
 import './book-about.css';
@@ -29,10 +30,7 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
   const characters = book.about_characters || [];
   const updatePerson = (index: number, patch: Partial<BookCharacter>) => onChange({ about_characters: characters.map((person, i) => i === index ? { ...person, ...patch } : person) });
   return <section className="aboutEditor full">
-    <label className="memoryCheck"><input type="checkbox" checked={book.content_forgotten || false} onChange={event => onChange({ content_forgotten: event.target.checked })} />내용 기억 안 남</label>
-    <details className="aboutEditorToggle">
-      <summary><span>ABOUT</span><ChevronDown size={13} aria-hidden="true" /></summary>
-      <div className="aboutEditorFields">
+    <div className="aboutEditorFields">
     <label>작품 키워드<input value={book.about_keywords || ''} placeholder="#현대물 #재회물 또는 쉼표로 구분" onChange={event => onChange({ about_keywords: event.target.value })} /></label>
     <label>짧은 작품 소개<textarea rows={3} value={book.about_summary || ''} placeholder="어떤 이야기인지 두세 줄로 남겨주세요." onChange={event => onChange({ about_summary: event.target.value })} /></label>
     {roles.length > 0 && <div className="aboutPeopleEditor">{characters.map((person, index) => roles.includes(person.role) && <fieldset key={index}><legend>인물 {characters.slice(0, index + 1).filter(item => roles.includes(item.role)).length}</legend>
@@ -42,6 +40,20 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
     </fieldset>)}<div className="aboutAddButtons">{roles.map(role => <button type="button" key={role} onClick={() => onChange({ about_characters: [...characters, { role, name: '', keywords: '', description: '' }] })}>+ {role} 추가</button>)}</div></div>}
     <label>작품 소개 링크<input type="url" value={book.about_url || ''} placeholder="https://… (선택)" onChange={event => onChange({ about_url: event.target.value })} /></label>
       </div>
-    </details>
   </section>;
+}
+
+export function BookAboutField({ book, onChange }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const roles = characterRoles(book.category);
+  const filled = Boolean(book.about_summary?.trim() || keywordList(book.about_keywords).length || book.about_url?.trim() || book.about_characters?.some(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim())));
+  return <div className="bookAboutProperty">
+    <span className="propertyLabel">작품소개</span>
+    <button type="button" className="aboutPropertyButton" aria-label={`작품소개 ${filled ? '작성됨' : '비어 있음'}`} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>{filled ? '작성됨' : '비어 있음'}<ChevronRight size={12} aria-hidden="true" /></button>
+    <dialog className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
+      <header><h2>작품 소개</h2><button type="button" aria-label="작품 소개 닫기" onClick={() => dialog.current?.close()}><X size={18} /></button></header>
+      <div className="aboutEntryBody"><BookAboutEditor book={book} onChange={onChange} /></div>
+      <footer><span>기록 저장 시 함께 저장됩니다.</span><button type="button" onClick={() => dialog.current?.close()}>완료</button></footer>
+    </dialog>
+  </div>;
 }

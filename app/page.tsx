@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import type { BookRecord, VolumePurchase } from "@/lib/books";
 import BookExcerpts from './book-excerpts';
-import { BookAbout, BookAboutEditor } from './book-about';
+import { BookAbout, BookAboutField } from './book-about';
 
 type Book = BookRecord & { id: string };
 type SearchBook = {
@@ -3255,6 +3255,7 @@ export default function FeedPage() {
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                     <label className="salesDiscontinuedField"><span className="propertyLabel">판매중단</span><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} title="기록한 구매처 기준" /></label>
+                    <BookAboutField book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
                   </div>
                 </div>
                 </div>}
@@ -3379,7 +3380,7 @@ export default function FeedPage() {
                   </div>
                 </div>}
                 {step === "notes" && <div className="fields wizardPage wizardNotesPage">
-                  <BookAboutEditor book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
+                  <div className="aboutEditor full"><label className="memoryCheck"><input type="checkbox" checked={form.content_forgotten || false} onChange={event => field("content_forgotten", event.target.checked)} />내용 기억 안 남</label></div>
                   <h3 className="formSectionTitle notesTitle">{form.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</h3>
                   {form.status === "책바구니" ? (
                     <>
