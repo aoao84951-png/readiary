@@ -10,8 +10,8 @@
 .bookExcerpts > p { font-size: calc(8.5px * var(--font-scale, 1)); color: #aaa; line-height: 1.6; }
 .excerptCarousel { min-width: 0; }
 .excerptGrid { display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: 2px 0 8px; scrollbar-width: thin; scrollbar-color: #ded2d7 transparent; }
-.excerptGrid button { flex: 0 0 72%; min-width: 0; scroll-snap-align: start; padding: 0; border: 1px solid #eee7e9; border-radius: 8px; overflow: hidden; background: #f8f5f6; cursor: pointer; }
-.excerptGrid img { display: block; width: 100%; height: 250px; object-fit: contain; }
+.excerptGrid button { flex: 0 0 auto; min-width: 0; scroll-snap-align: start; padding: 0; border: 0; border-radius: 0; overflow: hidden; background: transparent; cursor: pointer; }
+.excerptGrid img { display: block; width: auto; height: 250px; }
 .excerptLightbox { position: fixed; inset: 0; z-index: 1000; background: rgba(24, 20, 23, .96); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)); gap: 12px; }
 .excerptLightbox > header { display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 14px; }
 .excerptLightbox button { display: inline-flex; justify-content: center; align-items: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 8px; background: #ffffff15; border: 1px solid #ffffff30; border-radius: 8px; color: #fff; cursor: pointer; }
@@ -25,4 +25,4 @@
 .excerptNavigation { display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px; }
 .excerptNavigation button { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid #e7dde1; border-radius: 50%; background: transparent; color: #99828b; cursor: pointer; }
 .excerptGrid:focus-visible, .excerptGrid button:focus-visible, .excerptNavigation button:focus-visible { outline: 2px solid #9c7484; outline-offset: -2px; }
-@media (max-width: 480px) { .excerptGrid button { flex-basis: 85%; } .excerptGrid img { height: 230px; } }
+@media (max-width: 480px) { .excerptGrid img { height: 230px; } }

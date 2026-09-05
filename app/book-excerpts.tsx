@@ -46,8 +46,12 @@ export default function BookExcerpts({ bookId, title }: { bookId: string; title:
   function slide(direction: number) {
     const element = strip.current;
     if (!element) return;
-    const card = element.firstElementChild as HTMLElement | null;
-    element.scrollBy({ left: direction * ((card?.offsetWidth || element.clientWidth) + 10), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    const start = element.getBoundingClientRect().left;
+    const positions = Array.from(element.children).map(child => child.getBoundingClientRect().left - start + element.scrollLeft);
+    const target = direction > 0
+      ? positions.find(position => position > element.scrollLeft + 2) ?? element.scrollWidth
+      : positions.findLast(position => position < element.scrollLeft - 2) ?? 0;
+    element.scrollTo({ left: target, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
   const touchStart = useRef<number | null>(null);
   const index = items.findIndex(item => item.id === active);
