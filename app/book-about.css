@@ -51,6 +51,5 @@
 .aboutEntryDialog > footer span { color: #aaa; font-size: calc(8px * var(--font-scale, 1)); }
 .aboutEntryDialog > footer button { border: 0; border-radius: 7px; padding: 9px 18px; color: white; background: #65645f; font: inherit; cursor: pointer; }
 .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 92px minmax(0, 1fr); }
-@media (max-width: 520px) { .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 78px minmax(0, 1fr); } }
 
 .recordForm .wizardPage .bookAboutProperty > .propertyLabel { color: var(--property-label) !important; font-size: var(--property-font) !important; font-weight: 600 !important; line-height: 1.35 !important; }
