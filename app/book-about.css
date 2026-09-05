@@ -40,7 +40,7 @@
 
 .wizardBookPage .bookMetaFields > .bookAboutProperty { display: grid; grid-template-columns: 92px minmax(0, 1fr); align-items: center; min-height: 43px; padding: 4px 2px; color: #9a9691; font-size: calc(8.5px * var(--font-scale, 1)); }
 .aboutPropertyButton { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 5px 8px; border: 0; border-radius: 5px; background: #f5f3f1; color: #99918d; font: inherit; cursor: pointer; }
-.aboutEntryDialog { width: min(540px, calc(100vw - 32px)); max-height: 85dvh; padding: 0; border: 1px solid #eee7e9; border-radius: 16px; color: #514f4c; background: white; overflow: auto; }
+.aboutEntryDialog { width: min(540px, calc(100vw - 32px)); max-height: 85dvh; padding: 0; border: 1px solid #eee7e9; border-radius: 16px; color: #514f4c; background: white; overflow: auto; overscroll-behavior: contain; }
 .aboutEntryDialog::backdrop { background: #302b294d; }
 .aboutEntryDialog > header, .aboutEntryDialog > footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: white; position: sticky; z-index: 1; }
 .aboutEntryDialog > header { top: 0; border-bottom: 1px solid #eee7e9; }
@@ -51,5 +51,7 @@
 .aboutEntryDialog > footer span { color: #aaa; font-size: calc(8px * var(--font-scale, 1)); }
 .aboutEntryDialog > footer button { border: 0; border-radius: 7px; padding: 9px 18px; color: white; background: #65645f; font: inherit; cursor: pointer; }
 @media (max-width: 520px) { .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 78px minmax(0, 1fr); } }
+.recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 92px minmax(0, 1fr); }
+@media (max-width: 520px) { .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty { grid-template-columns: 78px minmax(0, 1fr); } }
 
 .recordForm .wizardPage .bookAboutProperty > .propertyLabel { color: var(--property-label) !important; font-size: var(--property-font) !important; font-weight: 600 !important; line-height: 1.35 !important; }

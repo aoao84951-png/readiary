@@ -786,6 +786,7 @@
   place-items: center;
   padding: 24px;
   background: rgba(43, 43, 40, 0.28);
+  overscroll-behavior: none;
   backdrop-filter: blur(4px);
   animation: modalShadeIn 0.18s ease-out;
 }
