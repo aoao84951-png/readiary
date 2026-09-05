@@ -1414,8 +1414,12 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
       </section>
     );
   }
-  if (!book.liked_notes.length && !book.disliked_notes.length && showEmpty) return <p className="emptyNotes">기록된 감상이 없습니다.</p>;
-  return <><Notes notes={book.liked_notes} kind="liked" /><Notes notes={book.disliked_notes} kind="disliked" /></>;
+  const hasNotes = book.liked_notes.some(note => note.trim()) || book.disliked_notes.some(note => note.trim());
+  if (!hasNotes) {
+    if (book.content_forgotten) return <p className="emptyNotes">내용이 기억나지 않는 작품이에요.</p>;
+    return showEmpty ? <p className="emptyNotes">기록된 감상이 없습니다.</p> : null;
+  }
+  return <>{book.content_forgotten && <p className="notesMemoryHint">지금은 내용이 기억나지 않아요.</p>}<Notes notes={book.liked_notes} kind="liked" /><Notes notes={book.disliked_notes} kind="disliked" /></>;
 }
 
 function BasketNoteEditor({ reason, images, onReasonChange, onImagesChange }: { reason: string; images: string[]; onReasonChange: (value: string) => void; onImagesChange: (images: string[]) => void }) {

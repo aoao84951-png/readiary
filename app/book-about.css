@@ -8,7 +8,6 @@
 .bookAbout a { display: inline-block; margin-top: 10px; color: #9c7484; }
 .aboutPerson { margin-top: 14px; }
 .aboutPerson > b { display: block; margin-bottom: 5px; }
-.memoryBadge { display: inline-block; margin-bottom: 12px; padding: 4px 8px; border-radius: 6px; background: #f4f1ee; color: #998c82; font-size: calc(8px * var(--font-scale, 1)); }
 .aboutEditor { min-width: 0; margin-bottom: 18px; }
 .aboutEditor > label { display: block; margin: 14px 0; }
 .aboutEditor .aboutHint { color: #aaa; font-size: calc(8.5px * var(--font-scale, 1)); }
@@ -20,3 +19,8 @@
 .aboutPersonHead { display: grid; grid-template-columns: 55px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .aboutEditor button { border: 1px solid #e7dde1; border-radius: 7px; background: transparent; padding: 6px 9px; color: #99828b; font-size: calc(8.5px * var(--font-scale, 1)); cursor: pointer; }
 .aboutAddButtons { display: flex; gap: 8px; margin: 12px 0; }
+
+.notesMemoryHint { margin: 0 0 8px; color: #aaa09a; font-size: calc(8px * var(--font-scale, 1)); font-weight: 400; line-height: 1.6; }
+.notesMemoryHint + .reviewNotes { margin-top: 0; }
+.archiveNotes:has(> .notesMemoryHint) { row-gap: 8px; }
+.archiveNotes > .notesMemoryHint { margin-bottom: 0; }

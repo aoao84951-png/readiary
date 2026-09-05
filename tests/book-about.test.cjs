@@ -34,7 +34,7 @@ test('genre selects correct character groups in both editor and detail without c
 });
 test('old records stay empty, memory flag works alone, unsafe links never render', () => {
   assert.equal(render(BookAbout, { category: 'BL' }), '');
-  assert.match(render(BookAbout, { category: '문학', content_forgotten: true }), /내용 기억 안 남/);
+  assert.equal(render(BookAbout, { category: '문학', content_forgotten: true }), '');
   assert.equal(render(BookAbout, { category: '문학', about_url: 'javascript:alert(1)' }), '');
   assert.match(render(BookAbout, { category: '문학', about_keywords: '#현대물 #현대물, 재회', about_summary: '소개' }), /#재회/);
 });

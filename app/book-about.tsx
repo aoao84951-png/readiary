@@ -11,9 +11,8 @@ export function BookAbout({ book }: { book: BookRecord }) {
   const characters = (book.about_characters || []).filter(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim()));
   const link = introductionLink(book.about_url);
   const hasAbout = keywordList(book.about_keywords).length || book.about_summary?.trim() || characters.length || link;
-  if (!hasAbout && !book.content_forgotten) return null;
+  if (!hasAbout) return null;
   return <section className="recordGroup bookAbout">
-    {book.content_forgotten && <span className="memoryBadge">내용 기억 안 남</span>}
     {!!hasAbout && <><h3>ABOUT</h3><Keywords value={book.about_keywords} />
       {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
       {(characters.length > 0 || book.about_summary?.trim() || link) && <details><summary>인물·소개 펼치기</summary>
