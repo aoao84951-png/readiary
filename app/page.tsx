@@ -1370,18 +1370,20 @@ function noteEditorToValue(root: HTMLElement) {
 function Notes({
   notes,
   kind,
+  forgotten = false,
 }: {
   notes: string[];
   kind: "liked" | "disliked";
+  forgotten?: boolean;
 }) {
   const visibleNotes = notes.map((note) => note.trim()).filter(Boolean);
   if (!visibleNotes.length) return null;
   return (
     <section className={`reviewNotes ${kind}`}>
-      <span className="reviewLabel">
+      <div className="noteTitleRow"><span className="reviewLabel">
         {kind === "liked" ? "LIKES" : "DISLIKES"}{" "}
         <small>{String(visibleNotes.length).padStart(2, "0")}</small>
-      </span>
+      </span>{forgotten && <span className="notesMemoryLabel">기억 안 남</span>}</div>
       {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
           <span className="noteHeart"><img src={kind === "liked" ? "/note-heart-pink.gif" : "/note-heart-blue.gif"} alt="" /></span>
@@ -1392,7 +1394,7 @@ function Notes({
   );
 }
 
-function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book | BookRecord; showEmpty?: boolean; hideBasket?: boolean }) {
+function BookNotes({ book, showEmpty = false, hideBasket = false, memoryInHeading = true, emptyHeading = true }: { book: Book | BookRecord; showEmpty?: boolean; hideBasket?: boolean; memoryInHeading?: boolean; emptyHeading?: boolean }) {
   const [openImage, setOpenImage] = useState<string | null>(null);
   useEffect(() => {
     if (!openImage) return;
@@ -1416,10 +1418,10 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
   }
   const hasNotes = book.liked_notes.some(note => note.trim()) || book.disliked_notes.some(note => note.trim());
   if (!hasNotes) {
-    if (book.content_forgotten) return <p className="emptyNotes">내용이 기억나지 않는 작품이에요.</p>;
+    if (book.content_forgotten) return memoryInHeading && emptyHeading ? <div className="noteTitleRow"><span className="reviewLabel">NOTES</span><span className="notesMemoryLabel">기억 안 남</span></div> : null;
     return showEmpty ? <p className="emptyNotes">기록된 감상이 없습니다.</p> : null;
   }
-  return <>{book.content_forgotten && <p className="notesMemoryHint">지금은 내용이 기억나지 않아요.</p>}<Notes notes={book.liked_notes} kind="liked" /><Notes notes={book.disliked_notes} kind="disliked" /></>;
+  return <><Notes notes={book.liked_notes} kind="liked" forgotten={memoryInHeading && book.content_forgotten} /><Notes notes={book.disliked_notes} kind="disliked" forgotten={memoryInHeading && book.content_forgotten && !book.liked_notes.some(note => note.trim())} /></>;
 }
 
 function BasketNoteEditor({ reason, images, onReasonChange, onImagesChange }: { reason: string; images: string[]; onReasonChange: (value: string) => void; onImagesChange: (images: string[]) => void }) {
@@ -2094,10 +2096,10 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                   </div>, document.body)}
                   <BookAbout book={book} />
                   <section className="recordGroup notesGroup">
-                    {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
+                    {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{book.content_forgotten && book.status !== "책바구니" && <span className="notesMemoryLabel">기억 안 남</span>}{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
                     {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
                     <div className="archiveNotes">
-                      <BookNotes book={book} showEmpty />
+                      <BookNotes book={book} showEmpty emptyHeading={false} />
                     </div>
                   </section>
                   <BookExcerpts key={book.id} bookId={book.id} title={book.title} />
@@ -3078,11 +3080,12 @@ export default function FeedPage() {
                     >
                       #{book.status}
                     </span>
+                    {book.content_forgotten && <span className="statusText memoryTag">#기억안남</span>}
                   </div>
                   <ClassicRating rating={book.rating} />
                 </div>
                 <div className="caption">
-                  <BookNotes book={book} hideBasket />
+                  <BookNotes book={book} hideBasket memoryInHeading={false} />
                 </div>
               </div>
             </article>

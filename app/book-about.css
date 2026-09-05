@@ -20,7 +20,11 @@
 .aboutEditor button { border: 1px solid #e7dde1; border-radius: 7px; background: transparent; padding: 6px 9px; color: #99828b; font-size: calc(8.5px * var(--font-scale, 1)); cursor: pointer; }
 .aboutAddButtons { display: flex; gap: 8px; margin: 12px 0; }
 
-.notesMemoryHint { margin: 0 0 8px; color: #aaa09a; font-size: calc(8px * var(--font-scale, 1)); font-weight: 400; line-height: 1.6; }
-.notesMemoryHint + .reviewNotes { margin-top: 0; }
-.archiveNotes:has(> .notesMemoryHint) { row-gap: 8px; }
-.archiveNotes > .notesMemoryHint { margin-bottom: 0; }
+
+.noteTitleRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.noteTitleRow .reviewLabel { margin-bottom: 0; }
+.notesMemoryLabel, .notesEmptyHead > .notesMemoryLabel { color: #aaa09a; font-family: inherit; font-size: calc(8px * var(--font-scale, 1)); font-weight: 400; letter-spacing: normal; white-space: nowrap; }
+.notesEmptyHead > .notesMemoryLabel { margin-left: auto; }
+.notesGroup:has(.notesQuickActions) .noteTitleRow { padding-right: 24px; }
+.metaActions { flex-wrap: wrap; }
+.metaActions .memoryTag { color: #aaa09a; white-space: nowrap; }
