@@ -3048,6 +3048,6 @@ html { scrollbar-gutter: stable; }
 .drawerShade { overscroll-behavior: none; }
 @media (max-width: 520px) {
   .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
-    grid-template-columns: 172px minmax(0, 1fr) !important;
+    grid-template-columns: 78px minmax(0, 1fr) !important;
   }
 }
