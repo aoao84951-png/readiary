@@ -1,4 +1,5 @@
 'use client';
+import { ChevronDown } from 'lucide-react';
 import type { BookRecord } from '@/lib/books';
 import { characterRoles, introductionLink, keywordList, type BookCharacter } from '@/lib/book-about';
 import './book-about.css';
@@ -29,8 +30,9 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
   const updatePerson = (index: number, patch: Partial<BookCharacter>) => onChange({ about_characters: characters.map((person, i) => i === index ? { ...person, ...patch } : person) });
   return <section className="aboutEditor full">
     <label className="memoryCheck"><input type="checkbox" checked={book.content_forgotten || false} onChange={event => onChange({ content_forgotten: event.target.checked })} />내용 기억 안 남</label>
-    <h3 className="formSectionTitle">ABOUT</h3>
-    <p className="aboutHint">작품을 떠올릴 단서를 선택해서 남겨보세요.</p>
+    <details className="aboutEditorToggle">
+      <summary><span>ABOUT</span><ChevronDown size={13} aria-hidden="true" /></summary>
+      <div className="aboutEditorFields">
     <label>작품 키워드<input value={book.about_keywords || ''} placeholder="#현대물 #재회물 또는 쉼표로 구분" onChange={event => onChange({ about_keywords: event.target.value })} /></label>
     <label>짧은 작품 소개<textarea rows={3} value={book.about_summary || ''} placeholder="어떤 이야기인지 두세 줄로 남겨주세요." onChange={event => onChange({ about_summary: event.target.value })} /></label>
     {roles.length > 0 && <div className="aboutPeopleEditor">{characters.map((person, index) => roles.includes(person.role) && <fieldset key={index}><legend>인물 {characters.slice(0, index + 1).filter(item => roles.includes(item.role)).length}</legend>
@@ -39,5 +41,7 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
       <label>인물 소개<textarea rows={2} value={person.description} placeholder="기억할 만한 특징 한두 줄 (선택)" onChange={event => updatePerson(index, { description: event.target.value })} /></label>
     </fieldset>)}<div className="aboutAddButtons">{roles.map(role => <button type="button" key={role} onClick={() => onChange({ about_characters: [...characters, { role, name: '', keywords: '', description: '' }] })}>+ {role} 추가</button>)}</div></div>}
     <label>작품 소개 링크<input type="url" value={book.about_url || ''} placeholder="https://… (선택)" onChange={event => onChange({ about_url: event.target.value })} /></label>
+      </div>
+    </details>
   </section>;
 }

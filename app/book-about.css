@@ -9,8 +9,7 @@
 .aboutPerson { margin-top: 14px; }
 .aboutPerson > b { display: block; margin-bottom: 5px; }
 .aboutEditor { min-width: 0; margin-bottom: 18px; }
-.aboutEditor > label { display: block; margin: 14px 0; }
-.aboutEditor .aboutHint { color: #aaa; font-size: calc(8.5px * var(--font-scale, 1)); }
+.aboutEditor > label, .aboutEditorFields > label { display: block; margin: 14px 0; }
 .aboutEditor .memoryCheck { display: flex; align-items: center; gap: 7px; color: #8b7c73; }
 .aboutEditor .memoryCheck input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
 .aboutEditor fieldset { min-width: 0; margin: 16px 0; padding: 12px; border: 1px solid #eee7e9; border-radius: 10px; }
@@ -23,3 +22,9 @@
 
 .metaActions { flex-wrap: wrap; }
 .metaActions .memoryTag { color: #aaa09a; white-space: nowrap; }
+
+.aboutEditorToggle > summary { display: flex; align-items: center; gap: 7px; width: fit-content; min-height: 32px; padding: 4px 0; color: #9b9b96; font: 700 8px "Courier New", monospace; letter-spacing: .14em; list-style: none; cursor: pointer; }
+.aboutEditorToggle > summary::-webkit-details-marker { display: none; }
+.aboutEditorToggle > summary svg { transition: transform .15s ease; }
+.aboutEditorToggle[open] > summary svg { transform: rotate(180deg); }
+.aboutEditorToggle > summary:focus-visible { outline: 2px solid #bc8296; outline-offset: 3px; border-radius: 3px; }
