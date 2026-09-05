@@ -25,6 +25,9 @@
 .aboutEditor fieldset select { border-bottom: 0 !important; }
 .aboutEditor .memoryCheck { display: flex; align-items: center; gap: 7px; color: #8b7c73; }
 .aboutEditor .memoryCheck input { width: 14px; height: 14px; margin: 0; accent-color: #bc8296; }
+/* The notes checkbox needs only the page gap before the first note editor. */
+.recordForm .wizardNotesPage > .aboutEditor { margin-bottom: 0; }
+.recordForm .wizardNotesPage .memoryCheck { margin-bottom: 0; }
 .aboutEditor fieldset { min-width: 0; margin: 16px 0; padding: 12px; border: 1px solid #eee7e9; border-radius: 10px; }
 .aboutEditor legend { color: #99828b; font-size: calc(8px * var(--font-scale, 1)); }
 .aboutEditor fieldset > label { display: block; margin-top: 12px; }
