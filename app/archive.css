@@ -3054,5 +3054,5 @@ html { scrollbar-gutter: stable; }
   .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty {
     grid-template-columns: 92px minmax(0, 1fr) !important;
   }
-  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty > .aboutPropertyButton { margin-left: 30px; }
+  .recordForm .wizardBookPage .bookMetaFields > .bookAboutProperty > .aboutPropertyButton { margin-left: 14px; }
 }
