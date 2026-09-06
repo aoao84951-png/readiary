@@ -90,30 +90,30 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.feedPage.fontSummer .starUnit {
+.feedPage .starUnit {
   width: 1em;
 }
-.feedPage.fontSummer .starCharacter {
+.feedPage .starCharacter {
   display: none;
 }
-.feedPage.fontSummer .starEmpty svg,
-.feedPage.fontSummer .starFill svg {
+.feedPage .starEmpty svg,
+.feedPage .starFill svg {
   display: block;
 }
-.feedPage.fontSummer .starEmpty {
+.feedPage .starEmpty {
   z-index: 2;
   color: #93aec4;
   pointer-events: none;
 }
-.feedPage.fontSummer .starEmpty path {
+.feedPage .starEmpty path {
   fill: none;
   stroke-width: 1.75;
 }
-.feedPage.fontSummer .starFill {
+.feedPage .starFill {
   z-index: 1;
-  color: #fff0a8;
+  color: #f3d6e3;
 }
-.feedPage.fontSummer .starFill path {
+.feedPage .starFill path {
   stroke: none;
 }
 .gridRating .starUnit {
@@ -162,7 +162,7 @@
 .ratingControl:focus-within .starEmpty {
   color: #d6d6d0;
 }
-.feedPage.fontSummer .ratingControl:focus-within .starEmpty {
+.feedPage .ratingControl:focus-within .starEmpty {
   color: #8ea7bc;
 }
 @media (max-width: 520px) {
@@ -173,3 +173,6 @@
     font-size:calc(20px * var(--font-scale, 1));
   }
 }
+
+.classicRating > svg { stroke: #93aec4; }
+.classicRating > svg[fill="currentColor"], .hallHero > span > svg { fill: #f3d6e3; stroke: #93aec4; }
