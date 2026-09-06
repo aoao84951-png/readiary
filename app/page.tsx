@@ -2370,6 +2370,7 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
+  const aboutImportTouched = useRef(false);
   const [aboutDraft, setAboutDraft] = useState<Book | null>(null);
   const [step, setStep] = useState<"search" | "book" | "reading" | "purchase" | "notes">("search");
   const [search, setSearch] = useState("");
@@ -2686,7 +2687,30 @@ export default function FeedPage() {
       setSearching(false);
     }
   }
+  useEffect(() => {
+    if (!adding || editingId || !form.source_url) return;
+    const match = form.source_url.match(/^https:\/\/ridibooks\.com\/books\/(\d+)$/);
+    if (!match) return;
+    const controller = new AbortController();
+    const source = form.source_url;
+    fetch(`/api/book-about?id=${match[1]}&category=${encodeURIComponent(form.category)}`, { signal: controller.signal })
+      .then(response => response.json() as Promise<{ about?: Partial<BookRecord> }>)
+      .then(({ about }) => {
+        if (!about || controller.signal.aborted || aboutImportTouched.current) return;
+        setForm(current => {
+          if (current.source_url !== source) return current;
+          return { ...current,
+            about_summary: current.about_summary || about.about_summary,
+            about_keywords: current.about_keywords || about.about_keywords,
+            about_characters: current.about_characters?.length ? current.about_characters : about.about_characters,
+          };
+        });
+      }).catch(() => {});
+    return () => controller.abort();
+  }, [adding, editingId, form.source_url, form.category]);
+
   function choose(book: SearchBook) {
+    aboutImportTouched.current = false;
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     const unit = book.countUnit || "권";
@@ -2701,6 +2725,7 @@ export default function FeedPage() {
       platform: book.platform,
       cover_url: book.cover,
       source_url: book.url,
+      about_url: book.url,
       reading_dates: [todayKey],
     });
     setPurchaseDraft({ label: `1${unit}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
@@ -3272,7 +3297,7 @@ export default function FeedPage() {
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                     <label className="salesDiscontinuedField"><span className="propertyLabel">판매중단</span><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} title="기록한 구매처 기준" /></label>
-                    <BookAboutField book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
+                    <BookAboutField book={form} onChange={patch => { aboutImportTouched.current = true; setForm(prev => ({ ...prev, ...patch })); }} />
                   </div>
                 </div>
                 </div>}
