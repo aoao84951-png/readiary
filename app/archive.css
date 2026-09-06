@@ -3039,3 +3039,5 @@ html { scrollbar-gutter: stable; }
     grid-column: 1 / -1 !important;
   }
 }
+
+.reviewLabel .notesMemoryTag { display: inline-block; margin-left: 8px; padding: 3px 7px; border-radius: 999px; background: #f2f2f0; color: #92928e; font-family: inherit; font-size: 8px; font-weight: 500; line-height: 1.2; letter-spacing: 0; vertical-align: middle; }

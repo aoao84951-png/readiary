@@ -1370,7 +1370,9 @@ function noteEditorToValue(root: HTMLElement) {
 function Notes({
   notes,
   kind,
+  forgotten = false,
 }: {
+  forgotten?: boolean;
   notes: string[];
   kind: "liked" | "disliked";
 }) {
@@ -1381,6 +1383,7 @@ function Notes({
       <span className="reviewLabel">
         {kind === "liked" ? "LIKES" : "DISLIKES"}{" "}
         <small>{String(visibleNotes.length).padStart(2, "0")}</small>
+        {forgotten && <span className="notesMemoryTag">#기억안남</span>}
       </span>
       {visibleNotes.map((note, i) => (
         <div className="reviewNote" key={i}>
@@ -1418,7 +1421,7 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
   if (!hasNotes) {
     return showEmpty ? <p className="emptyNotes">{book.content_forgotten ? "내용이 기억나지 않는 작품이에요." : "기록된 감상이 없습니다."}</p> : null;
   }
-  return <><Notes notes={book.liked_notes} kind="liked" /><Notes notes={book.disliked_notes} kind="disliked" /></>;
+  return <><Notes notes={book.liked_notes} kind="liked" forgotten={showEmpty && book.content_forgotten} /><Notes notes={book.disliked_notes} kind="disliked" forgotten={showEmpty && book.content_forgotten && !book.liked_notes.some(note => note.trim())} /></>;
 }
 
 function BasketNoteEditor({ reason, images, onReasonChange, onImagesChange }: { reason: string; images: string[]; onReasonChange: (value: string) => void; onImagesChange: (images: string[]) => void }) {
