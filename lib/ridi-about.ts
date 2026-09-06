@@ -22,6 +22,8 @@ export function parseRidiAbout(html: string, category: string): Omit<ImportedAbo
 export function parseGuide(text: string, category: string): Omit<ImportedAbout, 'about_url'> {
   const allowed = characterRoles(category);
   if (!allowed.length) return {};
+  // Publishers also group unbulleted Name(role): entries under 인물 소개.
+  text = text.replace(/(^|\n)([ \t]*)([가-힣A-Za-z·]{2,20})[ \t]*\((공|수|남주|여주)\)[ \t]*[:：][ \t]*/g, '$1▷ $3($4)\n');
   const blocks = text.split(/(?:^|\n)\s*[▷▶*＊]\s*/).map(s => s.trim()).filter(Boolean);
   const result: Omit<ImportedAbout, 'about_url'> = {};
   const words: string[] = [];
@@ -57,6 +59,7 @@ export function parseGuide(text: string, category: string): Omit<ImportedAbout, 
   for (const word of words) {
     const base = word.replace(/\([^)]*\)$/g, '');
     let role: CharacterRole | undefined;
+    if (/선수$/.test(base)) { general.push(word); continue; }
     if (['복수', '여공남수', '일공다수', '다공일수'].includes(base)) { general.push(word); continue; }
     if (category === 'BL') role = base.endsWith('공') ? '공' : base.endsWith('수') ? '수' : undefined;
     else role = /남$/.test(base) ? '남주' : /[녀여]$/.test(base) ? '여주' : undefined;

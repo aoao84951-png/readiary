@@ -32,3 +32,15 @@ test('no guide, blocked page, and mismatched category yield no guessed data', ()
  for (const html of ['<h1>Just a moment...</h1>', '<p>작품 키워드: 현대물</p>']) assert.equal(JSON.stringify(parser.parseRidiAbout(html, 'BL')), '{}');
  assert.equal(JSON.stringify(parser.parseGuide('▷작품 키워드: 현대물', '문학')), '{}');
 });
+
+test('grouped inline character descriptions are split without mixing the next person', () => {
+ const result = parser.parseGuide('* 배경/분야: 현대물, 스포츠물\n* 작품 키워드: #미남공 #천연수 #전직야구선수\n* 인물 소개\n백도준(공): 메이저리거.\n선수 설명 두 번째 줄.\n\n권은기(수): 전직 선수.\n학생 설명.\n* 이럴 때 보세요: 쌍방구원 이야기', 'BL');
+ assert.equal(result.about_characters.length, 2);
+ assert.equal(result.about_characters[0].name, '백도준');
+ assert.equal(result.about_characters[0].description, '메이저리거.\n선수 설명 두 번째 줄.');
+ assert.equal(result.about_characters[0].keywords, '#미남공');
+ assert.equal(result.about_characters[1].name, '권은기');
+ assert.equal(result.about_characters[1].description, '전직 선수.\n학생 설명.');
+ assert.equal(result.about_characters[1].keywords, '#천연수');
+ assert.match(result.about_keywords, /#전직야구선수/);
+});

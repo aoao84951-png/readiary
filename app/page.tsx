@@ -2702,7 +2702,7 @@ export default function FeedPage() {
           return { ...current,
             about_summary: current.about_summary || about.about_summary,
             about_keywords: current.about_keywords || about.about_keywords,
-            about_characters: current.about_characters?.length ? current.about_characters : about.about_characters,
+            about_characters: current.about_characters?.some(person => person.name.trim() || person.keywords.trim() || person.description.trim()) ? current.about_characters : about.about_characters,
           };
         });
       }).catch(() => {});
