@@ -16,7 +16,7 @@ export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => v
   const hasDetails = Boolean(characters.length || book.about_summary?.trim());
   const hasAbout = hasContent || link;
   if (!hasAbout) return null;
-  return <section className="recordGroup bookAbout">
+  return <section className={`recordGroup bookAbout${hasContent ? '' : ' isLinkOnly'}`}>
     {!!hasAbout && <><div className="aboutSectionHeading"><div className="aboutHeadingLinks">{hasContent && <h3>ABOUT</h3>}{link && !hasContent && <a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 ↗</a>}</div>{onEdit && <div className="notesEmptyHead imageExportExclude"><button type="button" aria-label="작품 소개 수정" title="작품 소개 수정" onClick={onEdit}><Plus size={9} /></button></div>}</div><Keywords value={book.about_keywords} />
       {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
       {hasDetails && <details><summary className="aboutDisclosureRow"><span className="aboutDisclosureLabel">인물·소개 펼치기</span>{link && <a href={link} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()}>작품 소개 원문 ↗</a>}</summary>

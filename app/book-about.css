@@ -81,3 +81,6 @@
 details[open] > .aboutDisclosureRow .aboutDisclosureLabel::before { content: '▼'; }
 .bookAbout .aboutDisclosureRow > a { margin: 0 0 0 auto; white-space: nowrap; }
 .aboutSourceRow { text-align: right; }
+
+.bookAbout.isLinkOnly .aboutSectionHeading { margin-bottom: 0; }
+.bookAbout.isLinkOnly + .notesGroup { margin-top: 8px; }
