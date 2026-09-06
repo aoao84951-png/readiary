@@ -19,7 +19,7 @@ export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => v
       {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
       {(characters.length > 0 || book.about_summary?.trim() || link) && <details><summary>인물·소개 펼치기</summary>
         {book.about_summary?.trim() && <p>{book.about_summary}</p>}
-        {characters.map((person, index) => <div className="aboutPerson" key={index}><b>{person.role}{person.name.trim() ? ` · ${person.name}` : ''}</b><Keywords value={person.keywords} />{person.description.trim() && <p>{person.description}</p>}</div>)}
+        {characters.map((person, index) => <div className="aboutPerson" key={index}><b><span className={`aboutRolePill ${person.role === '공' || person.role === '남주' ? 'blue' : 'pink'}`}>{person.role}</span>{person.name.trim() && <span>{person.name}</span>}</b><Keywords value={person.keywords} />{person.description.trim() && <p>{person.description}</p>}</div>)}
         {link && <a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 ↗</a>}
       </details>}
     </>}

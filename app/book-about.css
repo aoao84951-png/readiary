@@ -7,7 +7,10 @@
 .bookAbout:has(details[open]) .aboutPreview { display: none; }
 .bookAbout a { display: inline-block; margin-top: 10px; color: #9c7484; }
 .aboutPerson { margin-top: 14px; }
-.aboutPerson > b { display: block; margin-bottom: 5px; }
+.aboutPerson > b { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 5px; }
+.aboutRolePill { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 2px 8px; border-radius: 999px; font-size: .9em; line-height: 1.5; white-space: nowrap; }
+.aboutRolePill.blue { background: #e8f0f8; color: #527ba3; }
+.aboutRolePill.pink { background: #f5e5ec; color: #a65f7a; }
 .aboutEditor { min-width: 0; margin-bottom: 18px; }
 .aboutEditor > label, .aboutEditorFields > label { display: block; margin: 14px 0; }
 .aboutEditorFields > label { margin: 12px 0; }
