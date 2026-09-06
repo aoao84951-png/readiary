@@ -1496,9 +1496,26 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   }, [value]);
   useLayoutEffect(() => {
     const panel = panelRef.current;
-    if (!panel) return;
-    const rect = panel.getBoundingClientRect();
-    if (rect.bottom > window.innerHeight - 8) panel.style.top = `${Math.max(8, window.innerHeight - rect.height - 8)}px`;
+    const range = rangeRef.current;
+    if (!panel || !range) return;
+    const selection = range.getBoundingClientRect();
+    const viewport = window.visualViewport;
+    const viewportTop = (viewport?.offsetTop ?? 0) + 8;
+    const viewportBottom = (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 8;
+    const viewportLeft = (viewport?.offsetLeft ?? 0) + 8;
+    const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
+    // Measure the expanded palette before choosing a side; never clamp it across the selection.
+    panel.style.maxHeight = "none";
+    const height = panel.getBoundingClientRect().height;
+    const above = Math.max(0, selection.top - viewportTop - 8);
+    const below = Math.max(0, viewportBottom - selection.bottom - 8);
+    const placeAbove = above >= height || (below < height && above >= below);
+    const available = placeAbove ? above : below;
+    panel.style.maxHeight = `${available}px`;
+    const actualHeight = panel.getBoundingClientRect().height;
+    panel.style.top = `${placeAbove ? selection.top - 8 - actualHeight : selection.bottom + 8}px`;
+    const half = panel.getBoundingClientRect().width / 2;
+    panel.style.left = `${Math.max(viewportLeft + half, Math.min(viewportRight - half, selection.left + selection.width / 2))}px`;
   }, [toolbar, paletteOpen]);
   useEffect(() => {
     const close = (event: Event) => {
@@ -1523,7 +1540,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     }
     rangeRef.current = selection.getRangeAt(0).cloneRange();
     const rect = rangeRef.current.getBoundingClientRect();
-    const half = Math.min(320, window.innerWidth - 16) / 2;
+    const half = Math.min(220, window.innerWidth - 16) / 2;
     setToolbar({ top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
   const apply = (command: string, color?: string) => {

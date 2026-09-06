@@ -1901,18 +1901,18 @@
   word-break: break-word;
 }
 .richNoteEditor:empty::before { content: attr(data-placeholder); color: #b8b4b0; pointer-events: none; }
-.selectionFormatToolbar { position: fixed; z-index: 250; width: min(320px, calc(100vw - 16px)); box-sizing: border-box; padding: 7px; border: 1px solid #dce3ed; border-radius: 19px; background: #fff; color: #59616c; box-shadow: 0 8px 24px #35445b16; transform: translateX(-50%); max-height: calc(100dvh - 16px); overflow-y: auto; }
+.selectionFormatToolbar { position: fixed; z-index: 250; width: min(220px, calc(100vw - 16px)); box-sizing: border-box; padding: 4px; border: 1px solid #dce3ed; border-radius: 13px; background: #fff; color: #59616c; box-shadow: 0 8px 24px #35445b16; transform: translateX(-50%); max-height: calc(100dvh - 16px); overflow-y: auto; }
 .noteFormatActions { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; }
-.noteFormatActions button { display: grid; place-items: center; height: 43px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: #59616c; cursor: pointer; }
-.noteFormatActions svg { width: 23px; height: 23px; stroke-width: 1.8; }
+.noteFormatActions button { display: grid; place-items: center; height: 30px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: #59616c; cursor: pointer; }
+.noteFormatActions svg { width: 17px; height: 17px; stroke-width: 1.8; }
 .noteFormatActions button:hover, .noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
 .selectionFormatToolbar button:focus-visible { outline: 2px solid #86a6ce; outline-offset: 1px; }
-.noteColorPalette { border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 10px; }
-.notePaletteLabel { font-family: inherit; font-size: 13px; font-weight: 600; color: #8a8f99; margin: 8px 0 10px; }
-.noteSwatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
-.noteSwatches button { display: grid; place-items: center; height: 38px; min-width: 0; padding: 0; border: 1px solid #d9e0eb; border-radius: 10px; background: #fff; color: #373a3e; font-family: "Read Diary Symbols", sans-serif; font-size: 22px; font-weight: 600; cursor: pointer; }
+.noteColorPalette { border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 6px; }
+.notePaletteLabel { font-family: inherit; font-size: 10px; font-weight: 600; color: #8a8f99; margin: 6px 0 7px; }
+.noteSwatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.noteSwatches button { display: grid; place-items: center; height: 28px; min-width: 0; padding: 0; border: 1px solid #d9e0eb; border-radius: 7px; background: #fff; color: #373a3e; font-family: "Read Diary Symbols", sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; }
 .noteSwatches button:hover { box-shadow: 0 0 0 2px #bdcde0; }
-.noteSwatches svg { width: 18px; height: 18px; color: #59616c; }
+.noteSwatches svg { width: 14px; height: 14px; color: #59616c; }
 .noteComposer > button {
   align-self: center;
   padding: 5px 8px;
