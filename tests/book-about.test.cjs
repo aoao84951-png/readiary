@@ -113,3 +113,15 @@ test('about-only save updates only introduction fields and preserves unrelated d
   const cleared = await api.PATCH({ json: async () => ({ id: 'test', scope: 'about' }) });
   assert.equal(cleared.body.item.about_summary, '');
 });
+
+
+test('source link stays in heading and link-only records need no disclosure', () => {
+  const record = { category: 'BL', about_url: 'https://ridibooks.com/books/123' };
+  const onlyLink = render(BookAbout, record);
+  assert.match(onlyLink, /작품 소개 원문/);
+  assert.doesNotMatch(onlyLink, /<h3>ABOUT|<details/);
+  const content = render(BookAbout, { ...record, about_summary: '소개' });
+  assert.match(content, /<h3>ABOUT<\/h3>/);
+  assert.ok(content.indexOf('작품 소개 원문') < content.indexOf('<details'));
+  assert.equal((content.match(/작품 소개 원문/g) || []).length, 1);
+});

@@ -69,3 +69,8 @@
 .standaloneAboutEditor { padding: 0; }
 .standaloneAboutEditor > .wizardPage { margin: 0; }
 .standaloneAboutEditor .bookAboutProperty > .propertyLabel, .standaloneAboutEditor .aboutPropertyButton { display: none; }
+
+.aboutHeadingLinks { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
+.aboutHeadingLinks > h3 { margin: 0; }
+.bookAbout .aboutHeadingLinks > a { margin-top: 0; }
+.aboutSectionHeading { margin-bottom: 8px; }
