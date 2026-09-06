@@ -74,3 +74,10 @@
 .aboutHeadingLinks > h3 { margin: 0; }
 .bookAbout .aboutHeadingLinks > a { margin-top: 0; }
 .aboutSectionHeading { margin-bottom: 8px; }
+
+.bookAbout .aboutDisclosureRow { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; width: 100%; list-style: none; }
+.aboutDisclosureRow::-webkit-details-marker { display: none; }
+.aboutDisclosureLabel::before { content: '▶'; display: inline-block; margin-right: 5px; font-size: .8em; }
+details[open] > .aboutDisclosureRow .aboutDisclosureLabel::before { content: '▼'; }
+.bookAbout .aboutDisclosureRow > a { margin: 0 0 0 auto; white-space: nowrap; }
+.aboutSourceRow { text-align: right; }
