@@ -1804,7 +1804,7 @@ function GroupedRecordArchive({ books }: { books: Book[] }) {
                 </div>
               </div>
               <section className="recordGroup purchaseGroup">
-                <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">판매 중단</span>}</h3>
+                <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">#판매중단</span>}</h3>
                 <div className="priceLine">
                   <span>
                     <small>총 판매가</small>
@@ -2048,7 +2048,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                     </div>
                   </div>
                   <section className="recordGroup purchaseGroup">
-                    <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">판매 중단</span>}</h3>
+                    <h3 className="purchaseSectionHeading">PURCHASE{book.sales_discontinued && <span className="salesDiscontinuedLabel">#판매중단</span>}</h3>
                     <button type="button" className="priceLine purchaseSummaryButton" onClick={() => setPurchaseDetailsOpen(true)} aria-label="권별 구매 상세 보기">
                       <span>
                         <small>총 판매가</small>
