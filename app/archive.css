@@ -3042,3 +3042,5 @@ html { scrollbar-gutter: stable; }
 
 .reviewLabel .notesMemoryTag { display: inline-block; margin-left: 8px; padding: 3px 7px; border-radius: 999px; background: #f2f2f0; color: #92928e; font-family: "Read Diary Symbols", -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', sans-serif; font-size: 8px; font-weight: 500; line-height: 1.2; letter-spacing: 0; vertical-align: middle; }
 .feedPage.fontSummer .notesMemoryTag { font-family: "Read Diary Symbols", 'Aa Yeoreum Sori', sans-serif; }
+
+.reviewLabel.emptyNotesLabel { color: #aaa7a3; }

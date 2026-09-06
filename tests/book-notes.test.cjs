@@ -12,6 +12,7 @@ vm.runInNewContext(ts.transpileModule(source + '\nexports.BookNotes = BookNotes;
 const render = (forgotten, notes, showEmpty, disliked = []) => renderToStaticMarkup(React.createElement(exportsObject.BookNotes, { book: { status: '완독', content_forgotten: forgotten, liked_notes: notes, disliked_notes: disliked }, showEmpty }));
 test('detail empty state distinguishes forgotten content and missing notes', () => {
   assert.match(render(true, [], true), /#기억안남/);
+  assert.match(render(true, [], true), /기록된 감상이 없습니다./);
   assert.match(render(false, [], true), /기록된 감상이 없습니다./);
   assert.match(render(true, ['   '], true), /#기억안남/);
 });
