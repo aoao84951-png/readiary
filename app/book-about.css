@@ -1,5 +1,5 @@
 .bookAbout { font-size: calc(8.5px * var(--font-scale, 1)); }
-.bookAbout p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 8px 0; }
+.bookAbout p { font-size: calc(10.5px * var(--font-scale, 1)); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 8px 0; }
 .aboutKeywords { display: flex; flex-wrap: wrap; gap: 4px 9px; color: #99828b; line-height: 1.7; overflow-wrap: anywhere; }
 .aboutPreview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .bookAbout details { margin-top: 10px; }
@@ -65,3 +65,5 @@
 .recordForm .wizardPage .bookAboutProperty > .propertyLabel { color: var(--property-label) !important; font-size: var(--property-font) !important; font-weight: 600 !important; line-height: 1.35 !important; }
 
 .aboutSectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.feedPage.fontSummer .bookAbout p { font-size: calc(11.5px * var(--font-scale, 1)); }
