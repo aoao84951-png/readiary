@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './archive.css';
 import './rating.css';
+import './symbols.css';
 
 export const metadata: Metadata = {
   title: '읽은 마음 — 나의 독서기록',
