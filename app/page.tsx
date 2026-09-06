@@ -1420,7 +1420,7 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
   const hasNotes = book.liked_notes.some(note => note.trim()) || book.disliked_notes.some(note => note.trim());
   if (!hasNotes) {
     if (!showEmpty) return null;
-    return <>{book.content_forgotten && <span className="reviewLabel emptyNotesLabel">NOTES<span className="notesMemoryTag">#기억안남</span></span>}<p className="emptyNotes">기록된 감상이 없습니다.</p></>;
+    return <div className="emptyNotesState">{book.content_forgotten && <span className="reviewLabel emptyNotesLabel">NOTES<span className="notesMemoryTag">#기억안남</span></span>}<p className="emptyNotes">기록된 감상이 없습니다.</p></div>;
   }
   return <><Notes notes={book.liked_notes} kind="liked" forgotten={showEmpty && book.content_forgotten} /><Notes notes={book.disliked_notes} kind="disliked" forgotten={showEmpty && book.content_forgotten && !book.liked_notes.some(note => note.trim())} /></>;
 }
