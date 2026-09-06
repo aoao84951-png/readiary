@@ -3040,4 +3040,5 @@ html { scrollbar-gutter: stable; }
   }
 }
 
-.reviewLabel .notesMemoryTag { display: inline-block; margin-left: 8px; padding: 3px 7px; border-radius: 999px; background: #f2f2f0; color: #92928e; font-family: inherit; font-size: 8px; font-weight: 500; line-height: 1.2; letter-spacing: 0; vertical-align: middle; }
+.reviewLabel .notesMemoryTag { display: inline-block; margin-left: 8px; padding: 3px 7px; border-radius: 999px; background: #f2f2f0; color: #92928e; font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', sans-serif; font-size: 8px; font-weight: 500; line-height: 1.2; letter-spacing: 0; vertical-align: middle; }
+.feedPage.fontSummer .notesMemoryTag { font-family: 'Aa Yeoreum Sori', sans-serif; }
