@@ -1420,7 +1420,7 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
   const hasNotes = book.liked_notes.some(note => note.trim()) || book.disliked_notes.some(note => note.trim());
   if (!hasNotes) {
     if (!showEmpty) return null;
-    return <div className="emptyNotesState">{book.content_forgotten && <span className="reviewLabel emptyNotesLabel">NOTES<span className="notesMemoryTag">#기억안남</span></span>}<p className="emptyNotes">기록된 감상이 없습니다.</p></div>;
+    return <div className="emptyNotesState"><span className="reviewLabel emptyNotesLabel">NOTES{book.content_forgotten && <span className="notesMemoryTag">#기억안남</span>}</span><p className="emptyNotes">기록된 감상이 없습니다.</p></div>;
   }
   return <><Notes notes={book.liked_notes} kind="liked" forgotten={showEmpty && book.content_forgotten} /><Notes notes={book.disliked_notes} kind="disliked" forgotten={showEmpty && book.content_forgotten && !book.liked_notes.some(note => note.trim())} /></>;
 }
@@ -2100,8 +2100,8 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                   </div>, document.body)}
                   <BookAbout book={book} onEdit={onEdit ? () => { onEdit(book, "about"); } : undefined} />
                   <section className="recordGroup notesGroup">
-                    {!hasNotes && !(book.content_forgotten && book.status !== "책바구니") && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
-                    {(hasNotes || (book.content_forgotten && book.status !== "책바구니")) && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
+                    {!hasNotes && book.status === "책바구니" && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
+                    {(hasNotes || book.status !== "책바구니") && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
                     <div className="archiveNotes">
                       <BookNotes book={book} showEmpty />
                     </div>

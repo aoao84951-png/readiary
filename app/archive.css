@@ -3044,3 +3044,7 @@ html { scrollbar-gutter: stable; }
 .feedPage.fontSummer .notesMemoryTag { font-family: "Read Diary Symbols", 'Aa Yeoreum Sori', sans-serif; }
 
 .reviewLabel.emptyNotesLabel { color: #aaa7a3; }
+
+.emptyNotesState { display: grid; gap: 6px; }
+.emptyNotesState > .emptyNotesLabel { display: flex; align-items: center; min-height: 22px; }
+.emptyNotesState > .emptyNotes { margin: 0; padding: 0; line-height: 1.6; }
