@@ -1,4 +1,4 @@
-.bookExcerpts { margin-top: 22px; padding-top: 20px; border-top: 1px solid #eee7e9; }
+.bookExcerpts { margin-top: 12px; padding-top: 0; border-top: 0; }
 .bookExcerpts > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .bookExcerpts h3 { margin: 0; color: #aaa7a3; font: 700 8px "Courier New", monospace; letter-spacing: .14em; }
 .bookExcerpts h3 span { margin-left: 5px; color: #99828b; font-size: 8px; }
