@@ -3048,3 +3048,7 @@ html { scrollbar-gutter: stable; }
 .emptyNotesState { display: grid; gap: 6px; }
 .emptyNotesState > .emptyNotesLabel { display: flex; align-items: center; min-height: 22px; }
 .emptyNotesState > .emptyNotes { margin: 0; padding: 0; line-height: 1.6; }
+
+/* Center the 18px action on the empty heading's 22px row, after 2px body padding. */
+.notesGroup:has(.emptyNotesState) > .notesQuickActions { top: 4px; }
+.emptyNotesState > .emptyNotesLabel { padding-right: 26px; }
