@@ -13,14 +13,13 @@ export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => v
   const characters = (book.about_characters || []).filter(person => roles.includes(person.role) && (person.name.trim() || person.keywords.trim() || person.description.trim()));
   const link = introductionLink(book.about_url);
   const hasContent = Boolean(keywordList(book.about_keywords).length || book.about_summary?.trim() || characters.length);
-  const hasDetails = Boolean(characters.length || book.about_summary?.trim());
+  const hasDetails = Boolean(characters.length);
   const hasAbout = hasContent || link;
   if (!hasAbout) return null;
   return <section className={`recordGroup bookAbout${hasContent ? '' : ' isLinkOnly'}`}>
     {!!hasAbout && <><div className="aboutSectionHeading"><div className="aboutHeadingLinks">{hasContent && <h3>ABOUT</h3>}{link && !hasContent && <a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a>}</div>{onEdit && <div className="notesEmptyHead imageExportExclude"><button type="button" aria-label="작품 소개 수정" title="작품 소개 수정" onClick={onEdit}><Plus size={9} /></button></div>}</div><Keywords value={book.about_keywords} />
-      {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
+      {book.about_summary?.trim() && <p className="aboutSummary">{book.about_summary}</p>}
       {hasDetails && <details><summary className="aboutDisclosureRow"><span className="aboutDisclosureLabel">인물·소개 펼치기</span>{link && <a href={link} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()}>작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a>}</summary>
-        {book.about_summary?.trim() && <p>{book.about_summary}</p>}
         {characters.map((person, index) => <div className="aboutPerson" key={index}><b><span className={`aboutRolePill ${person.role === '공' || person.role === '남주' ? 'blue' : 'pink'}`}>{person.role}</span>{person.name.trim() && <span>{person.name}</span>}</b><Keywords value={person.keywords} />{person.description.trim() && <p>{person.description}</p>}</div>)}
       </details>}
       {hasContent && !hasDetails && link && <div className="aboutSourceRow"><a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a></div>}

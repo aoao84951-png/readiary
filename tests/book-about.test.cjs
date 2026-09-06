@@ -120,11 +120,20 @@ test('source link stays in disclosure row and link-only records need no disclosu
   const onlyLink = render(BookAbout, record);
   assert.match(onlyLink, /작품 소개 원문/);
   assert.doesNotMatch(onlyLink, /<h3>ABOUT|<details/);
-  const content = render(BookAbout, { ...record, about_summary: '소개' });
+  const content = render(BookAbout, { ...record, about_summary: '소개', about_characters: [{ role: '공', name: '인물', keywords: '', description: '인물 설명' }] });
   assert.match(content, /<h3>ABOUT<\/h3>/);
   assert.match(content, /<summary[^>]*>[\s\S]*작품 소개 원문[\s\S]*?<\/summary>/);
   const keywordsOnly = render(BookAbout, { ...record, about_keywords: '#현대물' });
   assert.doesNotMatch(keywordsOnly, /<details/);
   assert.match(keywordsOnly, /작품 소개 원문/);
   assert.equal((content.match(/작품 소개 원문/g) || []).length, 1);
+});
+
+test('summary is shown once above character disclosure and needs no empty toggle', () => {
+ const record = { category: 'BL', about_summary: '고정된 짧은 소개' };
+ const summaryOnly = render(BookAbout, record);
+ assert.doesNotMatch(summaryOnly, /<details/);
+ const html = render(BookAbout, { ...record, about_characters: [{ role: '수', name: '인물', keywords: '', description: '설명' }] });
+ assert.equal((html.match(/고정된 짧은 소개/g) || []).length, 1);
+ assert.ok(html.indexOf('고정된 짧은 소개') < html.indexOf('<details'));
 });
