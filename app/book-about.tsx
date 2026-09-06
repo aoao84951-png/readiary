@@ -6,7 +6,7 @@ import { characterRoles, introductionLink, keywordList, type BookCharacter } fro
 import './book-about.css';
 
 function Keywords({ value }: { value?: string }) {
-  return <div className="aboutKeywords">{keywordList(value).map(word => <span key={word}>#{word}</span>)}</div>;
+  return <div className="aboutKeywords">{keywordList(value).map(word => <span key={word}><span className="aboutSymbol">#</span>{word}</span>)}</div>;
 }
 export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => void }) {
   const roles = characterRoles(book.category);
@@ -17,13 +17,13 @@ export function BookAbout({ book, onEdit }: { book: BookRecord; onEdit?: () => v
   const hasAbout = hasContent || link;
   if (!hasAbout) return null;
   return <section className={`recordGroup bookAbout${hasContent ? '' : ' isLinkOnly'}`}>
-    {!!hasAbout && <><div className="aboutSectionHeading"><div className="aboutHeadingLinks">{hasContent && <h3>ABOUT</h3>}{link && !hasContent && <a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 ↗</a>}</div>{onEdit && <div className="notesEmptyHead imageExportExclude"><button type="button" aria-label="작품 소개 수정" title="작품 소개 수정" onClick={onEdit}><Plus size={9} /></button></div>}</div><Keywords value={book.about_keywords} />
+    {!!hasAbout && <><div className="aboutSectionHeading"><div className="aboutHeadingLinks">{hasContent && <h3>ABOUT</h3>}{link && !hasContent && <a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a>}</div>{onEdit && <div className="notesEmptyHead imageExportExclude"><button type="button" aria-label="작품 소개 수정" title="작품 소개 수정" onClick={onEdit}><Plus size={9} /></button></div>}</div><Keywords value={book.about_keywords} />
       {book.about_summary?.trim() && <p className="aboutPreview">{book.about_summary}</p>}
-      {hasDetails && <details><summary className="aboutDisclosureRow"><span className="aboutDisclosureLabel">인물·소개 펼치기</span>{link && <a href={link} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()}>작품 소개 원문 ↗</a>}</summary>
+      {hasDetails && <details><summary className="aboutDisclosureRow"><span className="aboutDisclosureLabel">인물·소개 펼치기</span>{link && <a href={link} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()}>작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a>}</summary>
         {book.about_summary?.trim() && <p>{book.about_summary}</p>}
         {characters.map((person, index) => <div className="aboutPerson" key={index}><b><span className={`aboutRolePill ${person.role === '공' || person.role === '남주' ? 'blue' : 'pink'}`}>{person.role}</span>{person.name.trim() && <span>{person.name}</span>}</b><Keywords value={person.keywords} />{person.description.trim() && <p>{person.description}</p>}</div>)}
       </details>}
-      {hasContent && !hasDetails && link && <div className="aboutSourceRow"><a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 ↗</a></div>}
+      {hasContent && !hasDetails && link && <div className="aboutSourceRow"><a href={link} target="_blank" rel="noopener noreferrer">작품 소개 원문 <span className="aboutSymbol" aria-hidden="true">↗</span></a></div>}
     </>}
   </section>;
 }

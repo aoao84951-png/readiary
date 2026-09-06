@@ -36,7 +36,7 @@ test('old records stay empty, memory flag works alone, unsafe links never render
   assert.equal(render(BookAbout, { category: 'BL' }), '');
   assert.equal(render(BookAbout, { category: '문학', content_forgotten: true }), '');
   assert.equal(render(BookAbout, { category: '문학', about_url: 'javascript:alert(1)' }), '');
-  assert.match(render(BookAbout, { category: '문학', about_keywords: '#현대물 #현대물, 재회', about_summary: '소개' }), /#재회/);
+  assert.match(render(BookAbout, { category: '문학', about_keywords: '#현대물 #현대물, 재회', about_summary: '소개' }), /#<\/span>재회/);
 });
 test('book updates preserve about data along with previous reading notes', async () => {
   let saved;

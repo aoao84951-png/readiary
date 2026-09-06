@@ -84,3 +84,6 @@ details[open] > .aboutDisclosureRow .aboutDisclosureLabel::before { content: 'â–
 
 .bookAbout.isLinkOnly .aboutSectionHeading { margin-bottom: 0; }
 .bookAbout.isLinkOnly + .notesGroup { margin-top: 8px; }
+
+/* Keep the handwritten symbol shapes in both text font modes. */
+.bookAbout .aboutSymbol, .bookAbout .aboutDisclosureLabel::before { font-family: 'Aa Yeoreum Sori', sans-serif; font-weight: 400; font-style: normal; }
