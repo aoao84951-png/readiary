@@ -1901,80 +1901,18 @@
   word-break: break-word;
 }
 .richNoteEditor:empty::before { content: attr(data-placeholder); color: #b8b4b0; pointer-events: none; }
-.selectionFormatToolbar {
-  position: fixed;
-  z-index: 250;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid rgba(82,73,68,.1);
-  border-radius: 10px;
-  background: rgba(255,255,255,.98);
-  box-shadow: 0 10px 26px rgba(49,43,39,.16);
-  backdrop-filter: blur(14px);
-  transform: translateX(-50%);
-}
-.selectionFormatToolbar > button {
-  width: 27px;
-  height: 27px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #57524e;
-  font-family: "Read Diary Symbols", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
-  font-size:calc(14px * var(--font-scale, 1));
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-.selectionFormatToolbar > button:hover,
-.selectionFormatToolbar > button:focus-visible,
-.selectionFormatToolbar > button[aria-expanded="true"] { background: #f4f1ef; outline: none; }
-.selectionFormatToolbar > button.active { background: #f7e9ee; color: #b46f87; }
-.selectionFormatToolbar .underline { text-decoration: underline; text-underline-offset: 2px; }
-.selectionFormatToolbar .paletteTrigger {
-  width: 29px;
-  border: 1px solid #e3dfdc;
-  background: #fff;
-  color: #57524e;
-  box-shadow: 0 1px 2px rgba(54,46,42,.04);
-}
-.selectionFormatToolbar .paletteTrigger span {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 17px;
-  height: 19px;
-  font-size:calc(13px * var(--font-scale, 1));
-  font-weight: 550;
-}
-.noteColorPalette {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  width: 126px;
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 3px;
-  padding: 7px;
-  border: 1px solid rgba(82,73,68,.1);
-  border-radius: 10px;
-  background: rgba(255,255,255,.99);
-  box-shadow: 0 10px 24px rgba(49,43,39,.15);
-}
-.noteColorPalette button { width: 34px; height: 28px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
-.noteColorPalette button:hover { background: #f5f2f0; }
-.noteColorPalette button.active { background: #f2eeec; box-shadow: inset 0 0 0 1px rgba(91,80,74,.12); }
-.noteColorPalette button.active i { box-shadow: 0 0 0 2px #fff, 0 0 0 3px currentColor; }
-.noteColorPalette i { width: 14px; height: 14px; border-radius: 4px; background: currentColor; opacity: .82; }
-.noteColorPalette .gray { color: #787774; }.noteColorPalette .brown { color: #9f6b53; }.noteColorPalette .orange { color: #d9730d; }
-.noteColorPalette .yellow { color: #cb912f; }.noteColorPalette .green { color: #448361; }.noteColorPalette .blue { color: #337ea9; }
-.noteColorPalette .purple { color: #9065b0; }.noteColorPalette .pink { color: #c14c8a; }.noteColorPalette .red { color: #d44c47; }
+.selectionFormatToolbar { position: fixed; z-index: 250; width: min(320px, calc(100vw - 16px)); box-sizing: border-box; padding: 7px; border: 1px solid #dce3ed; border-radius: 19px; background: #fff; color: #59616c; box-shadow: 0 8px 24px #35445b16; transform: translateX(-50%); max-height: calc(100dvh - 16px); overflow-y: auto; }
+.noteFormatActions { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; }
+.noteFormatActions button { display: grid; place-items: center; height: 43px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: #59616c; cursor: pointer; }
+.noteFormatActions svg { width: 23px; height: 23px; stroke-width: 1.8; }
+.noteFormatActions button:hover, .noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
+.selectionFormatToolbar button:focus-visible { outline: 2px solid #86a6ce; outline-offset: 1px; }
+.noteColorPalette { border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 10px; }
+.notePaletteLabel { font-family: inherit; font-size: 13px; font-weight: 600; color: #8a8f99; margin: 8px 0 10px; }
+.noteSwatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
+.noteSwatches button { display: grid; place-items: center; height: 38px; min-width: 0; padding: 0; border: 1px solid #d9e0eb; border-radius: 10px; background: #fff; color: #373a3e; font-family: "Read Diary Symbols", sans-serif; font-size: 22px; font-weight: 600; cursor: pointer; }
+.noteSwatches button:hover { box-shadow: 0 0 0 2px #bdcde0; }
+.noteSwatches svg { width: 18px; height: 18px; color: #59616c; }
 .noteComposer > button {
   align-self: center;
   padding: 5px 8px;
