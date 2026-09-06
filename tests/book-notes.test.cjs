@@ -11,9 +11,9 @@ const exportsObject = {};
 vm.runInNewContext(ts.transpileModule(source + '\nexports.BookNotes = BookNotes;', { compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText, { exports: exportsObject, require, useState: React.useState, useEffect: React.useEffect, Notes: ({ notes, forgotten }) => React.createElement('div', null, notes.some(note => note.trim()) && forgotten ? '#기억안남' : '', notes.join(' ')) });
 const render = (forgotten, notes, showEmpty, disliked = []) => renderToStaticMarkup(React.createElement(exportsObject.BookNotes, { book: { status: '완독', content_forgotten: forgotten, liked_notes: notes, disliked_notes: disliked }, showEmpty }));
 test('detail empty state distinguishes forgotten content and missing notes', () => {
-  assert.match(render(true, [], true), /내용이 기억나지 않는 작품이에요./);
+  assert.match(render(true, [], true), /#기억안남/);
   assert.match(render(false, [], true), /기록된 감상이 없습니다./);
-  assert.match(render(true, ['   '], true), /내용이 기억나지 않는 작품이에요./);
+  assert.match(render(true, ['   '], true), /#기억안남/);
 });
 test('first visible detail notes show memory tag once and feed has no empty message', () => {
   assert.equal(render(true, ['예전 감상'], true), '<div>#기억안남예전 감상</div><div></div>');

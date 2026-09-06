@@ -1419,7 +1419,8 @@ function BookNotes({ book, showEmpty = false, hideBasket = false }: { book: Book
   }
   const hasNotes = book.liked_notes.some(note => note.trim()) || book.disliked_notes.some(note => note.trim());
   if (!hasNotes) {
-    return showEmpty ? <p className="emptyNotes">{book.content_forgotten ? "내용이 기억나지 않는 작품이에요." : "기록된 감상이 없습니다."}</p> : null;
+    if (!showEmpty) return null;
+    return book.content_forgotten ? <span className="reviewLabel">NOTES<span className="notesMemoryTag">#기억안남</span></span> : <p className="emptyNotes">기록된 감상이 없습니다.</p>;
   }
   return <><Notes notes={book.liked_notes} kind="liked" forgotten={showEmpty && book.content_forgotten} /><Notes notes={book.disliked_notes} kind="disliked" forgotten={showEmpty && book.content_forgotten && !book.liked_notes.some(note => note.trim())} /></>;
 }
@@ -2099,8 +2100,8 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                   </div>, document.body)}
                   <BookAbout book={book} onEdit={onEdit ? () => { onEdit(book, "about"); } : undefined} />
                   <section className="recordGroup notesGroup">
-                    {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
-                    {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
+                    {!hasNotes && !(book.content_forgotten && book.status !== "책바구니") && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
+                    {(hasNotes || (book.content_forgotten && book.status !== "책바구니")) && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
                     <div className="archiveNotes">
                       <BookNotes book={book} showEmpty />
                     </div>
