@@ -67,7 +67,7 @@ test('introduction dialog consumes Escape and dismisses only a complete outside 
   const refs = [];
   const { BookAboutField } = load('app/book-about.tsx', {
     '@/lib/book-about': helpers,
-    react: { ...React, useEffect() {}, useRef(value) { const ref = { current: value }; refs.push(ref); return ref; } },
+    react: { ...React, useState(value) { return [value, () => {}]; }, useEffect() {}, useRef(value) { const ref = { current: value }; refs.push(ref); return ref; } },
   });
   const tree = BookAboutField({ book: { category: '문학' }, onChange() {} });
   const dialog = tree.props.children.find(child => child.type === 'dialog');
@@ -93,4 +93,23 @@ test('introduction dialog consumes Escape and dismisses only a complete outside 
   dialog.props.onPointerDown(event(0));
   dialog.props.onPointerUp(event(0));
   assert.equal(closes, 2);
+});
+
+
+test('about-only save updates only introduction fields and preserves unrelated data', async () => {
+  let patch;
+  const existing = { id: 'test', title: '제목', paid_price: 8100, liked_notes: ['감상'] };
+  const api = load('app/api/books/route.ts', {
+    'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) } },
+    '@/lib/firebase': { firebaseConfigured: () => true, patchDocument: async (_, id, data) => { patch = data; return { ...existing, ...data }; } },
+  });
+  const response = await api.PATCH({ json: async () => ({ id: 'test', scope: 'about', title: '변경 금지', paid_price: 0, about_summary: '새 소개', about_keywords: '#현대물', about_characters: [] }) });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.item.title, '제목');
+  assert.equal(response.body.item.paid_price, 8100);
+  assert.deepEqual(response.body.item.liked_notes, ['감상']);
+  assert.deepEqual(Object.keys(patch).sort(), ['about_characters', 'about_keywords', 'about_summary', 'about_url', 'updated_at']);
+  assert.equal(patch.about_url, '');
+  const cleared = await api.PATCH({ json: async () => ({ id: 'test', scope: 'about' }) });
+  assert.equal(cleared.body.item.about_summary, '');
 });

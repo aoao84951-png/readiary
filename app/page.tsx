@@ -1853,7 +1853,10 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
   const [statusError, setStatusError] = useState("");
   const [coverOpen, setCoverOpen] = useState(false);
   useEffect(() => {
-    if (openBook) setSelected({ book: openBook, index: Math.max(0, books.findIndex((book) => book.id === openBook.id)) });
+    setSelected(current => {
+      const target = openBook || current?.book;
+      return target ? { book: books.find(item => item.id === target.id) || target, index: Math.max(0, books.findIndex(item => item.id === target.id)) } : null;
+    });
   }, [openBook, books]);
   const closeSelected = () => { setSelected(null); setCoverOpen(false); setPurchaseDetailsOpen(false); setStatusEditing(false); setStatusError(""); setConfirmingDelete(false); setDeleteError(""); onClose?.(); };
   useEffect(() => {
@@ -2091,7 +2094,7 @@ function ModalRecordArchive({ books, openBook, onClose, onEdit, onAddPurchase, o
                       <footer><span><small>총 판매가</small><s>{book.list_price.toLocaleString()}원</s></span><span><small>총 실구매가</small><b>{book.paid_price.toLocaleString()}원</b></span></footer>
                     </section>
                   </div>, document.body)}
-                  <BookAbout book={book} onEdit={onEdit ? () => { closeSelected(); onEdit(book, "about"); } : undefined} />
+                  <BookAbout book={book} onEdit={onEdit ? () => { onEdit(book, "about"); } : undefined} />
                   <section className="recordGroup notesGroup">
                     {!hasNotes && <div className="notesEmptyHead"><span>{book.status === "책바구니" ? "BASKET NOTES" : "NOTES"}</span>{onEditNotes && <button type="button" className="imageExportExclude" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button>}</div>}
                     {hasNotes && onEditNotes && <div className="notesQuickActions imageExportExclude"><button type="button" aria-label="감상 기록 추가" title="감상 기록 추가" onClick={() => { closeSelected(); onEditNotes(book); }}><Plus size={9} /></button></div>}
@@ -2364,7 +2367,7 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [adding, setAdding] = useState(false);
-  const [openAboutOnEntry, setOpenAboutOnEntry] = useState(false);
+  const [aboutDraft, setAboutDraft] = useState<Book | null>(null);
   const [step, setStep] = useState<"search" | "book" | "reading" | "purchase" | "notes">("search");
   const [search, setSearch] = useState("");
   const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
@@ -2616,6 +2619,7 @@ export default function FeedPage() {
     setAdding(true);
   }
   function openEdit(book: Book, initialStep: "book" | "reading" | "purchase" | "notes" | "about" = "book") {
+    if (initialStep === "about") { setAboutDraft({ ...book }); return; }
     const { id, ...record } = book;
     const purchaseItems = purchaseItemsByDate(record.purchase_items?.length
       ? record.purchase_items.map((item) => ({ ...item, purchase_date: item.purchase_date || record.purchase_date || null, methods: item.methods || [] }))
@@ -2631,8 +2635,7 @@ export default function FeedPage() {
     setPurchaseDraft({ label: `${purchaseItems.length + 1}${record.count_unit || "권"}`, purchase_date: null, list_price: 0, paid_price: 0, methods: [] });
     setEditingPurchaseIndex(null);
     setMessage("");
-    setOpenAboutOnEntry(initialStep === "about");
-    setStep(initialStep === "about" ? "book" : initialStep);
+    setStep(initialStep);
     setDetailBook(null);
     setAdding(true);
   }
@@ -3093,6 +3096,15 @@ export default function FeedPage() {
         </section>
         </>
       )}
+      {aboutDraft && <div className="recordForm wizardForm standaloneAboutEditor"><div className="wizardPage">
+        <BookAboutField book={aboutDraft} autoOpen onClose={() => setAboutDraft(null)} onChange={patch => setAboutDraft(current => current ? { ...current, ...patch } : null)} onSave={async () => {
+          const response = await fetch('/api/books', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: aboutDraft.id, scope: 'about', about_summary: aboutDraft.about_summary, about_keywords: aboutDraft.about_keywords, about_url: aboutDraft.about_url, about_characters: aboutDraft.about_characters }) });
+          const data = await response.json() as { item: Book; error?: string };
+          if (!response.ok) throw new Error(data.error || '작품소개를 저장하지 못했습니다.');
+          setBooks(current => current.map(item => item.id === aboutDraft.id ? data.item : item));
+          setDetailBook(current => current?.id === aboutDraft.id ? data.item : current);
+        }} />
+      </div></div>}
       {detailBook && <ModalRecordArchive books={visible} openBook={detailBook} onClose={() => setDetailBook(null)} onEdit={openEdit} onAddPurchase={(book) => openEdit(book, "purchase")} onEditNotes={(book) => openEdit(book, "notes")} onStatusChange={changeBookStatus} onDelete={deleteBook} hideList summerFont={fontMode === "summer"} />}
       {feedCoverBook?.cover_url && <CoverLightbox src={feedCoverBook.cover_url} title={feedCoverBook.title} onClose={() => setFeedCoverBook(null)} />}
       <nav className="bottomDock" aria-label="주요 화면">
@@ -3257,7 +3269,7 @@ export default function FeedPage() {
                     </label>
                     <EditableSelect label="플랫폼" value={form.platform} options={platformOptions} onChange={(value) => field("platform", value)} onAdd={(value) => addOption("platforms", value)} />
                     <label className="salesDiscontinuedField"><span className="propertyLabel">판매중단</span><input type="checkbox" checked={form.sales_discontinued || false} onChange={event => field("sales_discontinued", event.target.checked)} title="기록한 구매처 기준" /></label>
-                    <BookAboutField autoOpen={openAboutOnEntry} onOpened={() => setOpenAboutOnEntry(false)} book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
+                    <BookAboutField book={form} onChange={patch => setForm(prev => ({ ...prev, ...patch }))} />
                   </div>
                 </div>
                 </div>}

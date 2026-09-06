@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BookRecord } from '@/lib/books';
-import { createDocument, deleteDocument, firebaseConfigured, listDocuments, setDocument } from '@/lib/firebase';
+import { createDocument, deleteDocument, firebaseConfigured, listDocuments, setDocument, patchDocument } from '@/lib/firebase';
 
 export async function GET() {
   if (!firebaseConfigured()) return NextResponse.json({ items: [], configured: false });
@@ -26,9 +26,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const input = await request.json() as BookRecord & { id?: string };
-  const { id, ...body } = input;
+  const input = await request.json() as BookRecord & { id?: string; scope?: string };
+  const { id, scope, ...body } = input;
   if (!id) return NextResponse.json({ error: '수정할 기록을 찾지 못했습니다.' }, { status: 400 });
+  if (scope === 'about') {
+    if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
+    try {
+      const item = await patchDocument('books', id, {
+        about_summary: body.about_summary || '',
+        about_keywords: body.about_keywords || '',
+        about_url: body.about_url || '',
+        about_characters: body.about_characters || [],
+        updated_at: new Date().toISOString(),
+      });
+      return NextResponse.json({ item });
+    } catch { return NextResponse.json({ error: '작품소개를 저장하지 못했습니다.' }, { status: 502 }); }
+  }
   if (!body.title?.trim()) return NextResponse.json({ error: '책 제목을 입력해주세요.' }, { status: 400 });
   if (!firebaseConfigured()) return NextResponse.json({ error: 'Firebase 연결 정보가 아직 설정되지 않았습니다.' }, { status: 503 });
   const payload = {

@@ -1,6 +1,6 @@
 'use client';
 import { ChevronRight, Plus, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { BookRecord } from '@/lib/books';
 import { characterRoles, introductionLink, keywordList, type BookCharacter } from '@/lib/book-about';
 import './book-about.css';
@@ -43,8 +43,23 @@ export function BookAboutEditor({ book, onChange }: { book: BookRecord; onChange
   </section>;
 }
 
-export function BookAboutField({ book, onChange, autoOpen = false, onOpened }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void; autoOpen?: boolean; onOpened?: () => void }) {
+export function BookAboutField({ book, onChange, autoOpen = false, onOpened, onSave, onClose }: { book: BookRecord; onChange: (patch: Partial<BookRecord>) => void; autoOpen?: boolean; onOpened?: () => void; onSave?: () => Promise<void>; onClose?: () => void }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
+  const finish = async () => {
+    if (!onSave) { dialog.current?.close(); return; }
+    if (saving) return;
+    if (!dialog.current?.querySelector<HTMLInputElement>('input[type="url"]')?.checkValidity()) {
+      (dialog.current?.querySelector('input[type="url"]') as HTMLInputElement)?.reportValidity();
+      return;
+    }
+    setSaving(true);
+    setSaveError('');
+    try { await onSave(); dialog.current?.close(); }
+    catch (error) { setSaveError(error instanceof Error ? error.message : '저장하지 못했습니다.'); }
+    finally { setSaving(false); }
+  };
   const heading = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
   const openDialog = () => {
@@ -71,10 +86,10 @@ export function BookAboutField({ book, onChange, autoOpen = false, onOpened }: {
   return <div className="bookAboutProperty">
     <span className="propertyLabel">작품소개</span>
     <button type="button" className={`aboutPropertyButton${filled ? ' isFilled' : ''}`} aria-label={`작품소개 ${filled ? '작성됨' : '비어 있음'}`} aria-haspopup="dialog" onClick={openDialog}>{filled ? '작성됨' : '비어 있음'}<ChevronRight size={12} aria-hidden="true" /></button>
-    <dialog className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onPointerDown={event => { event.stopPropagation(); backdropPress.current = isOutside(event); }} onPointerUp={event => { event.stopPropagation(); if (backdropPress.current && isOutside(event)) dialog.current?.close(); backdropPress.current = false; }} onPointerCancel={() => { backdropPress.current = false; }} onClick={event => event.stopPropagation()} onMouseDown={event => event.stopPropagation()} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); dialog.current?.close(); } if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
+    <dialog onClose={onClose} className="aboutEntryDialog" ref={dialog} aria-label="작품 소개" onInvalid={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} onPointerDown={event => { event.stopPropagation(); backdropPress.current = isOutside(event); }} onPointerUp={event => { event.stopPropagation(); if (backdropPress.current && isOutside(event)) dialog.current?.close(); backdropPress.current = false; }} onPointerCancel={() => { backdropPress.current = false; }} onClick={event => event.stopPropagation()} onMouseDown={event => event.stopPropagation()} onKeyDown={event => { event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); dialog.current?.close(); } if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault(); }} onCancel={event => event.stopPropagation()}>
       <header><h2 ref={heading} tabIndex={-1}>작품 소개</h2><button type="button" aria-label="작품 소개 닫기" onClick={() => dialog.current?.close()}><X size={18} /></button></header>
       <div className="aboutEntryBody" ref={body}><BookAboutEditor book={book} onChange={onChange} /></div>
-      <footer><span>기록 저장 시 함께 저장됩니다.</span><button type="button" onClick={() => dialog.current?.close()}>완료</button></footer>
+      <footer><span role={saveError ? "alert" : undefined}>{saveError || (onSave ? "작품소개만 저장됩니다." : "기록 저장 시 함께 저장됩니다.")}</span><button type="button" disabled={saving} onClick={() => void finish()}>{saving ? "저장 중…" : onSave ? "저장" : "완료"}</button></footer>
     </dialog>
   </div>;
 }

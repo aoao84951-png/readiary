@@ -128,6 +128,14 @@ export async function setDocument(collection: string, id: string, data: Record<s
   return record(await response.json() as FirestoreDocument);
 }
 
+export async function patchDocument(collection: string, id: string, data: Record<string, unknown>) {
+  const query = new URLSearchParams({ 'currentDocument.exists': 'true' });
+  for (const key of Object.keys(data)) query.append('updateMask.fieldPaths', key);
+  const response = await request(`${collection}/${encodeURIComponent(id)}?${query}`, { method: 'PATCH', body: JSON.stringify({ fields: fields(data) }) });
+  if (!response || !response.ok) throw new Error('기록을 수정하지 못했습니다.');
+  return record(await response.json() as FirestoreDocument);
+}
+
 export async function deleteDocument(collection: string, id: string) {
   const response = await request(`${collection}/${encodeURIComponent(id)}`, { method: 'DELETE' });
   if (!response) return false;
