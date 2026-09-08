@@ -3017,7 +3017,7 @@ html { scrollbar-gutter: stable; }
    Only the drawer scrolls; keyboard changes never resize the backdrop. */
 @media (max-width: 640px), (pointer: coarse) {
   .drawerShade { inset: 0; height: 100%; background: #fff; overflow: hidden; padding: 0; align-items: flex-start; }
-  .drawerShade > .addDrawer { margin-top: var(--editor-viewport-top, 0px); height: var(--editor-viewport-height, 100dvh) !important; min-height: 0 !important; max-height: none !important; width: 100%; display: block; overflow-y: auto !important; overscroll-behavior: contain; border: 0; border-radius: 0; padding-bottom: var(--note-dock-space, 0px); scroll-padding-bottom: var(--note-dock-space, 0px); overflow-anchor: none; }
+  .drawerShade > .addDrawer { margin-top: var(--editor-viewport-top, 0px); height: var(--editor-viewport-height, 100dvh) !important; min-height: 0 !important; max-height: none !important; width: 100%; display: block; overflow-y: auto !important; overscroll-behavior: contain; border: 0; border-radius: 0; padding-bottom: calc(var(--editor-keyboard-space, 0px) + var(--note-dock-space, 0px)); scroll-padding-bottom: calc(var(--editor-keyboard-space, 0px) + var(--note-dock-space, 0px)); overflow-anchor: none; }
   .addDrawer > .recordForm, .addDrawer > .drawerBody { height: auto !important; overflow: visible !important; }
   .addDrawer > .recordForm.wizardForm { min-height: 0 !important; }
   .addDrawer > header { position: sticky; top: 0; z-index: 2; background: #fff; }
@@ -3031,3 +3031,8 @@ html { scrollbar-gutter: stable; }
   .drawerShade { backdrop-filter: none; -webkit-backdrop-filter: none; }
   .drawerShade > .addDrawer, .mobileNoteDock { box-shadow: none; }
 }
+
+.mobileNoteSheet { overflow: hidden; max-width: calc(100vw - 24px); }
+.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; padding-bottom: 12px; }
+.mobileColorOptions button[aria-pressed="true"] { border-color: #ad748d; box-shadow: inset 0 0 0 1px #ad748d; background: #f7edf3; color: #80506a; font-weight: 700; }
+.mobileColorOptions button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; font-size: 14px; color: #ad748d; }

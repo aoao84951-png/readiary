@@ -42,13 +42,15 @@ test('selection handle changes capture the current range and clear a collapsed s
     ref: { current: { contains: node => node === text } }, rangeRef, interactingRef: {current: false}, setPaletteOpen: () => {},
     panelRef: { current: { contains: () => false } },
     window: { getSelection: () => selection, innerWidth: 390 },
-    document: { queryCommandState: command => command === 'bold' },
+    document: { queryCommandValue: command => command === "foreColor" ? "rgb(255, 0, 0)" : "rgb(255, 255, 0)", queryCommandState: command => command === 'bold' },
     setToolbar: next => toolbar = next,
   };
   vm.createContext(context);
   vm.runInContext(ts.transpileModule(selectionUpdate + '\nupdateToolbar();', { compilerOptions: { target: ts.ScriptTarget.ES2020 } }).outputText, context);
   assert.equal(rangeRef.current, range);
   assert.equal(toolbar.bold, true);
+  assert.equal(toolbar.textColor, "#ff0000");
+  assert.equal(toolbar.backgroundColor, "#ffff00");
   selection = { ...selection, isCollapsed: true };
   vm.runInContext('updateToolbar()', context);
   assert.equal(rangeRef.current, null);
@@ -136,14 +138,15 @@ test('record drawer locks the feed, follows keyboard viewport, and restores on c
   let cleanup, restored;
   vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
     adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}}, drawerRef: {current: {parentElement: shade, style: drawerStyle}},
-    window: {scrollX: 0, scrollY: 420, visualViewport: viewport, addEventListener: () => {}, removeEventListener: () => {}, scrollTo: (x, y) => restored = [x, y]},
+    window: {innerHeight: 800, scrollX: 0, scrollY: 420, visualViewport: viewport, addEventListener: () => {}, removeEventListener: () => {}, scrollTo: (x, y) => restored = [x, y]},
   });
   assert.equal(style.position, 'fixed'); assert.equal(style.top, '-420px');
   assert.deepEqual(shade.style, {});
-  assert.equal(drawerStyle['--editor-viewport-top'], '100px'); assert.equal(drawerStyle['--editor-viewport-height'], '350px');
+  assert.equal(drawerStyle['--editor-viewport-top'], '100px'); assert.equal(drawerStyle['--editor-viewport-height'], '700px');
+  assert.equal(drawerStyle['--editor-keyboard-space'], '350px');
   viewport.height = 700; viewport.offsetTop = 0; handlers.resize();
   assert.deepEqual(shade.style, {});
-  assert.equal(drawerStyle['--editor-viewport-height'], '700px'); assert.equal(drawerStyle['--editor-viewport-top'], '0px');
+  assert.equal(drawerStyle['--editor-viewport-height'], '800px'); assert.equal(drawerStyle['--editor-viewport-top'], '0px');
   cleanup(); assert.equal(style.position, ''); assert.equal(style.overflow, '');
   assert.deepEqual(restored, [0, 420]); assert.deepEqual(handlers, {});
 });
@@ -233,7 +236,7 @@ test('successive palette commands preserve text range when Safari collapses sele
   const context = {
     mobile: true, paletteOpen: true, interactingRef: {current: true}, ref: {current: root}, rangeRef,
     window: {getSelection: () => ({removeAllRanges() {nativeRange = null;}, addRange(r) {nativeRange = r;}})},
-    NodeFilter: {SHOW_TEXT: 4}, emitValue() {}, updateToolbar() {},
+    NodeFilter: {SHOW_TEXT: 4}, emitValue() {}, updateToolbar() {}, setToolbar() {},
     document: {createRange: () => new Range(), createTreeWalker: () => {let i = -1; return {nextNode() {return !!nodes[++i];}, get currentNode() {return nodes[i];}};},
       execCommand(command) {if (command === 'styleWithCSS') return; assert.equal(nativeRange.toString(), 'bcde'); calls++; nodes = [{textContent: 'a'}, {textContent: 'bcde'}, {textContent: 'f'}]; nativeRange = null;},
     },

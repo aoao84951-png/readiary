@@ -1490,7 +1490,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const panelRef = useRef<HTMLDivElement>(null);
   const rangeRef = useRef<Range | null>(null);
   const lastEmitted = useRef<string | null>(null);
-  const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean } | null>(null);
+  const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean; textColor: string; backgroundColor: string } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const interactingRef = useRef(false);
   const [mobile, setMobile] = useState(false);
@@ -1516,7 +1516,8 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
     if (mobile) {
       panel.style.width = `${viewportRight - viewportLeft}px`;
-      panel.style.maxHeight = `${Math.min(320, Math.max(40, (viewportBottom - viewportTop) * 0.45))}px`;
+      // Fit the complete sheet where possible, keeping a margin outside its border.
+      panel.style.maxHeight = `${Math.max(40, viewportBottom - viewportTop - 56)}px`;
       panel.style.visibility = "visible";
       panel.style.left = `${(viewportLeft + viewportRight) / 2}px`;
       const height = panel.getBoundingClientRect().height;
@@ -1583,7 +1584,12 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     rangeRef.current = selection.getRangeAt(0).cloneRange();
     const rect = rangeRef.current.getBoundingClientRect();
     const half = Math.min(220, window.innerWidth - 16) / 2;
-    setToolbar({ top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
+    const colorValue = (command: string) => {
+      const value = String(document.queryCommandValue(command) || "").toLowerCase().replace(/\s/g, "");
+      const rgb = value.match(/^rgb\((\d+),(\d+),(\d+)\)$/);
+      return rgb ? "#" + rgb.slice(1).map(n => Number(n).toString(16).padStart(2, "0")).join("") : value;
+    };
+    setToolbar({ textColor: colorValue("foreColor"), backgroundColor: colorValue("hiliteColor"), top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
   useEffect(() => {
     let start: { x: number; y: number; target: EventTarget | null } | null = null;
@@ -1683,6 +1689,9 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     rangeRef.current = restored;
     selection.removeAllRanges(); selection.addRange(restored);
     emitValue(); updateToolbar();
+    if (command === "foreColor" || command === "hiliteColor") {
+      setToolbar(current => current ? { ...current, [command === "foreColor" ? "textColor" : "backgroundColor"]: color || "" } : current);
+    }
     if (mobile && paletteOpen) {
       interactingRef.current = true;
       const saved = restored.cloneRange();
@@ -1720,7 +1729,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
           <button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button>
         </div>
         <div className="mobileColorOptions" role="group" aria-label={colorTab === "text" ? "글자색" : "배경색"}>
-          {["default", ...noteColors].map((color, i) => <button type="button" key={color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", i === 0 ? (colorTab === "text" ? "#4d4d49" : "transparent") : (colorTab === "text" ? noteColorHex[noteColors[i - 1]] : noteBackgroundHex[noteColors[i - 1]]))}>
+          {["default", ...noteColors].map((color, i) => <button type="button" key={color} aria-pressed={colorTab === "text" ? toolbar?.textColor === (i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]) : i === 0 ? !toolbar?.backgroundColor || ["transparent", "rgba(0,0,0,0)"].includes(toolbar.backgroundColor) : toolbar?.backgroundColor === noteBackgroundHex[noteColors[i - 1]]} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", i === 0 ? (colorTab === "text" ? "#4d4d49" : "transparent") : (colorTab === "text" ? noteColorHex[noteColors[i - 1]] : noteBackgroundHex[noteColors[i - 1]]))}>
             <span className={colorTab === "background" ? "colorSample backgroundSample" : "colorSample"} style={colorTab === "text" ? {color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]} : {backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]]}}>{colorTab === "text" ? "가" : ""}</span>
             {i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}
           </button>)}
@@ -2679,7 +2688,10 @@ export default function FeedPage() {
     const fit = () => {
       if (!drawer) return;
       drawer.style.setProperty("--editor-viewport-top", `${viewport?.offsetTop ?? 0}px`);
-      drawer.style.setProperty("--editor-viewport-height", `${viewport?.height ?? window.innerHeight}px`);
+      // Let editor content extend beneath translucent browser/keyboard chrome.
+      const top = viewport?.offsetTop ?? 0;
+      drawer.style.setProperty("--editor-viewport-height", `${Math.max(viewport?.height ?? 0, window.innerHeight - top)}px`);
+      drawer.style.setProperty("--editor-keyboard-space", `${Math.max(0, window.innerHeight - top - (viewport?.height ?? window.innerHeight))}px`);
     };
     fit();
     viewport?.addEventListener("resize", fit);
