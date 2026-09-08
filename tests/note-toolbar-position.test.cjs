@@ -113,7 +113,7 @@ test('palette touch keeps selection; editor tap rechecks native selection', () =
 test('viewport movement only repositions, never re-reads a lost native selection', () => {
   const handlers = {}, viewportHandlers = {};
   let selected = 0, positioned = 0;
-  const source = editor.slice(editor.indexOf('  // Native handle movement'), editor.indexOf('  const apply ='));
+  const source = editor.slice(editor.indexOf('  // Native handle movement'), editor.indexOf('  // Paint the saved range'));
   vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
     useEffect: fn => fn(), cancelAnimationFrame: () => {}, requestAnimationFrame: fn => fn(),
     Node: class {}, panelRef: {current: null}, updateToolbar: () => selected++, positionToolbar: () => positioned++,
@@ -213,4 +213,32 @@ test('palette transition reveals selected text once and user interaction cancels
   timer(); assert.equal(scroller.scrollTop, 282);
   scroller.scrollTop = 100;
   cancel(); assert.equal(timer, null); assert.equal(scroller.scrollTop, 100);
+});
+
+test('successive palette commands preserve text range when Safari collapses selection', () => {
+  let nodes = [{textContent: 'abcdef'}];
+  class Range {
+    constructor() { this.startContainer = nodes[0]; this.startOffset = 0; this.endContainer = nodes[0]; this.endOffset = 0; }
+    selectNodeContents() { this.startContainer = nodes[0]; this.startOffset = 0; }
+    setStart(n, o) { this.startContainer = n; this.startOffset = o; }
+    setEnd(n, o) { this.endContainer = n; this.endOffset = o; }
+    toString() { const all = nodes.map(n => n.textContent).join(''); const at = (n, o) => nodes.slice(0, nodes.indexOf(n)).reduce((a, x) => a + x.textContent.length, 0) + o; return all.slice(at(this.startContainer, this.startOffset), at(this.endContainer, this.endOffset)); }
+    cloneRange() { return Object.assign(new Range(), this); }
+  }
+  const initial = new Range(); initial.setStart(nodes[0], 1); initial.setEnd(nodes[0], 5);
+  const rangeRef = {current: initial};
+  let nativeRange = initial, calls = 0;
+  const root = {blur() {nativeRange = null;}};
+  const source = editor.slice(editor.indexOf('  const apply ='), editor.indexOf('  const togglePalette ='));
+  const context = {
+    mobile: true, paletteOpen: true, interactingRef: {current: true}, ref: {current: root}, rangeRef,
+    window: {getSelection: () => ({removeAllRanges() {nativeRange = null;}, addRange(r) {nativeRange = r;}})},
+    NodeFilter: {SHOW_TEXT: 4}, emitValue() {}, updateToolbar() {},
+    document: {createRange: () => new Range(), createTreeWalker: () => {let i = -1; return {nextNode() {return !!nodes[++i];}, get currentNode() {return nodes[i];}};},
+      execCommand(command) {if (command === 'styleWithCSS') return; assert.equal(nativeRange.toString(), 'bcde'); calls++; nodes = [{textContent: 'a'}, {textContent: 'bcde'}, {textContent: 'f'}]; nativeRange = null;},
+    },
+  };
+  vm.createContext(context);
+  vm.runInContext(ts.transpileModule(source + '\napply("foreColor", "red"); apply("hiliteColor", "yellow");', {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, context);
+  assert.equal(calls, 2); assert.equal(rangeRef.current.toString(), 'bcde');
 });

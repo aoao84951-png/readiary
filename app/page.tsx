@@ -1644,16 +1644,52 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       window.visualViewport?.removeEventListener("scroll", move);
     };
   });
+  // Paint the saved range independently of native keyboard focus.
+  useEffect(() => {
+    if (!mobile || !paletteOpen || !toolbar || !rangeRef.current || typeof Highlight === "undefined") return;
+    const style = document.createElement("style");
+    style.textContent = "::highlight(note-format-selection) { background-color: rgba(90,157,230,.24); }";
+    document.head.appendChild(style);
+    const highlight = new Highlight(rangeRef.current);
+    CSS.highlights.set("note-format-selection", highlight);
+    return () => { style.remove(); if (CSS.highlights.get("note-format-selection") === highlight) CSS.highlights.delete("note-format-selection"); };
+  }, [mobile, paletteOpen, toolbar]);
   const apply = (command: string, color?: string) => {
     const selection = window.getSelection();
     if (!selection || !rangeRef.current) return;
     if (!(mobile && paletteOpen)) ref.current?.focus({ preventScroll: true });
     selection.removeAllRanges(); selection.addRange(rangeRef.current);
+    // Formatting can replace text nodes and collapse Safari's native selection.
+    // Save text offsets before the DOM mutation and reconstruct the full range.
+    const root = ref.current!;
+    const before = document.createRange();
+    before.selectNodeContents(root);
+    before.setEnd(rangeRef.current.startContainer, rangeRef.current.startOffset);
+    const start = before.toString().length;
+    const end = start + rangeRef.current.toString().length;
     document.execCommand("styleWithCSS", false, "true");
     document.execCommand(command, false, color);
     document.execCommand("styleWithCSS", false, "false");
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const restored = document.createRange();
+    let offset = 0, foundStart = false;
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const length = node.textContent?.length ?? 0;
+      if (!foundStart && start <= offset + length) { restored.setStart(node, start - offset); foundStart = true; }
+      if (foundStart && end <= offset + length) { restored.setEnd(node, end - offset); break; }
+      offset += length;
+    }
+    rangeRef.current = restored;
+    selection.removeAllRanges(); selection.addRange(restored);
     emitValue(); updateToolbar();
-    if (mobile && paletteOpen) ref.current?.blur();
+    if (mobile && paletteOpen) {
+      interactingRef.current = true;
+      const saved = restored.cloneRange();
+      root.blur();
+      // Keep the saved range and its visible highlight while the keyboard is hidden.
+      rangeRef.current = saved;
+    }
   };
   const togglePalette = () => {
     interactingRef.current = true;

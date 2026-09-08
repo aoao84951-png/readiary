@@ -3026,3 +3026,8 @@ html { scrollbar-gutter: stable; }
 @media (max-width: 640px), (pointer: coarse) {
   .addDrawer .richNoteEditor { max-height: none; overflow: visible; }
 }
+
+@media (max-width: 640px), (pointer: coarse) {
+  .drawerShade { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .drawerShade > .addDrawer, .mobileNoteDock { box-shadow: none; }
+}
