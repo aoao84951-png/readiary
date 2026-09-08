@@ -1547,7 +1547,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const half = panel.getBoundingClientRect().width / 2;
     panel.style.left = `${Math.max(viewportLeft + half, Math.min(viewportRight - half, selection.left + selection.width / 2))}px`;
   };
-  useLayoutEffect(positionToolbar, [toolbar, paletteOpen, mobile, colorTab]);
+  useLayoutEffect(positionToolbar, [mobile ? !!toolbar : toolbar, paletteOpen, mobile]);
   useEffect(() => {
     if (!mobile || !toolbar) return;
     const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
@@ -1685,6 +1685,8 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const apply = (command: string, color?: string) => {
     const selection = window.getSelection();
     if (!selection || !rangeRef.current) return;
+    const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
+    const scrollTop = scroller?.scrollTop;
     if (!(mobile && paletteOpen)) ref.current?.focus({ preventScroll: true });
     selection.removeAllRanges(); selection.addRange(rangeRef.current);
     // Formatting can replace text nodes and collapse Safari's native selection.
@@ -1720,6 +1722,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       root.blur();
       // Keep the saved range and its visible highlight while the keyboard is hidden.
       rangeRef.current = saved;
+      if (scroller && scrollTop !== undefined) scroller.scrollTop = scrollTop;
     }
   };
   const togglePalette = () => {
@@ -1727,6 +1730,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     if (mobile) {
       if (!paletteOpen) ref.current?.blur();
       else {
+        ref.current?.removeAttribute("inputmode");
         ref.current?.focus({ preventScroll: true });
         const selection = window.getSelection();
         if (selection && rangeRef.current) { selection.removeAllRanges(); selection.addRange(rangeRef.current); }
@@ -1735,7 +1739,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     setPaletteOpen(!paletteOpen);
   };
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
-  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={{ top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
+  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
         {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
         <button type="button" disabled={!toolbar} aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
@@ -1765,7 +1769,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       </fieldset>}
     </div>;
   return <div className="richNoteField">
-    <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onInput={emitValue} onKeyUp={(event) => { interactingRef.current = false; if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
+    <div ref={ref} className="richNoteEditor" inputMode={mobile && paletteOpen ? "none" : undefined} contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onInput={emitValue} onKeyUp={(event) => { interactingRef.current = false; if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
     {toolbar && createPortal(controls, document.body)}
   </div>;
 }

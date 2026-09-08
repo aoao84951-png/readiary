@@ -170,7 +170,7 @@ test('mobile palette saves selection through blur and restores it when returning
   let open = false, focused = 0, blurred = 0, restored = 0;
   const range = {};
   const context = {mobile: true, paletteOpen: false, interactingRef: {current: false},
-    ref: {current: {focus: () => focused++, blur: () => blurred++}}, rangeRef: {current: range},
+    ref: {current: {removeAttribute() {}, focus: () => focused++, blur: () => blurred++}}, rangeRef: {current: range},
     window: {getSelection: () => ({removeAllRanges: () => {}, addRange: r => {assert.equal(r, range); restored++;}})},
     setPaletteOpen: value => open = value,
   };
@@ -231,7 +231,8 @@ test('successive palette commands preserve text range when Safari collapses sele
   const initial = new Range(); initial.setStart(nodes[0], 1); initial.setEnd(nodes[0], 5);
   const rangeRef = {current: initial};
   let nativeRange = initial, calls = 0;
-  const root = {blur() {nativeRange = null;}};
+  const scroller = {scrollTop: 240};
+  const root = {closest: () => scroller, blur() {nativeRange = null; scroller.scrollTop = 0;}};
   const source = editor.slice(editor.indexOf('  const apply ='), editor.indexOf('  const togglePalette ='));
   const context = {
     mobile: true, paletteOpen: true, interactingRef: {current: true}, ref: {current: root}, rangeRef,
@@ -244,6 +245,7 @@ test('successive palette commands preserve text range when Safari collapses sele
   vm.createContext(context);
   vm.runInContext(ts.transpileModule(source + '\napply("foreColor", "red"); apply("hiliteColor", "yellow");', {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, context);
   assert.equal(calls, 2); assert.equal(rangeRef.current.toString(), 'bcde');
+  assert.equal(scroller.scrollTop, 240);
 });
 
 test('standalone palette section reaches screen edge with safe space reserved for its content', () => {

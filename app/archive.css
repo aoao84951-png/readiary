@@ -1905,7 +1905,7 @@
 .noteFormatActions { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; }
 .noteFormatActions button { display: grid; place-items: center; height: 30px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: #59616c; cursor: pointer; }
 .noteFormatActions svg { width: 17px; height: 17px; stroke-width: 1.8; }
-.noteFormatActions button:hover, .noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
+.noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
 .selectionFormatToolbar button:focus-visible { outline: 2px solid #86a6ce; outline-offset: 1px; }
 .noteColorPalette { min-width: 0; margin: 0; border: 0; border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 6px; }
 .notePaletteLabel { font-family: inherit; font-size: 10px; font-weight: 600; color: #8a8f99; margin: 6px 0 7px; }
@@ -3049,3 +3049,14 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet .noteColorTabs { padding-bottom: 12px; }
 .mobileNoteSheet .noteColorTabs button { background: transparent; border-radius: 0; color: #a1a39e; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { color: #666d61; border-bottom: 1px solid #dce0d7; }
+
+@media (hover: hover) and (pointer: fine) {
+  .noteFormatActions button:hover { background: #f3eef4; color: #ad748d; }
+}
+.mobileNoteSheet, .mobileNoteSheet * { box-sizing: border-box; }
+.mobileNoteSheet .mobileNoteColors { width: 100%; min-width: 0; overflow-x: hidden; }
+.mobileColorOptions { width: 100%; min-width: 0; }
+.mobileColorOptions button { min-width: 0; overflow-wrap: anywhere; }
+.mobileNoteSheet .noteColorTabs { min-width: 0; }
+.mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
+.mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
