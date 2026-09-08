@@ -3060,3 +3060,12 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
+
+/* Keep selected pills inset from the dock ends and the close-button divider. */
+.mobileNoteDock .noteFormatActions button { position: relative; isolation: isolate; min-width: 0; border-radius: 999px; background: transparent; }
+.mobileNoteDock .noteFormatActions button::before { content: ""; position: absolute; inset: 3px 6px; max-width: 46px; margin-inline: auto; border-radius: 999px; background: transparent; pointer-events: none; z-index: -1; }
+.mobileNoteDock .noteFormatActions button[aria-pressed="true"]::before,
+.mobileNoteDock .noteFormatActions button[aria-expanded="true"]::before { background: #f3eef4; }
+@media (hover: hover) and (pointer: fine) {
+  .mobileNoteDock .noteFormatActions button:hover::before { background: #f3eef4; }
+}
