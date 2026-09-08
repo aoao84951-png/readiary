@@ -3,7 +3,7 @@ import { FormEvent, TouchEvent, useEffect, useLayoutEffect, useMemo, useRef, use
 import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
-  Bold, Underline, Italic, Strikethrough, Palette, CircleSlash,
+  Bold, Underline, Italic, Strikethrough, RemoveFormatting, Palette, CircleSlash,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
@@ -1587,7 +1587,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteToolbar" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left }} onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
         {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
-        <button type="button" className="noteResetFormat" disabled={!toolbar} aria-label="서식 초기화" title="서식 초기화" onClick={() => apply("removeFormat")}>초기화</button>
+        <button type="button" disabled={!toolbar} aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
         <button type="button" aria-label="글자색과 배경색" title="글자색과 배경색" aria-expanded={paletteOpen} onClick={() => setPaletteOpen(!paletteOpen)}><Palette /></button>
       </div>
       {paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>

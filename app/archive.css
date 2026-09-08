@@ -2998,5 +2998,3 @@ html { scrollbar-gutter: stable; }
 .mobileNoteToolbar .noteSwatches button { min-height: 44px; }
 .mobileNoteToolbar .notePaletteLabel { font-size: 14px; }
 .selectionFormatToolbar button:disabled { opacity: .35; cursor: default; }
-.selectionFormatToolbar .noteResetFormat { font-size: 10px; font-family: inherit; }
-.mobileNoteToolbar .noteResetFormat { font-size: 12px; }
