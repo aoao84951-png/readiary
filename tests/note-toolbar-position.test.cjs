@@ -130,24 +130,27 @@ test('record drawer locks the feed, follows keyboard viewport, and restores on c
   const source = page.slice(start, page.indexOf('  }, [adding]);', start) + '  }, [adding]);'.length);
   const style = {position: '', top: '', left: '', width: '', overflow: ''};
   const shade = {style: {}};
+  const drawerStyle = {setProperty(key, value) {this[key] = value;}};
   const handlers = {};
   const viewport = {offsetTop: 100, height: 350, addEventListener: (name, fn) => handlers[name] = fn, removeEventListener: name => delete handlers[name]};
   let cleanup, restored;
   vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
-    adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}}, drawerRef: {current: {parentElement: shade}},
+    adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}}, drawerRef: {current: {parentElement: shade, style: drawerStyle}},
     window: {scrollX: 0, scrollY: 420, visualViewport: viewport, addEventListener: () => {}, removeEventListener: () => {}, scrollTo: (x, y) => restored = [x, y]},
   });
   assert.equal(style.position, 'fixed'); assert.equal(style.top, '-420px');
-  assert.equal(shade.style.top, '100px'); assert.equal(shade.style.height, '350px');
+  assert.deepEqual(shade.style, {});
+  assert.equal(drawerStyle['--editor-viewport-top'], '100px'); assert.equal(drawerStyle['--editor-viewport-height'], '350px');
   viewport.height = 700; viewport.offsetTop = 0; handlers.resize();
-  assert.equal(shade.style.height, '700px'); assert.equal(shade.style.top, '0px');
+  assert.deepEqual(shade.style, {});
+  assert.equal(drawerStyle['--editor-viewport-height'], '700px'); assert.equal(drawerStyle['--editor-viewport-top'], '0px');
   cleanup(); assert.equal(style.position, ''); assert.equal(style.overflow, '');
   assert.deepEqual(restored, [0, 420]); assert.deepEqual(handlers, {});
 });
 
 test('mobile dock sits above keyboard and sheet reserves editor scrolling space', () => {
   const style = {};
-  const scroller = {style: {}, scrollTop: 0};
+  const scroller = {style: {setProperty(key, value) {this[key] = value;}}, scrollTop: 0};
   const panel = {style, getBoundingClientRect: () => ({height: 52})};
   vm.runInNewContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
     panelRef: {current: panel}, rangeRef: {current: {getBoundingClientRect: () => ({top: 280, bottom: 310})}},
@@ -155,7 +158,7 @@ test('mobile dock sits above keyboard and sheet reserves editor scrolling space'
     window: {visualViewport: {offsetTop: 100, offsetLeft: 0, height: 400, width: 390}},
   });
   assert.equal(style.top, '440px'); assert.equal(style.width, '374px');
-  assert.equal(scroller.style.paddingBottom, '76px');
+  assert.equal(scroller.style['--note-dock-space'], '68px');
   assert.equal(scroller.scrollTop, 0);
 });
 
@@ -174,4 +177,40 @@ test('mobile palette saves selection through blur and restores it when returning
   context.paletteOpen = true;
   vm.runInContext('togglePalette()', context);
   assert.equal(open, false); assert.equal(focused, 1); assert.equal(restored, 1);
+});
+
+test('mobile viewport repositioning never overrides manual scrolling', () => {
+  const style = {};
+  const scroller = {style: {setProperty() {}}, scrollTop: 170};
+  const context = {
+    panelRef: {current: {style, getBoundingClientRect: () => ({height: 300})}},
+    rangeRef: {current: {getBoundingClientRect: () => ({top: 900, bottom: 930})}},
+    ref: {current: {closest: () => scroller}}, mobile: true,
+    window: {visualViewport: {offsetTop: 0, offsetLeft: 0, height: 700, width: 390}},
+  };
+  vm.createContext(context);
+  vm.runInContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, context);
+  assert.equal(scroller.scrollTop, 170);
+  context.window.visualViewport.height = 400;
+  vm.runInContext('positionToolbar()', context);
+  assert.equal(scroller.scrollTop, 170);
+});
+
+test('palette transition reveals selected text once and user interaction cancels pending reveal', () => {
+  const start = editor.indexOf('  // Reveal once');
+  const source = editor.slice(start, editor.indexOf('  const updateToolbar', start));
+  const scroller = {scrollTop: 200};
+  let timer, cancel;
+  vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    mobile: true, toolbar: {}, paletteOpen: true, useEffect: fn => fn(),
+    panelRef: {current: {getBoundingClientRect: () => ({top: 400})}},
+    rangeRef: {current: {getBoundingClientRect: () => ({top: 450, bottom: 470, height: 20})}},
+    ref: {current: {closest: () => scroller}},
+    window: {visualViewport: {offsetTop: 0}, setTimeout: fn => {timer = fn; return 1;}, clearTimeout: () => {timer = null;}},
+    document: {addEventListener: (event, fn) => {cancel = fn;}},
+  });
+  assert.equal(scroller.scrollTop, 200);
+  timer(); assert.equal(scroller.scrollTop, 282);
+  scroller.scrollTop = 100;
+  cancel(); assert.equal(timer, null); assert.equal(scroller.scrollTop, 100);
 });

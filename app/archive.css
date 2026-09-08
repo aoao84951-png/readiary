@@ -2996,11 +2996,11 @@ html { scrollbar-gutter: stable; }
 .selectionFormatToolbar .noteFormatActions { position: sticky; top: -4px; z-index: 1; background: #fff; }
 /* Mobile keyboard accessory and replacement color sheet. */
 .mobileNoteDock { padding: 4px; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px #35445b16; }
-.mobileNoteDock .noteFormatActions { margin-right: 44px; position: static; }
-.mobileNoteDock .noteFormatActions button { height: 44px; }
-.mobileNoteDock .noteFormatActions svg { width: 20px; height: 20px; }
-.noteDockClose { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-left: 1px solid #eee; background: #fff; color: #777; border-radius: 0 22px 22px 0; }
-.noteDockClose svg { width: 20px; height: 20px; }
+.mobileNoteDock .noteFormatActions { margin-right: 34px; position: static; }
+.mobileNoteDock .noteFormatActions button { height: 32px; }
+.mobileNoteDock .noteFormatActions svg { width: 17px; height: 17px; }
+.noteDockClose { position: absolute; top: 4px; right: 4px; width: 34px; height: 32px; display: grid; place-items: center; border: 0; border-left: 1px solid #eee; background: #fff; color: #777; border-radius: 0 22px 22px 0; }
+.noteDockClose svg { width: 17px; height: 17px; }
 .mobileNoteSheet { border-radius: 20px; display: flex; flex-direction: column; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
 .mobileNoteSheet .noteFormatActions { flex-shrink: 0; }
 .mobileNoteColors { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 8px 8px; }
@@ -3008,7 +3008,21 @@ html { scrollbar-gutter: stable; }
 .noteColorTabs button { flex: 1; height: 36px; border: 0; border-radius: 8px; background: #f7f7f7; color: #888; font-size: 14px; }
 .noteColorTabs button[aria-selected="true"] { background: #f3eef4; color: #ad748d; }
 .mobileColorOptions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-.mobileColorOptions button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border: 1px solid #eee; border-radius: 7px; background: #fff; color: #555; font-size: 13px; text-align: left; }
+.mobileColorOptions button { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 4px 8px; border: 1px solid #eee; border-radius: 7px; background: #fff; color: #555; font-size: 13px; text-align: left; }
 .colorSample { flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center; font-size: 16px; }
 .backgroundSample { border: 1px solid #ddd; border-radius: 4px; }
 .selectionFormatToolbar button:disabled { opacity: .35; cursor: default; }
+
+/* The backdrop always covers the layout viewport, including Safari's chrome.
+   Only the drawer scrolls; keyboard changes never resize the backdrop. */
+@media (max-width: 640px), (pointer: coarse) {
+  .drawerShade { inset: 0; height: 100%; background: #fff; overflow: hidden; padding: 0; align-items: flex-start; }
+  .drawerShade > .addDrawer { margin-top: var(--editor-viewport-top, 0px); height: var(--editor-viewport-height, 100dvh) !important; min-height: 0 !important; max-height: none !important; width: 100%; display: block; overflow-y: auto !important; overscroll-behavior: contain; border: 0; border-radius: 0; padding-bottom: var(--note-dock-space, 0px); scroll-padding-bottom: var(--note-dock-space, 0px); overflow-anchor: none; }
+  .addDrawer > .recordForm, .addDrawer > .drawerBody { height: auto !important; overflow: visible !important; }
+  .addDrawer > .recordForm.wizardForm { min-height: 0 !important; }
+  .addDrawer > header { position: sticky; top: 0; z-index: 2; background: #fff; }
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+  .addDrawer .richNoteEditor { max-height: none; overflow: visible; }
+}

@@ -1516,23 +1516,14 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
     if (mobile) {
       panel.style.width = `${viewportRight - viewportLeft}px`;
-      panel.style.maxHeight = `${Math.max(48, (viewportBottom - viewportTop) * 0.6)}px`;
+      panel.style.maxHeight = `${Math.min(320, Math.max(40, (viewportBottom - viewportTop) * 0.45))}px`;
       panel.style.visibility = "visible";
       panel.style.left = `${(viewportLeft + viewportRight) / 2}px`;
       const height = panel.getBoundingClientRect().height;
       const top = viewportBottom - height;
       panel.style.top = `${top}px`;
-      // Reserve space in the actual editor scroller, not the background feed.
-      const scroller = ref.current?.closest(".drawerShade") as HTMLElement | null;
-      if (scroller) {
-        scroller.style.paddingBottom = `${height + 24}px`;
-        scroller.style.scrollPaddingBottom = `${height + 24}px`;
-        const usableHeight = top - viewportTop - 24;
-        if (selection.bottom - selection.top <= usableHeight) {
-          if (selection.bottom > top - 12) scroller.scrollTop += selection.bottom - top + 12;
-          else if (selection.top < viewportTop + 12) scroller.scrollTop -= viewportTop + 12 - selection.top;
-        }
-      }
+      const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
+      if (scroller) scroller.style.setProperty("--note-dock-space", `${height + 16}px`);
       return;
     }
     // Measure the expanded palette before choosing a side; never clamp it across the selection.
@@ -1556,10 +1547,30 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   useLayoutEffect(positionToolbar, [toolbar, paletteOpen, mobile, colorTab]);
   useEffect(() => {
     if (!mobile || !toolbar) return;
-    const scroller = ref.current?.closest(".drawerShade") as HTMLElement | null;
+    const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
     if (!scroller) return;
-    return () => { scroller.style.paddingBottom = ""; scroller.style.scrollPaddingBottom = ""; };
+    return () => { scroller.style.removeProperty("--note-dock-space"); };
   }, [mobile, !!toolbar]);
+  // Reveal once after keyboard/palette transitions. Never fight a user's scroll.
+  useEffect(() => {
+    if (!mobile || !toolbar) return;
+    const reveal = () => {
+      const panel = panelRef.current;
+      const range = rangeRef.current;
+      const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
+      if (!panel || !range || !scroller) return;
+      const rect = range.getBoundingClientRect();
+      const top = (window.visualViewport?.offsetTop ?? 0) + 60;
+      const bottom = panel.getBoundingClientRect().top - 12;
+      if (rect.height > bottom - top || rect.bottom === 0) return;
+      if (rect.bottom > bottom) scroller.scrollTop += rect.bottom - bottom;
+      else if (rect.top < top) scroller.scrollTop -= top - rect.top;
+    };
+    const timer = window.setTimeout(reveal, 400);
+    const cancelReveal = () => window.clearTimeout(timer);
+    document.addEventListener("pointerdown", cancelReveal, { once: true });
+    return () => { window.clearTimeout(timer); document.removeEventListener("pointerdown", cancelReveal); };
+  }, [mobile, paletteOpen, !!toolbar]);
   const updateToolbar = () => {
     const selection = window.getSelection();
     if (!ref.current || !selection?.rangeCount || selection.isCollapsed || !ref.current.contains(selection.anchorNode) || !ref.current.contains(selection.focusNode)) {
@@ -2627,13 +2638,12 @@ export default function FeedPage() {
     const scrollY = window.scrollY;
     const previous = { position: body.style.position, top: body.style.top, left: body.style.left, width: body.style.width, overflow: body.style.overflow };
     Object.assign(body.style, { position: "fixed", top: `${-scrollY}px`, left: `${-scrollX}px`, width: "100%", overflow: "hidden" });
-    const shade = drawerRef.current?.parentElement;
+    const drawer = drawerRef.current;
     const viewport = window.visualViewport;
     const fit = () => {
-      if (!shade) return;
-      shade.style.top = `${viewport?.offsetTop ?? 0}px`;
-      shade.style.height = `${viewport?.height ?? window.innerHeight}px`;
-      shade.style.bottom = "auto";
+      if (!drawer) return;
+      drawer.style.setProperty("--editor-viewport-top", `${viewport?.offsetTop ?? 0}px`);
+      drawer.style.setProperty("--editor-viewport-height", `${viewport?.height ?? window.innerHeight}px`);
     };
     fit();
     viewport?.addEventListener("resize", fit);
