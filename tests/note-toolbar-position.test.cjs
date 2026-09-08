@@ -5,12 +5,12 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const page = fs.readFileSync('app/page.tsx', 'utf8');
 const editor = page.slice(page.indexOf('function RichNoteTextarea('));
-const effect = editor.slice(editor.indexOf('  const positionToolbar ='), editor.indexOf('  const updateToolbar ='));
+const effect = editor.slice(editor.indexOf('  const positionToolbar ='), editor.indexOf('  useLayoutEffect(positionToolbar')) + '\npositionToolbar();';
 function position(top, bottom, height, viewportHeight = 700, visualViewport, mobile = false) {
   const style = {};
   const panel = { style, getBoundingClientRect: () => ({ width: 220, height: style.maxHeight === 'none' ? height : Math.min(height, parseFloat(style.maxHeight)) }) };
   vm.runInNewContext(ts.transpileModule(effect, { compilerOptions: { target: ts.ScriptTarget.ES2020 } }).outputText, {
-    useLayoutEffect: fn => fn(), panelRef: { current: panel }, rangeRef: { current: { getBoundingClientRect: () => ({ top, bottom, left: 100, width: 50 }) } }, window: { innerWidth: 400, innerHeight: viewportHeight, visualViewport, matchMedia: () => ({matches: mobile}) }, toolbar: {}, paletteOpen: true, mobile: false,
+    useLayoutEffect: fn => fn(), panelRef: { current: panel }, rangeRef: { current: { getBoundingClientRect: () => ({ top, bottom, left: 100, width: 50 }) } }, window: { innerWidth: 400, innerHeight: viewportHeight, visualViewport, matchMedia: () => ({matches: mobile}) }, toolbar: {}, paletteOpen: true, mobile: false, colorTab: "text",
   });
   return { visibility: style.visibility, width: parseFloat(style.width), top: parseFloat(style.top), height: Math.min(height, parseFloat(style.maxHeight)) };
 }
@@ -55,7 +55,7 @@ test('selection handle changes capture the current range and clear a collapsed s
   assert.equal(toolbar, null);
 });
 
-test('mobile keyboard and panned visual viewport bound the expanded palette', () => {
+test('panned visual viewport bounds the expanded desktop palette', () => {
   const panel = position(350, 380, 250, 800, {offsetTop: 180, offsetLeft: 0, height: 300, width: 390}, true);
   assert.equal(panel.width, 288);
   assert.ok(panel.top >= 188);
@@ -143,4 +143,35 @@ test('record drawer locks the feed, follows keyboard viewport, and restores on c
   assert.equal(shade.style.height, '700px'); assert.equal(shade.style.top, '0px');
   cleanup(); assert.equal(style.position, ''); assert.equal(style.overflow, '');
   assert.deepEqual(restored, [0, 420]); assert.deepEqual(handlers, {});
+});
+
+test('mobile dock sits above keyboard and sheet reserves editor scrolling space', () => {
+  const style = {};
+  const scroller = {style: {}, scrollTop: 0};
+  const panel = {style, getBoundingClientRect: () => ({height: 52})};
+  vm.runInNewContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    panelRef: {current: panel}, rangeRef: {current: {getBoundingClientRect: () => ({top: 280, bottom: 310})}},
+    ref: {current: {closest: () => scroller}}, mobile: true,
+    window: {visualViewport: {offsetTop: 100, offsetLeft: 0, height: 400, width: 390}},
+  });
+  assert.equal(style.top, '440px'); assert.equal(style.width, '374px');
+  assert.equal(scroller.style.paddingBottom, '76px');
+  assert.equal(scroller.scrollTop, 0);
+});
+
+test('mobile palette saves selection through blur and restores it when returning to keyboard', () => {
+  const source = editor.slice(editor.indexOf('  const togglePalette ='), editor.indexOf('  const labels ='));
+  let open = false, focused = 0, blurred = 0, restored = 0;
+  const range = {};
+  const context = {mobile: true, paletteOpen: false, interactingRef: {current: false},
+    ref: {current: {focus: () => focused++, blur: () => blurred++}}, rangeRef: {current: range},
+    window: {getSelection: () => ({removeAllRanges: () => {}, addRange: r => {assert.equal(r, range); restored++;}})},
+    setPaletteOpen: value => open = value,
+  };
+  vm.createContext(context);
+  vm.runInContext(ts.transpileModule(source + '\ntogglePalette();', {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, context);
+  assert.equal(open, true); assert.equal(blurred, 1); assert.equal(context.interactingRef.current, true);
+  context.paletteOpen = true;
+  vm.runInContext('togglePalette()', context);
+  assert.equal(open, false); assert.equal(focused, 1); assert.equal(restored, 1);
 });

@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
   Bold, Underline, Italic, Strikethrough, RemoveFormatting, Palette, CircleSlash,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
@@ -1492,6 +1493,14 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const interactingRef = useRef(false);
+  const [mobile, setMobile] = useState(false);
+  const [colorTab, setColorTab] = useState<"text" | "background">("text");
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 640px), (pointer: coarse)");
+    const update = () => setMobile(query.matches);
+    update(); query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   useEffect(() => {
     if (ref.current && value !== lastEmitted.current) ref.current.innerHTML = noteValueToHtml(value);
   }, [value]);
@@ -1505,6 +1514,27 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportBottom = (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 8;
     const viewportLeft = (viewport?.offsetLeft ?? 0) + 8;
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
+    if (mobile) {
+      panel.style.width = `${viewportRight - viewportLeft}px`;
+      panel.style.maxHeight = `${Math.max(48, (viewportBottom - viewportTop) * 0.6)}px`;
+      panel.style.visibility = "visible";
+      panel.style.left = `${(viewportLeft + viewportRight) / 2}px`;
+      const height = panel.getBoundingClientRect().height;
+      const top = viewportBottom - height;
+      panel.style.top = `${top}px`;
+      // Reserve space in the actual editor scroller, not the background feed.
+      const scroller = ref.current?.closest(".drawerShade") as HTMLElement | null;
+      if (scroller) {
+        scroller.style.paddingBottom = `${height + 24}px`;
+        scroller.style.scrollPaddingBottom = `${height + 24}px`;
+        const usableHeight = top - viewportTop - 24;
+        if (selection.bottom - selection.top <= usableHeight) {
+          if (selection.bottom > top - 12) scroller.scrollTop += selection.bottom - top + 12;
+          else if (selection.top < viewportTop + 12) scroller.scrollTop -= viewportTop + 12 - selection.top;
+        }
+      }
+      return;
+    }
     // Measure the expanded palette before choosing a side; never clamp it across the selection.
     const scrollTop = panel.scrollTop;
     panel.style.width = `${Math.min(window.matchMedia("(pointer: coarse)").matches ? 288 : 220, viewportRight - viewportLeft)}px`;
@@ -1523,7 +1553,13 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const half = panel.getBoundingClientRect().width / 2;
     panel.style.left = `${Math.max(viewportLeft + half, Math.min(viewportRight - half, selection.left + selection.width / 2))}px`;
   };
-  useLayoutEffect(positionToolbar, [toolbar, paletteOpen]);
+  useLayoutEffect(positionToolbar, [toolbar, paletteOpen, mobile, colorTab]);
+  useEffect(() => {
+    if (!mobile || !toolbar) return;
+    const scroller = ref.current?.closest(".drawerShade") as HTMLElement | null;
+    if (!scroller) return;
+    return () => { scroller.style.paddingBottom = ""; scroller.style.scrollPaddingBottom = ""; };
+  }, [mobile, !!toolbar]);
   const updateToolbar = () => {
     const selection = window.getSelection();
     if (!ref.current || !selection?.rangeCount || selection.isCollapsed || !ref.current.contains(selection.anchorNode) || !ref.current.contains(selection.focusNode)) {
@@ -1600,21 +1636,50 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const apply = (command: string, color?: string) => {
     const selection = window.getSelection();
     if (!selection || !rangeRef.current) return;
-    ref.current?.focus({ preventScroll: true });
+    if (!(mobile && paletteOpen)) ref.current?.focus({ preventScroll: true });
     selection.removeAllRanges(); selection.addRange(rangeRef.current);
     document.execCommand("styleWithCSS", false, "true");
     document.execCommand(command, false, color);
     document.execCommand("styleWithCSS", false, "false");
     emitValue(); updateToolbar();
+    if (mobile && paletteOpen) ref.current?.blur();
+  };
+  const togglePalette = () => {
+    interactingRef.current = true;
+    if (mobile) {
+      if (!paletteOpen) ref.current?.blur();
+      else {
+        ref.current?.focus({ preventScroll: true });
+        const selection = window.getSelection();
+        if (selection && rangeRef.current) { selection.removeAllRanges(); selection.addRange(rangeRef.current); }
+      }
+    }
+    setPaletteOpen(!paletteOpen);
   };
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
-  const controls = <div ref={panelRef} className="selectionFormatToolbar" style={{ top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
+  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={{ top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
         {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
         <button type="button" disabled={!toolbar} aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
-        <button type="button" aria-label="글자색과 배경색" title="글자색과 배경색" aria-expanded={paletteOpen} onClick={() => setPaletteOpen(!paletteOpen)}><Palette /></button>
+        <button type="button" aria-label="글자색과 배경색" title="글자색과 배경색" aria-expanded={paletteOpen} onClick={togglePalette}><Palette /></button>
       </div>
-      {paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
+      {mobile && <button className="noteDockClose" type="button" aria-label={paletteOpen ? "키보드로 돌아가기" : "서식 도구 닫기"} onClick={() => {
+        if (paletteOpen) togglePalette();
+        else { setToolbar(null); rangeRef.current = null; ref.current?.blur(); }
+      }}>{paletteOpen ? <ChevronDown /> : <X />}</button>}
+      {mobile && paletteOpen && <div className="mobileNoteColors">
+        <div className="noteColorTabs" role="tablist" aria-label="색상 종류">
+          <button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button>
+          <button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button>
+        </div>
+        <div className="mobileColorOptions" role="group" aria-label={colorTab === "text" ? "글자색" : "배경색"}>
+          {["default", ...noteColors].map((color, i) => <button type="button" key={color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", i === 0 ? (colorTab === "text" ? "#4d4d49" : "transparent") : (colorTab === "text" ? noteColorHex[noteColors[i - 1]] : noteBackgroundHex[noteColors[i - 1]]))}>
+            <span className={colorTab === "background" ? "colorSample backgroundSample" : "colorSample"} style={colorTab === "text" ? {color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]} : {backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]]}}>{colorTab === "text" ? "가" : ""}</span>
+            {i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}
+          </button>)}
+        </div>
+      </div>}
+      {!mobile && paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
         <div className="notePaletteLabel">글자색</div>
         <div className="noteSwatches"><button type="button" aria-label="기본 글자색" onClick={() => apply("foreColor", "#4d4d49")}>A</button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 글자색`} style={{ color: noteColorHex[color] }} onClick={() => apply("foreColor", noteColorHex[color])}>A</button>)}</div>
         <div className="notePaletteLabel">배경색</div>

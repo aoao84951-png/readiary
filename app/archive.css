@@ -2994,10 +2994,21 @@ html { scrollbar-gutter: stable; }
 /* Popup controls remain independent of the editor's layout and scrolling. */
 .selectionFormatToolbar { overscroll-behavior: contain; touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; }
 .selectionFormatToolbar .noteFormatActions { position: sticky; top: -4px; z-index: 1; background: #fff; }
-@media (max-width: 640px), (pointer: coarse) {
-  .selectionFormatToolbar .noteFormatActions button { min-height: 44px; }
-  .selectionFormatToolbar .noteSwatches { display: grid; grid-template-columns: repeat(10, 44px); overflow-x: auto; overscroll-behavior: contain; touch-action: pan-x pan-y; padding: 2px; }
-  .selectionFormatToolbar .noteSwatches button { height: 44px; }
-  .selectionFormatToolbar .notePaletteLabel { font-size: 12px; }
-}
+/* Mobile keyboard accessory and replacement color sheet. */
+.mobileNoteDock { padding: 4px; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px #35445b16; }
+.mobileNoteDock .noteFormatActions { margin-right: 44px; position: static; }
+.mobileNoteDock .noteFormatActions button { height: 44px; }
+.mobileNoteDock .noteFormatActions svg { width: 20px; height: 20px; }
+.noteDockClose { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-left: 1px solid #eee; background: #fff; color: #777; border-radius: 0 22px 22px 0; }
+.noteDockClose svg { width: 20px; height: 20px; }
+.mobileNoteSheet { border-radius: 20px; display: flex; flex-direction: column; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.mobileNoteSheet .noteFormatActions { flex-shrink: 0; }
+.mobileNoteColors { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 8px 8px; }
+.noteColorTabs { display: flex; gap: 8px; padding: 4px 0 10px; }
+.noteColorTabs button { flex: 1; height: 36px; border: 0; border-radius: 8px; background: #f7f7f7; color: #888; font-size: 14px; }
+.noteColorTabs button[aria-selected="true"] { background: #f3eef4; color: #ad748d; }
+.mobileColorOptions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.mobileColorOptions button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border: 1px solid #eee; border-radius: 7px; background: #fff; color: #555; font-size: 13px; text-align: left; }
+.colorSample { flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center; font-size: 16px; }
+.backgroundSample { border: 1px solid #ddd; border-radius: 4px; }
 .selectionFormatToolbar button:disabled { opacity: .35; cursor: default; }
