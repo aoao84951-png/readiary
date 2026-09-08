@@ -1491,22 +1491,14 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const lastEmitted = useRef<string | null>(null);
   const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [mobile, setMobile] = useState(false);
-  const [focused, setFocused] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia("(max-width: 640px), (pointer: coarse)");
-    const update = () => setMobile(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
+  const interactingRef = useRef(false);
   useEffect(() => {
     if (ref.current && value !== lastEmitted.current) ref.current.innerHTML = noteValueToHtml(value);
   }, [value]);
-  useLayoutEffect(() => {
+  const positionToolbar = () => {
     const panel = panelRef.current;
     const range = rangeRef.current;
-    if (!panel || !range || mobile) return;
+    if (!panel || !range) return;
     const selection = range.getBoundingClientRect();
     const viewport = window.visualViewport;
     const viewportTop = (viewport?.offsetTop ?? 0) + 8;
@@ -1514,39 +1506,30 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportLeft = (viewport?.offsetLeft ?? 0) + 8;
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
     // Measure the expanded palette before choosing a side; never clamp it across the selection.
+    const scrollTop = panel.scrollTop;
+    panel.style.width = `${Math.min(window.matchMedia("(pointer: coarse)").matches ? 288 : 220, viewportRight - viewportLeft)}px`;
     panel.style.maxHeight = "none";
     const height = panel.getBoundingClientRect().height;
-    const above = Math.max(0, selection.top - viewportTop - 8);
-    const below = Math.max(0, viewportBottom - selection.bottom - 8);
+    const above = Math.max(0, Math.min(viewportBottom, selection.top - 8) - viewportTop);
+    const below = Math.max(0, viewportBottom - Math.max(viewportTop, selection.bottom + 8));
     const placeAbove = above >= height || (below < height && above >= below);
     const available = placeAbove ? above : below;
+    // Keep the saved selection when it scrolls away; reveal controls on return.
+    panel.style.visibility = selection.bottom < viewportTop || selection.top > viewportBottom || available < 44 ? "hidden" : "visible";
     panel.style.maxHeight = `${available}px`;
     const actualHeight = panel.getBoundingClientRect().height;
     panel.style.top = `${placeAbove ? selection.top - 8 - actualHeight : selection.bottom + 8}px`;
+    panel.scrollTop = scrollTop;
     const half = panel.getBoundingClientRect().width / 2;
     panel.style.left = `${Math.max(viewportLeft + half, Math.min(viewportRight - half, selection.left + selection.width / 2))}px`;
-  }, [toolbar, paletteOpen, mobile]);
-  useEffect(() => {
-    const close = (event: Event) => {
-      if (panelRef.current?.contains(event.target as Node) || ref.current?.contains(event.target as Node)) return;
-      rangeRef.current = null;
-      setFocused(false); setToolbar(null); setPaletteOpen(false);
-    };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, []);
-  const emitValue = () => {
-    if (!ref.current) return;
-    const next = noteEditorToValue(ref.current);
-    lastEmitted.current = next;
-    onChange(next);
   };
+  useLayoutEffect(positionToolbar, [toolbar, paletteOpen]);
   const updateToolbar = () => {
     const selection = window.getSelection();
     if (!ref.current || !selection?.rangeCount || selection.isCollapsed || !ref.current.contains(selection.anchorNode) || !ref.current.contains(selection.focusNode)) {
-      if (!panelRef.current?.contains(document.activeElement)) {
+      if (!interactingRef.current && !panelRef.current?.contains(document.activeElement)) {
         rangeRef.current = null;
-        setToolbar(null);
+        setToolbar(null); setPaletteOpen(false);
       }
       return;
     }
@@ -1555,22 +1538,63 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const half = Math.min(220, window.innerWidth - 16) / 2;
     setToolbar({ top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
-  // iOS selection handles update selection independently of pointer/key events.
   useEffect(() => {
-    let frame = 0;
-    const update = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(updateToolbar); };
-    document.addEventListener("selectionchange", update);
-    window.addEventListener("scroll", update, true);
-    window.addEventListener("resize", update);
-    window.visualViewport?.addEventListener("resize", update);
-    window.visualViewport?.addEventListener("scroll", update);
+    let start: { x: number; y: number; target: EventTarget | null } | null = null;
+    const down = (event: PointerEvent) => {
+      start = { x: event.clientX, y: event.clientY, target: event.target };
+      if (rangeRef.current) interactingRef.current = true;
+    };
+    const up = (event: PointerEvent) => {
+      const press = start;
+      start = null;
+      if (!press || Math.hypot(event.clientX - press.x, event.clientY - press.y) > 8) return;
+      if (panelRef.current?.contains(press.target as Node)) return;
+      if (ref.current?.contains(press.target as Node)) {
+        interactingRef.current = false;
+        requestAnimationFrame(updateToolbar);
+        return;
+      }
+      rangeRef.current = null;
+      interactingRef.current = false;
+      setToolbar(null); setPaletteOpen(false);
+    };
+    const cancel = () => { start = null; };
+    document.addEventListener("pointerdown", down);
+    document.addEventListener("pointerup", up);
+    document.addEventListener("pointercancel", cancel);
     return () => {
-      cancelAnimationFrame(frame);
-      document.removeEventListener("selectionchange", update);
-      window.removeEventListener("scroll", update, true);
-      window.removeEventListener("resize", update);
-      window.visualViewport?.removeEventListener("resize", update);
-      window.visualViewport?.removeEventListener("scroll", update);
+      document.removeEventListener("pointerdown", down);
+      document.removeEventListener("pointerup", up);
+      document.removeEventListener("pointercancel", cancel);
+    };
+  });
+  const emitValue = () => {
+    if (!ref.current) return;
+    const next = noteEditorToValue(ref.current);
+    lastEmitted.current = next;
+    onChange(next);
+  };
+  // Native handle movement and viewport movement are different events on iOS.
+  useEffect(() => {
+    let selectionFrame = 0;
+    let positionFrame = 0;
+    const select = () => { cancelAnimationFrame(selectionFrame); selectionFrame = requestAnimationFrame(updateToolbar); };
+    const move = (event: Event) => {
+      if (event.target instanceof Node && panelRef.current?.contains(event.target)) return;
+      cancelAnimationFrame(positionFrame); positionFrame = requestAnimationFrame(positionToolbar);
+    };
+    document.addEventListener("selectionchange", select);
+    window.addEventListener("scroll", move, true);
+    window.addEventListener("resize", move);
+    window.visualViewport?.addEventListener("resize", move);
+    window.visualViewport?.addEventListener("scroll", move);
+    return () => {
+      cancelAnimationFrame(selectionFrame); cancelAnimationFrame(positionFrame);
+      document.removeEventListener("selectionchange", select);
+      window.removeEventListener("scroll", move, true);
+      window.removeEventListener("resize", move);
+      window.visualViewport?.removeEventListener("resize", move);
+      window.visualViewport?.removeEventListener("scroll", move);
     };
   });
   const apply = (command: string, color?: string) => {
@@ -1584,7 +1608,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     emitValue(); updateToolbar();
   };
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
-  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteToolbar" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left }} onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
+  const controls = <div ref={panelRef} className="selectionFormatToolbar" style={{ top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
         {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
         <button type="button" disabled={!toolbar} aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
@@ -1598,9 +1622,8 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       </fieldset>}
     </div>;
   return <div className="richNoteField">
-    {mobile && focused && controls}
-    <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onFocus={() => setFocused(true)} onInput={emitValue} onPointerUp={() => requestAnimationFrame(updateToolbar)} onKeyUp={(event) => { if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
-    {!mobile && toolbar && createPortal(controls, document.body)}
+    <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onInput={emitValue} onKeyUp={(event) => { interactingRef.current = false; if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
+    {toolbar && createPortal(controls, document.body)}
   </div>;
 }
 
@@ -2532,6 +2555,33 @@ export default function FeedPage() {
       document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
     };
   }, [topMenuOpen]);
+  useEffect(() => {
+    if (!adding) return;
+    const body = document.body;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const previous = { position: body.style.position, top: body.style.top, left: body.style.left, width: body.style.width, overflow: body.style.overflow };
+    Object.assign(body.style, { position: "fixed", top: `${-scrollY}px`, left: `${-scrollX}px`, width: "100%", overflow: "hidden" });
+    const shade = drawerRef.current?.parentElement;
+    const viewport = window.visualViewport;
+    const fit = () => {
+      if (!shade) return;
+      shade.style.top = `${viewport?.offsetTop ?? 0}px`;
+      shade.style.height = `${viewport?.height ?? window.innerHeight}px`;
+      shade.style.bottom = "auto";
+    };
+    fit();
+    viewport?.addEventListener("resize", fit);
+    viewport?.addEventListener("scroll", fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      viewport?.removeEventListener("resize", fit);
+      viewport?.removeEventListener("scroll", fit);
+      window.removeEventListener("resize", fit);
+      Object.assign(body.style, previous);
+      window.scrollTo(scrollX, scrollY);
+    };
+  }, [adding]);
   useEffect(() => {
     if (!adding) return;
     function closeAddOnEscape(event: KeyboardEvent) {

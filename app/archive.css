@@ -2991,10 +2991,13 @@ html { scrollbar-gutter: stable; }
 .notesGroup:has(.emptyNotesState) > .notesQuickActions { top: 4px; }
 .emptyNotesState > .emptyNotesLabel { padding-right: 26px; }
 
-/* Mobile controls stay in the editor flow so palettes never cover the text. */
-.mobileNoteToolbar { position: static; transform: none; width: 100%; max-height: none; overflow: visible; margin-bottom: 8px; box-shadow: none; }
-.mobileNoteToolbar .noteFormatActions button { min-height: 44px; }
-.mobileNoteToolbar .noteSwatches { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.mobileNoteToolbar .noteSwatches button { min-height: 44px; }
-.mobileNoteToolbar .notePaletteLabel { font-size: 14px; }
+/* Popup controls remain independent of the editor's layout and scrolling. */
+.selectionFormatToolbar { overscroll-behavior: contain; touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; }
+.selectionFormatToolbar .noteFormatActions { position: sticky; top: -4px; z-index: 1; background: #fff; }
+@media (max-width: 640px), (pointer: coarse) {
+  .selectionFormatToolbar .noteFormatActions button { min-height: 44px; }
+  .selectionFormatToolbar .noteSwatches { display: grid; grid-template-columns: repeat(10, 44px); overflow-x: auto; overscroll-behavior: contain; touch-action: pan-x pan-y; padding: 2px; }
+  .selectionFormatToolbar .noteSwatches button { height: 44px; }
+  .selectionFormatToolbar .notePaletteLabel { font-size: 12px; }
+}
 .selectionFormatToolbar button:disabled { opacity: .35; cursor: default; }

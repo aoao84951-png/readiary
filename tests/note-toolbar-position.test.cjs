@@ -5,14 +5,14 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const page = fs.readFileSync('app/page.tsx', 'utf8');
 const editor = page.slice(page.indexOf('function RichNoteTextarea('));
-const effect = editor.slice(editor.indexOf('  useLayoutEffect(() => {'), editor.indexOf('  useEffect(() => {\n    const close'));
-function position(top, bottom, height, viewportHeight = 700) {
+const effect = editor.slice(editor.indexOf('  const positionToolbar ='), editor.indexOf('  const updateToolbar ='));
+function position(top, bottom, height, viewportHeight = 700, visualViewport, mobile = false) {
   const style = {};
   const panel = { style, getBoundingClientRect: () => ({ width: 220, height: style.maxHeight === 'none' ? height : Math.min(height, parseFloat(style.maxHeight)) }) };
   vm.runInNewContext(ts.transpileModule(effect, { compilerOptions: { target: ts.ScriptTarget.ES2020 } }).outputText, {
-    useLayoutEffect: fn => fn(), panelRef: { current: panel }, rangeRef: { current: { getBoundingClientRect: () => ({ top, bottom, left: 100, width: 50 }) } }, window: { innerWidth: 400, innerHeight: viewportHeight }, toolbar: {}, paletteOpen: true, mobile: false,
+    useLayoutEffect: fn => fn(), panelRef: { current: panel }, rangeRef: { current: { getBoundingClientRect: () => ({ top, bottom, left: 100, width: 50 }) } }, window: { innerWidth: 400, innerHeight: viewportHeight, visualViewport, matchMedia: () => ({matches: mobile}) }, toolbar: {}, paletteOpen: true, mobile: false,
   });
-  return { top: parseFloat(style.top), height: Math.min(height, parseFloat(style.maxHeight)) };
+  return { visibility: style.visibility, width: parseFloat(style.width), top: parseFloat(style.top), height: Math.min(height, parseFloat(style.maxHeight)) };
 }
 test('expanded palette stays above selection when room exists', () => {
   const panel = position(400, 420, 250);
@@ -31,7 +31,7 @@ test('collapsed toolbar also respects selected text bounds', () => {
   assert.equal(panel.top + panel.height, 92);
 });
 
-const selectionUpdate = editor.slice(editor.indexOf('  const updateToolbar ='), editor.indexOf('  // iOS selection handles'));
+const selectionUpdate = editor.slice(editor.indexOf('  const updateToolbar ='), editor.indexOf('  useEffect(() => {\n    let start:'));
 test('selection handle changes capture the current range and clear a collapsed selection', () => {
   const text = {};
   const range = { getBoundingClientRect: () => ({ top: 300, left: 50, width: 80 }) };
@@ -39,7 +39,7 @@ test('selection handle changes capture the current range and clear a collapsed s
   let toolbar;
   const rangeRef = { current: null };
   const context = {
-    ref: { current: { contains: node => node === text } }, rangeRef,
+    ref: { current: { contains: node => node === text } }, rangeRef, interactingRef: {current: false}, setPaletteOpen: () => {},
     panelRef: { current: { contains: () => false } },
     window: { getSelection: () => selection, innerWidth: 390 },
     document: { queryCommandState: command => command === 'bold' },
@@ -53,4 +53,94 @@ test('selection handle changes capture the current range and clear a collapsed s
   vm.runInContext('updateToolbar()', context);
   assert.equal(rangeRef.current, null);
   assert.equal(toolbar, null);
+});
+
+test('mobile keyboard and panned visual viewport bound the expanded palette', () => {
+  const panel = position(350, 380, 250, 800, {offsetTop: 180, offsetLeft: 0, height: 300, width: 390}, true);
+  assert.equal(panel.width, 288);
+  assert.ok(panel.top >= 188);
+  assert.ok(panel.top + panel.height <= 342);
+  assert.equal(panel.visibility, 'visible');
+});
+test('offscreen selection hides geometry without placing a popup under the keyboard', () => {
+  assert.equal(position(600, 620, 200, 800, {offsetTop: 0, height: 350, width: 390}).visibility, 'hidden');
+});
+
+function eventHarness() {
+  const handlers = {};
+  const panel = {};
+  const text = {};
+  const outside = {};
+  const rangeRef = {current: {}};
+  const interactingRef = {current: false};
+  let closed = 0, updated = 0;
+  const source = editor.slice(editor.indexOf('  useEffect(() => {\n    let start:'), editor.indexOf('  const emitValue'));
+  vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    useEffect: fn => fn(), document: {addEventListener: (name, fn) => handlers[name] = fn},
+    panelRef: {current: {contains: node => node === panel}}, ref: {current: {contains: node => node === text}},
+    rangeRef, interactingRef, setToolbar: () => closed++, setPaletteOpen: () => {},
+    requestAnimationFrame: fn => fn(), updateToolbar: () => updated++,
+  });
+  const event = (target, x, y) => ({target, clientX: x, clientY: y});
+  return {handlers, panel, text, outside, rangeRef, interactingRef, event, closed: () => closed, updated: () => updated};
+}
+test('scrolling outside the palette preserves it, a deliberate outside tap closes it', () => {
+  const h = eventHarness();
+  h.handlers.pointerdown(h.event(h.outside, 10, 10));
+  h.handlers.pointerup(h.event(h.outside, 10, 100));
+  assert.equal(h.closed(), 0);
+  assert.ok(h.rangeRef.current);
+  h.handlers.pointerdown(h.event(h.outside, 10, 10));
+  h.handlers.pointercancel();
+  h.handlers.pointerup(h.event(h.outside, 10, 10));
+  assert.equal(h.closed(), 0);
+  h.handlers.pointerdown(h.event(h.outside, 10, 10));
+  h.handlers.pointerup(h.event(h.outside, 10, 10));
+  assert.equal(h.closed(), 1);
+  assert.equal(h.rangeRef.current, null);
+});
+test('palette touch keeps selection; editor tap rechecks native selection', () => {
+  const h = eventHarness();
+  h.handlers.pointerdown(h.event(h.panel, 10, 10));
+  h.handlers.pointerup(h.event(h.panel, 10, 10));
+  assert.equal(h.closed(), 0);
+  assert.equal(h.interactingRef.current, true);
+  h.handlers.pointerdown(h.event(h.text, 10, 10));
+  h.handlers.pointerup(h.event(h.text, 10, 10));
+  assert.equal(h.interactingRef.current, false);
+  assert.equal(h.updated(), 1);
+});
+test('viewport movement only repositions, never re-reads a lost native selection', () => {
+  const handlers = {}, viewportHandlers = {};
+  let selected = 0, positioned = 0;
+  const source = editor.slice(editor.indexOf('  // Native handle movement'), editor.indexOf('  const apply ='));
+  vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    useEffect: fn => fn(), cancelAnimationFrame: () => {}, requestAnimationFrame: fn => fn(),
+    Node: class {}, panelRef: {current: null}, updateToolbar: () => selected++, positionToolbar: () => positioned++,
+    document: {addEventListener: (name, fn) => handlers[name] = fn},
+    window: {addEventListener: (name, fn) => handlers[name] = fn, visualViewport: {addEventListener: (name, fn) => viewportHandlers[name] = fn}},
+  });
+  handlers.scroll({}); viewportHandlers.resize({}); viewportHandlers.scroll({});
+  assert.equal(selected, 0); assert.equal(positioned, 3);
+  handlers.selectionchange(); assert.equal(selected, 1);
+});
+
+test('record drawer locks the feed, follows keyboard viewport, and restores on close', () => {
+  const start = page.indexOf('  useEffect(() => {\n    if (!adding) return;\n    const body');
+  const source = page.slice(start, page.indexOf('  }, [adding]);', start) + '  }, [adding]);'.length);
+  const style = {position: '', top: '', left: '', width: '', overflow: ''};
+  const shade = {style: {}};
+  const handlers = {};
+  const viewport = {offsetTop: 100, height: 350, addEventListener: (name, fn) => handlers[name] = fn, removeEventListener: name => delete handlers[name]};
+  let cleanup, restored;
+  vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}}, drawerRef: {current: {parentElement: shade}},
+    window: {scrollX: 0, scrollY: 420, visualViewport: viewport, addEventListener: () => {}, removeEventListener: () => {}, scrollTo: (x, y) => restored = [x, y]},
+  });
+  assert.equal(style.position, 'fixed'); assert.equal(style.top, '-420px');
+  assert.equal(shade.style.top, '100px'); assert.equal(shade.style.height, '350px');
+  viewport.height = 700; viewport.offsetTop = 0; handlers.resize();
+  assert.equal(shade.style.height, '700px'); assert.equal(shade.style.top, '0px');
+  cleanup(); assert.equal(style.position, ''); assert.equal(style.overflow, '');
+  assert.deepEqual(restored, [0, 420]); assert.deepEqual(handlers, {});
 });
