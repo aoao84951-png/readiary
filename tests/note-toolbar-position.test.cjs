@@ -137,7 +137,7 @@ test('record drawer locks the feed, follows keyboard viewport, and restores on c
   const viewport = {offsetTop: 100, height: 350, addEventListener: (name, fn) => handlers[name] = fn, removeEventListener: name => delete handlers[name]};
   let cleanup, restored;
   vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
-    adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}}, drawerRef: {current: {parentElement: shade, style: drawerStyle}},
+    adding: true, useEffect: fn => cleanup = fn(), document: {body: {style}, documentElement: {clientHeight: 800}}, drawerRef: {current: {parentElement: shade, style: drawerStyle}},
     window: {innerHeight: 800, scrollX: 0, scrollY: 420, visualViewport: viewport, addEventListener: () => {}, removeEventListener: () => {}, scrollTo: (x, y) => restored = [x, y]},
   });
   assert.equal(style.position, 'fixed'); assert.equal(style.top, '-420px');
@@ -246,7 +246,7 @@ test('successive palette commands preserve text range when Safari collapses sele
   assert.equal(calls, 2); assert.equal(rangeRef.current.toString(), 'bcde');
 });
 
-test('standalone palette border stays above the home indicator safe area', () => {
+test('standalone palette section reaches screen edge with safe space reserved for its content', () => {
   const style = {};
   vm.runInNewContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
     panelRef: {current: {style, getBoundingClientRect: () => ({height: 320})}},
@@ -255,7 +255,9 @@ test('standalone palette border stays above the home indicator safe area', () =>
     getComputedStyle: () => ({getPropertyValue: () => '34'}),
     window: {visualViewport: {offsetTop: 0, offsetLeft: 0, height: 800, width: 390}},
   });
-  assert.equal(parseFloat(style.top) + 320, 750);
+  assert.equal(parseFloat(style.top) + 320, 800);
+  assert.equal(style.width, "390px");
+  assert.equal(style.maxHeight, "702px");
 });
 
 test('Safari transparent command result does not replace the real highlight color', () => {

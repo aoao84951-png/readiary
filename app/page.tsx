@@ -1516,10 +1516,10 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
     if (mobile) {
       const safeBottom = parseFloat(getComputedStyle(panel).getPropertyValue("--note-safe-bottom")) || 0;
-      const bottom = viewportBottom - (paletteOpen ? safeBottom + 8 : 0);
-      panel.style.width = `${viewportRight - viewportLeft}px`;
+      const bottom = paletteOpen ? viewportBottom + 8 : viewportBottom;
+      panel.style.width = `${viewportRight - viewportLeft + (paletteOpen ? 16 : 0)}px`; 
       // Fit the complete sheet where possible, keeping a margin outside its border.
-      panel.style.maxHeight = `${Math.max(40, bottom - viewportTop - 56)}px`;
+      panel.style.maxHeight = `${Math.max(40, bottom - viewportTop - 56 - (paletteOpen ? safeBottom : 0))}px`;
       panel.style.visibility = "visible";
       panel.style.left = `${(viewportLeft + viewportRight) / 2}px`;
       const height = panel.getBoundingClientRect().height;
@@ -2712,7 +2712,7 @@ export default function FeedPage() {
       drawer.style.setProperty("--editor-viewport-top", `${viewport?.offsetTop ?? 0}px`);
       // Let editor content extend beneath translucent browser/keyboard chrome.
       const top = viewport?.offsetTop ?? 0;
-      drawer.style.setProperty("--editor-viewport-height", `${Math.max(viewport?.height ?? 0, window.innerHeight - top)}px`);
+      drawer.style.setProperty("--editor-viewport-height", `${Math.max(viewport?.height ?? 0, Math.max(window.innerHeight, document.documentElement.clientHeight) - top)}px`);
       drawer.style.setProperty("--editor-keyboard-space", `${Math.max(0, window.innerHeight - top - (viewport?.height ?? window.innerHeight))}px`);
     };
     fit();

@@ -3017,7 +3017,7 @@ html { scrollbar-gutter: stable; }
    Only the drawer scrolls; keyboard changes never resize the backdrop. */
 @media (max-width: 640px), (pointer: coarse) {
   .drawerShade { inset: 0; height: 100%; background: #fff; overflow: hidden; padding: 0; align-items: flex-start; }
-  .drawerShade > .addDrawer { margin-top: var(--editor-viewport-top, 0px); height: var(--editor-viewport-height, 100dvh) !important; min-height: 0 !important; max-height: none !important; width: 100%; display: block; overflow-y: auto !important; overscroll-behavior: contain; border: 0; border-radius: 0; padding-bottom: calc(var(--editor-keyboard-space, 0px) + var(--note-dock-space, 0px)); scroll-padding-bottom: calc(var(--editor-keyboard-space, 0px) + var(--note-dock-space, 0px)); overflow-anchor: none; }
+  .drawerShade > .addDrawer { margin-top: var(--editor-viewport-top, 0px); height: var(--editor-viewport-height, 100dvh) !important; min-height: 0 !important; max-height: none !important; width: 100%; display: block; overflow-y: auto !important; overscroll-behavior: contain; border: 0; border-radius: 0; padding-bottom: var(--note-dock-space, 0px); scroll-padding-bottom: var(--note-dock-space, 0px); overflow-anchor: none; }
   .addDrawer > .recordForm, .addDrawer > .drawerBody { height: auto !important; overflow: visible !important; }
   .addDrawer > .recordForm.wizardForm { min-height: 0 !important; }
   .addDrawer > header { position: sticky; top: 0; z-index: 2; background: #fff; }
@@ -3040,3 +3040,12 @@ html { scrollbar-gutter: stable; }
 .mobileNoteDock { --note-safe-bottom: env(safe-area-inset-bottom, 0px); }
 .mobileNoteSheet { padding-bottom: 8px; }
 .noteColorTabs button[aria-selected="true"] { background: #f1f3ef; color: #737a6c; }
+
+/* The mobile palette is a bottom section, not a floating dialog card. */
+.mobileNoteSheet { max-width: none; border: 0; border-radius: 0; padding: 8px 12px 0; background: #fff; box-shadow: none; }
+.mobileNoteSheet .noteFormatActions { margin-right: 34px; border-radius: 20px 0 0 20px; padding-left: 4px; }
+.mobileNoteSheet .noteDockClose { top: 8px; right: 12px; }
+.mobileNoteSheet .mobileNoteColors { padding: 12px 4px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.mobileNoteSheet .noteColorTabs { padding-bottom: 12px; }
+.mobileNoteSheet .noteColorTabs button { background: transparent; border-radius: 0; color: #a1a39e; }
+.mobileNoteSheet .noteColorTabs button[aria-selected="true"] { color: #666d61; border-bottom: 1px solid #dce0d7; }
