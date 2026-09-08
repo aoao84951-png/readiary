@@ -157,7 +157,7 @@ test('mobile dock sits above keyboard and sheet reserves editor scrolling space'
   const panel = {style, getBoundingClientRect: () => ({height: 52})};
   vm.runInNewContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
     panelRef: {current: panel}, rangeRef: {current: {getBoundingClientRect: () => ({top: 280, bottom: 310})}},
-    ref: {current: {closest: () => scroller}}, mobile: true,
+    ref: {current: {closest: () => scroller}}, mobile: true, paletteOpen: false, getComputedStyle: () => ({getPropertyValue: () => "34"}),
     window: {visualViewport: {offsetTop: 100, offsetLeft: 0, height: 400, width: 390}},
   });
   assert.equal(style.top, '440px'); assert.equal(style.width, '374px');
@@ -188,7 +188,7 @@ test('mobile viewport repositioning never overrides manual scrolling', () => {
   const context = {
     panelRef: {current: {style, getBoundingClientRect: () => ({height: 300})}},
     rangeRef: {current: {getBoundingClientRect: () => ({top: 900, bottom: 930})}},
-    ref: {current: {closest: () => scroller}}, mobile: true,
+    ref: {current: {closest: () => scroller}}, mobile: true, paletteOpen: false, getComputedStyle: () => ({getPropertyValue: () => "34"}),
     window: {visualViewport: {offsetTop: 0, offsetLeft: 0, height: 700, width: 390}},
   };
   vm.createContext(context);
@@ -244,4 +244,34 @@ test('successive palette commands preserve text range when Safari collapses sele
   vm.createContext(context);
   vm.runInContext(ts.transpileModule(source + '\napply("foreColor", "red"); apply("hiliteColor", "yellow");', {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, context);
   assert.equal(calls, 2); assert.equal(rangeRef.current.toString(), 'bcde');
+});
+
+test('standalone palette border stays above the home indicator safe area', () => {
+  const style = {};
+  vm.runInNewContext(ts.transpileModule(effect, {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    panelRef: {current: {style, getBoundingClientRect: () => ({height: 320})}},
+    rangeRef: {current: {getBoundingClientRect: () => ({top: 200, bottom: 220})}},
+    ref: {current: {closest: () => null}}, mobile: true, paletteOpen: true,
+    getComputedStyle: () => ({getPropertyValue: () => '34'}),
+    window: {visualViewport: {offsetTop: 0, offsetLeft: 0, height: 800, width: 390}},
+  });
+  assert.equal(parseFloat(style.top) + 320, 750);
+});
+
+test('Safari transparent command result does not replace the real highlight color', () => {
+  const root = {nodeType: 1, contains: () => true};
+  const span = {parentElement: root};
+  const text = {textContent: 'selected', parentElement: span};
+  const range = {startContainer: text, startOffset: 0, endContainer: text, endOffset: 8,
+    intersectsNode: () => true, getBoundingClientRect: () => ({top: 100, left: 10, width: 30})};
+  let toolbar;
+  vm.runInNewContext(ts.transpileModule(selectionUpdate + '\nupdateToolbar();', {compilerOptions: {target: ts.ScriptTarget.ES2020}}).outputText, {
+    ref: {current: root}, rangeRef: {current: null}, panelRef: {current: null}, interactingRef: {current: false},
+    setToolbar: value => toolbar = value, setPaletteOpen() {}, NodeFilter: {SHOW_TEXT: 4},
+    getComputedStyle: () => ({backgroundColor: 'rgb(230, 220, 240)'}),
+    window: {innerWidth: 390, getSelection: () => ({rangeCount: 1, isCollapsed: false, anchorNode: text, focusNode: text, getRangeAt: () => ({cloneRange: () => range})})},
+    document: {queryCommandValue: () => 'transparent', queryCommandState: () => false,
+      createTreeWalker: () => {let done = false; return {currentNode: text, nextNode() {if (done) return false; done = true; return true;}};}},
+  });
+  assert.equal(toolbar.backgroundColor, '#e6dcf0');
 });

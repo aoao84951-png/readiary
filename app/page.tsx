@@ -1515,13 +1515,15 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const viewportLeft = (viewport?.offsetLeft ?? 0) + 8;
     const viewportRight = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8;
     if (mobile) {
+      const safeBottom = parseFloat(getComputedStyle(panel).getPropertyValue("--note-safe-bottom")) || 0;
+      const bottom = viewportBottom - (paletteOpen ? safeBottom + 8 : 0);
       panel.style.width = `${viewportRight - viewportLeft}px`;
       // Fit the complete sheet where possible, keeping a margin outside its border.
-      panel.style.maxHeight = `${Math.max(40, viewportBottom - viewportTop - 56)}px`;
+      panel.style.maxHeight = `${Math.max(40, bottom - viewportTop - 56)}px`;
       panel.style.visibility = "visible";
       panel.style.left = `${(viewportLeft + viewportRight) / 2}px`;
       const height = panel.getBoundingClientRect().height;
-      const top = viewportBottom - height;
+      const top = bottom - height;
       panel.style.top = `${top}px`;
       const scroller = ref.current?.closest(".addDrawer") as HTMLElement | null;
       if (scroller) scroller.style.setProperty("--note-dock-space", `${height + 16}px`);
@@ -1585,7 +1587,27 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     const rect = rangeRef.current.getBoundingClientRect();
     const half = Math.min(220, window.innerWidth - 16) / 2;
     const colorValue = (command: string) => {
-      const value = String(document.queryCommandValue(command) || "").toLowerCase().replace(/\s/g, "");
+      let raw = String(document.queryCommandValue(command) || "");
+      if (command === "hiliteColor" && ref.current?.nodeType) {
+        // Safari reports transparent for hiliteColor even on highlighted text.
+        const range = rangeRef.current!;
+        const walker = document.createTreeWalker(ref.current, NodeFilter.SHOW_TEXT);
+        raw = "transparent";
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (!range.intersectsNode(node) || !node.textContent?.length) continue;
+          if (node === range.startContainer && range.startOffset === node.textContent.length) continue;
+          if (node === range.endContainer && range.endOffset === 0) continue;
+          let element = node.parentElement;
+          while (element && element !== ref.current) {
+            const background = getComputedStyle(element).backgroundColor;
+            if (background && background !== "transparent" && background !== "rgba(0, 0, 0, 0)") { raw = background; break; }
+            element = element.parentElement;
+          }
+          break;
+        }
+      }
+      const value = raw.toLowerCase().replace(/\s/g, "");
       const rgb = value.match(/^rgb\((\d+),(\d+),(\d+)\)$/);
       return rgb ? "#" + rgb.slice(1).map(n => Number(n).toString(16).padStart(2, "0")).join("") : value;
     };
