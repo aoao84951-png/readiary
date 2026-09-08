@@ -1907,7 +1907,7 @@
 .noteFormatActions svg { width: 17px; height: 17px; stroke-width: 1.8; }
 .noteFormatActions button:hover, .noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
 .selectionFormatToolbar button:focus-visible { outline: 2px solid #86a6ce; outline-offset: 1px; }
-.noteColorPalette { border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 6px; }
+.noteColorPalette { min-width: 0; margin: 0; border: 0; border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 6px; }
 .notePaletteLabel { font-family: inherit; font-size: 10px; font-weight: 600; color: #8a8f99; margin: 6px 0 7px; }
 .noteSwatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .noteSwatches button { display: grid; place-items: center; height: 28px; min-width: 0; padding: 0; border: 1px solid #d9e0eb; border-radius: 7px; background: #fff; color: #373a3e; font-family: "Read Diary Symbols", sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; }
@@ -2990,3 +2990,13 @@ html { scrollbar-gutter: stable; }
 /* Center the 18px action on the empty heading's 22px row, after 2px body padding. */
 .notesGroup:has(.emptyNotesState) > .notesQuickActions { top: 4px; }
 .emptyNotesState > .emptyNotesLabel { padding-right: 26px; }
+
+/* Mobile controls stay in the editor flow so palettes never cover the text. */
+.mobileNoteToolbar { position: static; transform: none; width: 100%; max-height: none; overflow: visible; margin-bottom: 8px; box-shadow: none; }
+.mobileNoteToolbar .noteFormatActions button { min-height: 44px; }
+.mobileNoteToolbar .noteSwatches { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mobileNoteToolbar .noteSwatches button { min-height: 44px; }
+.mobileNoteToolbar .notePaletteLabel { font-size: 14px; }
+.selectionFormatToolbar button:disabled { opacity: .35; cursor: default; }
+.selectionFormatToolbar .noteResetFormat { font-size: 10px; font-family: inherit; }
+.mobileNoteToolbar .noteResetFormat { font-size: 12px; }

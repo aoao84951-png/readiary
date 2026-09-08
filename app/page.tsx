@@ -3,7 +3,7 @@ import { FormEvent, TouchEvent, useEffect, useLayoutEffect, useMemo, useRef, use
 import { createPortal } from "react-dom";
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import {
-  Bold, Underline, Italic, Strikethrough, RemoveFormatting, Palette, CircleSlash,
+  Bold, Underline, Italic, Strikethrough, Palette, CircleSlash,
   ChevronLeft,
   ChevronRight,
   Grid3X3,
@@ -1491,13 +1491,22 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const lastEmitted = useRef<string | null>(null);
   const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const [focused, setFocused] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 640px), (pointer: coarse)");
+    const update = () => setMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   useEffect(() => {
     if (ref.current && value !== lastEmitted.current) ref.current.innerHTML = noteValueToHtml(value);
   }, [value]);
   useLayoutEffect(() => {
     const panel = panelRef.current;
     const range = rangeRef.current;
-    if (!panel || !range) return;
+    if (!panel || !range || mobile) return;
     const selection = range.getBoundingClientRect();
     const viewport = window.visualViewport;
     const viewportTop = (viewport?.offsetTop ?? 0) + 8;
@@ -1516,16 +1525,15 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     panel.style.top = `${placeAbove ? selection.top - 8 - actualHeight : selection.bottom + 8}px`;
     const half = panel.getBoundingClientRect().width / 2;
     panel.style.left = `${Math.max(viewportLeft + half, Math.min(viewportRight - half, selection.left + selection.width / 2))}px`;
-  }, [toolbar, paletteOpen]);
+  }, [toolbar, paletteOpen, mobile]);
   useEffect(() => {
     const close = (event: Event) => {
-      if (panelRef.current?.contains(event.target as Node)) return;
-      setToolbar(null); setPaletteOpen(false);
+      if (panelRef.current?.contains(event.target as Node) || ref.current?.contains(event.target as Node)) return;
+      rangeRef.current = null;
+      setFocused(false); setToolbar(null); setPaletteOpen(false);
     };
     document.addEventListener("pointerdown", close);
-    window.addEventListener("resize", close);
-    window.addEventListener("scroll", close, true);
-    return () => { document.removeEventListener("pointerdown", close); window.removeEventListener("resize", close); window.removeEventListener("scroll", close, true); };
+    return () => document.removeEventListener("pointerdown", close);
   }, []);
   const emitValue = () => {
     if (!ref.current) return;
@@ -1536,17 +1544,39 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const updateToolbar = () => {
     const selection = window.getSelection();
     if (!ref.current || !selection?.rangeCount || selection.isCollapsed || !ref.current.contains(selection.anchorNode) || !ref.current.contains(selection.focusNode)) {
-      setToolbar(null); setPaletteOpen(false); return;
+      if (!panelRef.current?.contains(document.activeElement)) {
+        rangeRef.current = null;
+        setToolbar(null);
+      }
+      return;
     }
     rangeRef.current = selection.getRangeAt(0).cloneRange();
     const rect = rangeRef.current.getBoundingClientRect();
     const half = Math.min(220, window.innerWidth - 16) / 2;
     setToolbar({ top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
+  // iOS selection handles update selection independently of pointer/key events.
+  useEffect(() => {
+    let frame = 0;
+    const update = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(updateToolbar); };
+    document.addEventListener("selectionchange", update);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("scroll", update);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("selectionchange", update);
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("scroll", update);
+    };
+  });
   const apply = (command: string, color?: string) => {
     const selection = window.getSelection();
     if (!selection || !rangeRef.current) return;
-    ref.current?.focus();
+    ref.current?.focus({ preventScroll: true });
     selection.removeAllRanges(); selection.addRange(rangeRef.current);
     document.execCommand("styleWithCSS", false, "true");
     document.execCommand(command, false, color);
@@ -1554,21 +1584,23 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     emitValue(); updateToolbar();
   };
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
-  return <div className="richNoteField">
-    <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onInput={emitValue} onPointerUp={() => requestAnimationFrame(updateToolbar)} onKeyUp={(event) => { if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
-    {toolbar && createPortal(<div ref={panelRef} className="selectionFormatToolbar" style={{ top: toolbar.top, left: toolbar.left, fontFamily: ref.current ? getComputedStyle(ref.current).fontFamily : undefined }} onPointerDown={(event) => event.preventDefault()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus(); } }}>
+  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteToolbar" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left }} onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
-        {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} aria-pressed={toolbar[command]} onClick={() => apply(command)}><Icon /></button>)}
-        <button type="button" aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
+        {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
+        <button type="button" className="noteResetFormat" disabled={!toolbar} aria-label="서식 초기화" title="서식 초기화" onClick={() => apply("removeFormat")}>초기화</button>
         <button type="button" aria-label="글자색과 배경색" title="글자색과 배경색" aria-expanded={paletteOpen} onClick={() => setPaletteOpen(!paletteOpen)}><Palette /></button>
       </div>
-      {paletteOpen && <div className="noteColorPalette">
+      {paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
         <div className="notePaletteLabel">글자색</div>
         <div className="noteSwatches"><button type="button" aria-label="기본 글자색" onClick={() => apply("foreColor", "#4d4d49")}>A</button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 글자색`} style={{ color: noteColorHex[color] }} onClick={() => apply("foreColor", noteColorHex[color])}>A</button>)}</div>
         <div className="notePaletteLabel">배경색</div>
         <div className="noteSwatches"><button type="button" aria-label="하이라이트 없음" onClick={() => apply("hiliteColor", "transparent")}><CircleSlash /></button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 하이라이트`} style={{ backgroundColor: noteBackgroundHex[color] }} onClick={() => apply("hiliteColor", noteBackgroundHex[color])} />)}</div>
-      </div>}
-    </div>, document.body)}
+      </fieldset>}
+    </div>;
+  return <div className="richNoteField">
+    {mobile && focused && controls}
+    <div ref={ref} className="richNoteEditor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label={ariaLabel || placeholder} data-placeholder={placeholder} onFocus={() => setFocused(true)} onInput={emitValue} onPointerUp={() => requestAnimationFrame(updateToolbar)} onKeyUp={(event) => { if (event.key !== "Escape") requestAnimationFrame(updateToolbar); }} onKeyDown={(event) => { if (event.key === "Escape" && toolbar) { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); } }} />
+    {!mobile && toolbar && createPortal(controls, document.body)}
   </div>;
 }
 
