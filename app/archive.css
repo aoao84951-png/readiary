@@ -3076,10 +3076,43 @@ html { scrollbar-gutter: stable; }
 .noteSwatches button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #c9cec4; }
 .mobileColorOptions .customColorRow { grid-column: 1 / -1; }
 @media (max-width: 640px), (pointer: coarse) {
-  .mobileColorOptions { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-  .mobileColorOptions button { justify-content: center; min-height: 54px; height: 54px; padding: 4px; border-radius: 12px; }
-  .mobileColorOptions .colorSample { width: 100%; height: 100%; font-size: 26px; }
-  .mobileColorOptions button[aria-pressed="true"]::after { position: absolute; content: "✓"; margin: 0; font-size: 14px; }
+  /* Match the reference mobile palette: readable two-column cards inside one scroll area. */
+  .mobileNoteSheet .mobileNoteColors {
+    max-height: min(72dvh, 620px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  .mobileColorOptions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mobileColorOptions button,
+  .mobileCustomSwatches button {
+    position: relative;
+    justify-content: flex-start;
+    min-height: 58px;
+    height: 58px;
+    padding: 8px 10px;
+    border-radius: 13px;
+    text-align: left;
+  }
+  .mobileColorOptions .colorSample,
+  .mobileCustomSwatches .colorSample {
+    width: 30px;
+    height: 30px;
+    font-size: 25px;
+  }
+  .colorOptionLabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mobileColorOptions button[aria-pressed="true"]::after,
+  .mobileCustomSwatches button[aria-pressed="true"]::after {
+    position: absolute;
+    right: 10px;
+    content: "✓";
+    margin: 0;
+    font-size: 14px;
+  }
+  .mobileCustomColors { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7e2; }
+  .mobileCustomColors .customSectionHeading { margin-top: 0; padding-top: 0; border-top: 0; }
+  .mobileCustomSwatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mobileCustomColors .customColorRow { margin-top: 10px; }
 }
 
 /* Keep selected pills inset from the dock ends and the close-button divider. */

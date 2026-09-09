@@ -1744,9 +1744,13 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
   const customColorName = colorTab === "text" ? "텍스트" : "배경";
   const addCustomColor = () => {
-    const value = customColorInput.trim().toLowerCase();
+    const raw = customColorInput.trim().toLowerCase();
+    const value = /^#[0-9a-f]{3}$/i.test(raw)
+      ? `#${raw.slice(1).split("").map(part => part + part).join("")}`
+      : raw;
     if (!/^#[0-9a-f]{6}$/i.test(value)) return;
     setCustomColors(current => current.includes(value) ? current : [...current, value]);
+    setCustomColorInput(value);
   };
   const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={{ ...(mobile ? {} : { top: toolbar?.top, left: toolbar?.left }), fontFamily: toolbar?.fontFamily || "inherit" }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
@@ -1766,14 +1770,15 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
         <div className="mobileColorOptions" role="group" aria-label={colorTab === "text" ? "글자색" : "배경색"}>
           {["default", ...noteColors].map((color, i) => <button type="button" key={color} aria-pressed={colorTab === "text" ? toolbar?.textColor === (i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]) : i === 0 ? !toolbar?.backgroundColor || ["transparent", "rgba(0,0,0,0)"].includes(toolbar.backgroundColor) : toolbar?.backgroundColor === noteBackgroundHex[noteColors[i - 1]]} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", i === 0 ? (colorTab === "text" ? "#4d4d49" : "transparent") : (colorTab === "text" ? noteColorHex[noteColors[i - 1]] : noteBackgroundHex[noteColors[i - 1]]))}>
             <span className={colorTab === "background" ? "colorSample backgroundSample" : "colorSample"} style={colorTab === "text" ? {color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]} : {backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]]}}>{colorTab === "text" ? "가" : ""}</span>
-            <span className="srOnly">{i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}</span>
+            <span className="colorOptionLabel">{i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}</span>
           </button>)}
-          {customColors.length > 0 && <div className="customSectionHeading">내 색상</div>}
-          {customColors.map(color => <button type="button" key={color} aria-label={`내 색상 ${color}`} aria-pressed={toolbar?.[colorTab === "text" ? "textColor" : "backgroundColor"] === color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", color)}><span className="colorSample" style={colorTab === "text" ? { color } : { backgroundColor: color }}>{colorTab === "text" ? "A" : ""}</span></button>)}
         </div>
-        <div className="customSectionHeading">내 색상</div>
-        <div className="noteColorTabs customColorTabs" role="tablist" aria-label="내 색상 종류"><button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button><button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button></div>
-        <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
+        <section className="mobileCustomColors" aria-label="내 색상">
+          <div className="customSectionHeading">내 색상</div>
+          <div className="noteColorTabs customColorTabs" role="tablist" aria-label="내 색상 종류"><button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button><button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button></div>
+          {customColors.length > 0 && <div className="mobileCustomSwatches">{customColors.map(color => <button type="button" key={color} aria-label={`내 색상 ${color}`} aria-pressed={toolbar?.[colorTab === "text" ? "textColor" : "backgroundColor"] === color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", color)}><span className="colorSample" style={colorTab === "text" ? { color } : { backgroundColor: color }}>{colorTab === "text" ? "가" : ""}</span><span className="colorOptionLabel">{color}</span></button>)}</div>}
+          <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); addCustomColor(); } }} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
+        </section>
       </div>}
       {!mobile && paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
         <div className="notePaletteLabel">글자색</div>
