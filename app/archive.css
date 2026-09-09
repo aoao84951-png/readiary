@@ -3034,7 +3034,7 @@ html { scrollbar-gutter: stable; }
 }
 
 .mobileNoteSheet { overflow: hidden; max-width: calc(100vw - 24px); }
-.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; max-height: min(460px, 52dvh); overflow-y: auto; padding-bottom: 12px; }
+.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; max-height: min(360px, 40dvh); overflow-y: auto; padding-bottom: 12px; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d4d6d2; box-shadow: none; background: #f5f6f3; color: #62675e; font-weight: 500; }
 .mobileColorOptions button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; font-size: 14px; color: #90978b; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d9c6d2; background: #f8f1f6; color: #8f647d; }
