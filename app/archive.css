@@ -3040,7 +3040,7 @@ html { scrollbar-gutter: stable; }
 
 .mobileNoteDock { --note-safe-bottom: env(safe-area-inset-bottom, 0px); }
 .mobileNoteSheet { padding-bottom: 8px; }
-.noteColorTabs button[aria-selected="true"] { background: #f1f3ef; color: #737a6c; }
+.noteColorTabs button[aria-selected="true"] { background: #f3eef4; color: #ad748d; }
 
 /* The mobile palette is a bottom section, not a floating dialog card. */
 .mobileNoteSheet { max-width: none; border: 0; border-radius: 0; padding: 8px 12px 0; background: #fff; box-shadow: none; }
@@ -3062,11 +3062,13 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
-.customSectionHeading { grid-column: 1 / -1; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7e2; color: #949a91; font-size: 12px; font-weight: 700; }
+.customSectionHeading { grid-column: 1 / -1; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e5e7e2; color: #96909a; font-size: 10px; font-weight: 700; }
 .noteColorPalette .customSectionHeading { margin-top: 14px; }
-.customColorRow { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
-.customColorRow input { min-width: 0; flex: 1; height: 34px; padding: 0 9px; border: 1px solid #e6e7e2; border-radius: 8px; background: #fff; color: #5f645d; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
-.customColorRow button { height: 34px; padding: 0 11px; border: 0; border-radius: 8px; background: #eef1eb; color: #687060; font-size: 12px; font-weight: 700; }
+.customColorTabs { gap: 6px; padding: 4px 0 6px; }
+.customColorTabs button { height: 30px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+.customColorRow { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.customColorRow input { min-width: 0; flex: 1; height: 30px; padding: 0 8px; border: 1px solid #e6e0e5; border-radius: 8px; background: #fff; color: #5f5962; font: inherit; font-size: 11px; }
+.customColorRow button { height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: #f3eef4; color: #ad748d; font-size: 11px; font-weight: 700; }
 .noteSwatches button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #c9cec4; }
 .mobileColorOptions .customColorRow { grid-column: 1 / -1; }
 

@@ -1613,7 +1613,8 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       const rgb = value.match(/^rgb\((\d+),(\d+),(\d+)\)$/);
       return rgb ? "#" + rgb.slice(1).map(n => Number(n).toString(16).padStart(2, "0")).join("") : value;
     };
-    setToolbar({ textColor: colorValue("foreColor"), backgroundColor: colorValue("hiliteColor"), fontFamily: getComputedStyle(ref.current).fontFamily, top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
+    const fontFamily = ref.current && typeof window.getComputedStyle === "function" ? window.getComputedStyle(ref.current).fontFamily : ref.current?.style?.fontFamily;
+    setToolbar({ textColor: colorValue("foreColor"), backgroundColor: colorValue("hiliteColor"), fontFamily, top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
   useEffect(() => {
     let start: { x: number; y: number; target: EventTarget | null } | null = null;
