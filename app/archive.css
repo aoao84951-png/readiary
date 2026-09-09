@@ -3051,6 +3051,15 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet .noteColorTabs { padding-bottom: 12px; }
 .mobileNoteSheet .noteColorTabs button { background: transparent; border-radius: 0; color: #a1a39e; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { color: #666d61; border-bottom: 1px solid #dce0d7; }
+.mobileNoteSheet .mobileNoteColors,
+.mobileNoteSheet .mobileNoteColors button,
+.mobileNoteSheet .mobileNoteColors input { font-size: 11px; }
+.mobileNoteSheet .noteColorTabs button { font-size: 11px; }
+.mobileNoteSheet .colorSample { font-size: 20px; }
+.mobileNoteSheet .customSectionHeading { font-size: 9px; }
+.mobileNoteSheet .customColorTabs button,
+.mobileNoteSheet .customColorRow input,
+.mobileNoteSheet .customColorRow button { font-size: 10px; }
 
 @media (hover: hover) and (pointer: fine) {
   .noteFormatActions button:hover { background: #f3eef4; color: #ad748d; }
