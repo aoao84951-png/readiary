@@ -3034,7 +3034,7 @@ html { scrollbar-gutter: stable; }
 }
 
 .mobileNoteSheet { overflow: hidden; max-width: calc(100vw - 24px); }
-.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; max-height: min(72dvh, 620px); overflow-y: auto; padding-bottom: 12px; }
+.mobileNoteSheet .mobileNoteColors { flex: 1 1 auto; min-height: 0; max-height: min(72dvh, 620px); overflow-y: auto; padding-bottom: 12px; font-family: inherit; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d4d6d2; box-shadow: none; background: #f5f6f3; color: #62675e; font-weight: 500; }
 .mobileColorOptions button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; font-size: 14px; color: #90978b; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d9c6d2; background: #f8f1f6; color: #8f647d; }
@@ -3060,6 +3060,9 @@ html { scrollbar-gutter: stable; }
 .mobileColorOptions { width: 100%; min-width: 0; }
 .mobileColorOptions { max-height: none; overflow: visible; overscroll-behavior: contain; }
 .mobileColorOptions button { min-width: 0; overflow-wrap: anywhere; }
+.mobileNoteSheet .mobileColorOptions button,
+.mobileNoteSheet .customSectionHeading,
+.mobileNoteSheet .customColorRow { font-family: inherit; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
