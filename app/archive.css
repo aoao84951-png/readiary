@@ -3034,9 +3034,10 @@ html { scrollbar-gutter: stable; }
 }
 
 .mobileNoteSheet { overflow: hidden; max-width: calc(100vw - 24px); }
-.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; padding-bottom: 12px; }
+.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; max-height: min(72dvh, 620px); overflow-y: auto; padding-bottom: 12px; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d4d6d2; box-shadow: none; background: #f5f6f3; color: #62675e; font-weight: 500; }
 .mobileColorOptions button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; font-size: 14px; color: #90978b; }
+.mobileColorOptions button[aria-pressed="true"] { border-color: #d9c6d2; background: #f8f1f6; color: #8f647d; }
 
 .mobileNoteDock { --note-safe-bottom: env(safe-area-inset-bottom, 0px); }
 .mobileNoteSheet { padding-bottom: 8px; }
@@ -3057,7 +3058,7 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet, .mobileNoteSheet * { box-sizing: border-box; }
 .mobileNoteSheet .mobileNoteColors { width: 100%; min-width: 0; overflow-x: hidden; }
 .mobileColorOptions { width: 100%; min-width: 0; }
-.mobileColorOptions { max-height: min(460px, 52dvh); overflow-y: auto; overscroll-behavior: contain; }
+.mobileColorOptions { max-height: none; overflow: visible; overscroll-behavior: contain; }
 .mobileColorOptions button { min-width: 0; overflow-wrap: anywhere; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
