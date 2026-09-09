@@ -1764,16 +1764,24 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
         else { setToolbar(null); rangeRef.current = null; ref.current?.blur(); }
       }}>{paletteOpen ? <ChevronDown /> : <X />}</button>}
       {mobile && paletteOpen && <div className="mobileNoteColors">
-        <div className="noteColorTabs" role="tablist" aria-label="색상 종류">
-          <button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button>
-          <button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button>
-        </div>
-        <div className="mobileColorOptions" role="group" aria-label={colorTab === "text" ? "글자색" : "배경색"}>
-          {["default", ...noteColors].map((color, i) => <button type="button" key={color} aria-pressed={colorTab === "text" ? toolbar?.textColor === (i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]) : i === 0 ? !toolbar?.backgroundColor || ["transparent", "rgba(0,0,0,0)"].includes(toolbar.backgroundColor) : toolbar?.backgroundColor === noteBackgroundHex[noteColors[i - 1]]} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", i === 0 ? (colorTab === "text" ? "#4d4d49" : "transparent") : (colorTab === "text" ? noteColorHex[noteColors[i - 1]] : noteBackgroundHex[noteColors[i - 1]]))}>
-            <span className={colorTab === "background" ? "colorSample backgroundSample" : "colorSample"} style={colorTab === "text" ? {color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]} : {backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]]}}>{colorTab === "text" ? "가" : ""}</span>
-            <span className="colorOptionLabel">{i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}</span>
-          </button>)}
-        </div>
+        <section className="mobileColorSection" aria-label="글자색">
+          <div className="mobilePaletteSectionLabel">글자색</div>
+          <div className="mobileColorOptions" role="group" aria-label="글자색">
+            {["default", ...noteColors].map((color, i) => <button type="button" key={color} aria-pressed={toolbar?.textColor === (i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]])} onClick={() => apply("foreColor", i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]])}>
+              <span className="colorSample" style={{ color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]] }}>가</span>
+              <span className="colorOptionLabel">{i === 0 ? "기본" : labels[i - 1]} 텍스트</span>
+            </button>)}
+          </div>
+        </section>
+        <section className="mobileColorSection" aria-label="배경색">
+          <div className="mobilePaletteSectionLabel">배경색</div>
+          <div className="mobileColorOptions" role="group" aria-label="배경색">
+            {["default", ...noteColors].map((color, i) => <button type="button" key={color} aria-pressed={i === 0 ? !toolbar?.backgroundColor || ["transparent", "rgba(0,0,0,0)"].includes(toolbar.backgroundColor) : toolbar?.backgroundColor === noteBackgroundHex[noteColors[i - 1]]} onClick={() => apply("hiliteColor", i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]])}>
+              <span className="colorSample backgroundSample" style={{ backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]] }} />
+              <span className="colorOptionLabel">{i === 0 ? "기본" : labels[i - 1]} 배경</span>
+            </button>)}
+          </div>
+        </section>
         <section className="mobileCustomColors" aria-label="내 색상">
           <button className="customSectionToggle" type="button" aria-expanded={customColorsOpen} onClick={() => setCustomColorsOpen(open => !open)}><span>내 색상</span><ChevronDown size={15} /></button>
           {customColorsOpen && <div className="mobileCustomColorsBody">

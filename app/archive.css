@@ -3069,6 +3069,8 @@ html { scrollbar-gutter: stable; }
 .mobileColorOptions { width: 100%; min-width: 0; }
 .mobileColorOptions { max-height: none; overflow: visible; overscroll-behavior: contain; }
 .mobileColorOptions button { min-width: 0; overflow-wrap: anywhere; }
+.mobileColorSection + .mobileColorSection { margin-top: 12px; }
+.mobilePaletteSectionLabel { margin: 0 0 7px; color: #96909a; font-size: 10px; font-weight: 700; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
