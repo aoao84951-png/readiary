@@ -1908,6 +1908,7 @@
 .noteFormatActions button[aria-expanded="true"], .noteFormatActions button[aria-pressed="true"] { background: #f3eef4; color: #ad748d; }
 .selectionFormatToolbar button:focus-visible { outline: 2px solid #86a6ce; outline-offset: 1px; }
 .noteColorPalette { min-width: 0; margin: 0; border: 0; border-top: 1px solid #e5eaf1; margin-top: 2px; padding: 6px; }
+.noteColorPalette { max-height: min(560px, calc(100dvh - 32px)); overflow-y: auto; overscroll-behavior: contain; }
 .notePaletteLabel { font-family: inherit; font-size: 10px; font-weight: 600; color: #8a8f99; margin: 6px 0 7px; }
 .noteSwatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .noteSwatches button { display: grid; place-items: center; height: 28px; min-width: 0; padding: 0; border: 1px solid #d9e0eb; border-radius: 7px; background: #fff; color: #373a3e; font-family: "Read Diary Symbols", sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; }
@@ -3056,10 +3057,13 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet, .mobileNoteSheet * { box-sizing: border-box; }
 .mobileNoteSheet .mobileNoteColors { width: 100%; min-width: 0; overflow-x: hidden; }
 .mobileColorOptions { width: 100%; min-width: 0; }
+.mobileColorOptions { max-height: min(460px, 52dvh); overflow-y: auto; overscroll-behavior: contain; }
 .mobileColorOptions button { min-width: 0; overflow-wrap: anywhere; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
+.customSectionHeading { grid-column: 1 / -1; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7e2; color: #949a91; font-size: 12px; font-weight: 700; }
+.noteColorPalette .customSectionHeading { margin-top: 14px; }
 .customColorRow { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
 .customColorRow input { min-width: 0; flex: 1; height: 34px; padding: 0 9px; border: 1px solid #e6e7e2; border-radius: 8px; background: #fff; color: #5f645d; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
 .customColorRow button { height: 34px; padding: 0 11px; border: 0; border-radius: 8px; background: #eef1eb; color: #687060; font-size: 12px; font-weight: 700; }
