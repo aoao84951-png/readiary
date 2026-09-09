@@ -3034,7 +3034,7 @@ html { scrollbar-gutter: stable; }
 }
 
 .mobileNoteSheet { overflow: hidden; max-width: calc(100vw - 24px); }
-.mobileNoteSheet .mobileNoteColors { flex: 1 1 auto; min-height: 0; max-height: min(72dvh, 620px); overflow-y: auto; padding-bottom: 12px; }
+.mobileNoteSheet .mobileNoteColors { flex: 0 1 auto; max-height: min(460px, 52dvh); overflow-y: auto; padding-bottom: 12px; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d4d6d2; box-shadow: none; background: #f5f6f3; color: #62675e; font-weight: 500; }
 .mobileColorOptions button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; font-size: 14px; color: #90978b; }
 .mobileColorOptions button[aria-pressed="true"] { border-color: #d9c6d2; background: #f8f1f6; color: #8f647d; }
@@ -3083,12 +3083,7 @@ html { scrollbar-gutter: stable; }
 .mobileColorOptions .customColorRow { grid-column: 1 / -1; }
 @media (max-width: 640px), (pointer: coarse) {
   /* Match the reference mobile palette: readable two-column cards inside one scroll area. */
-  .mobileNoteSheet .mobileNoteColors {
-    max-height: min(72dvh, 620px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-  }
+  .mobileNoteSheet .mobileNoteColors { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
   .mobileColorOptions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobileColorOptions button,
   .mobileCustomSwatches button {
@@ -3116,7 +3111,10 @@ html { scrollbar-gutter: stable; }
     font-size: 14px;
   }
   .mobileCustomColors { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7e2; }
-  .mobileCustomColors .customSectionHeading { margin-top: 0; padding-top: 0; border-top: 0; }
+  .customSectionToggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0 4px; border: 0; background: transparent; color: #96909a; font-size: 9px; font-weight: 700; text-align: left; }
+  .customSectionToggle svg { transition: transform .16s ease; }
+  .customSectionToggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .mobileCustomColorsBody { padding-top: 4px; }
   .mobileCustomSwatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobileCustomColors .customColorRow { margin-top: 10px; }
 }

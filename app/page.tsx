@@ -1496,6 +1496,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const [mobile, setMobile] = useState(false);
   const [colorTab, setColorTab] = useState<"text" | "background">("text");
   const [customColors, setCustomColors] = useState<string[]>([]);
+  const [customColorsOpen, setCustomColorsOpen] = useState(false);
   const [customColorInput, setCustomColorInput] = useState("#787774");
   useEffect(() => {
     const query = window.matchMedia("(max-width: 640px), (pointer: coarse)");
@@ -1774,10 +1775,12 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
           </button>)}
         </div>
         <section className="mobileCustomColors" aria-label="내 색상">
-          <div className="customSectionHeading">내 색상</div>
-          <div className="noteColorTabs customColorTabs" role="tablist" aria-label="내 색상 종류"><button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button><button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button></div>
-          {customColors.length > 0 && <div className="mobileCustomSwatches">{customColors.map(color => <button type="button" key={color} aria-label={`내 색상 ${color}`} aria-pressed={toolbar?.[colorTab === "text" ? "textColor" : "backgroundColor"] === color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", color)}><span className="colorSample" style={colorTab === "text" ? { color } : { backgroundColor: color }}>{colorTab === "text" ? "가" : ""}</span><span className="colorOptionLabel">{color}</span></button>)}</div>}
-          <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); addCustomColor(); } }} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
+          <button className="customSectionToggle" type="button" aria-expanded={customColorsOpen} onClick={() => setCustomColorsOpen(open => !open)}><span>내 색상</span><ChevronDown size={15} /></button>
+          {customColorsOpen && <div className="mobileCustomColorsBody">
+            <div className="noteColorTabs customColorTabs" role="tablist" aria-label="내 색상 종류"><button type="button" role="tab" aria-selected={colorTab === "text"} onClick={() => setColorTab("text")}>글자색</button><button type="button" role="tab" aria-selected={colorTab === "background"} onClick={() => setColorTab("background")}>배경색</button></div>
+            {customColors.length > 0 && <div className="mobileCustomSwatches">{customColors.map(color => <button type="button" key={color} aria-label={`내 색상 ${color}`} aria-pressed={toolbar?.[colorTab === "text" ? "textColor" : "backgroundColor"] === color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", color)}><span className="colorSample" style={colorTab === "text" ? { color } : { backgroundColor: color }}>{colorTab === "text" ? "가" : ""}</span><span className="colorOptionLabel">{color}</span></button>)}</div>}
+            <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); addCustomColor(); } }} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
+          </div>}
         </section>
       </div>}
       {!mobile && paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
