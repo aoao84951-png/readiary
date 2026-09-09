@@ -1490,11 +1490,13 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
   const panelRef = useRef<HTMLDivElement>(null);
   const rangeRef = useRef<Range | null>(null);
   const lastEmitted = useRef<string | null>(null);
-  const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean; textColor: string; backgroundColor: string } | null>(null);
+  const [toolbar, setToolbar] = useState<{ top: number; left: number; bold: boolean; underline: boolean; italic: boolean; strikeThrough: boolean; textColor: string; backgroundColor: string; fontFamily: string } | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const interactingRef = useRef(false);
   const [mobile, setMobile] = useState(false);
   const [colorTab, setColorTab] = useState<"text" | "background">("text");
+  const [customColors, setCustomColors] = useState<string[]>([]);
+  const [customColorInput, setCustomColorInput] = useState("#787774");
   useEffect(() => {
     const query = window.matchMedia("(max-width: 640px), (pointer: coarse)");
     const update = () => setMobile(query.matches);
@@ -1611,7 +1613,7 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
       const rgb = value.match(/^rgb\((\d+),(\d+),(\d+)\)$/);
       return rgb ? "#" + rgb.slice(1).map(n => Number(n).toString(16).padStart(2, "0")).join("") : value;
     };
-    setToolbar({ textColor: colorValue("foreColor"), backgroundColor: colorValue("hiliteColor"), top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
+    setToolbar({ textColor: colorValue("foreColor"), backgroundColor: colorValue("hiliteColor"), fontFamily: getComputedStyle(ref.current).fontFamily, top: Math.max(8, rect.top - 66), left: Math.min(window.innerWidth - half - 8, Math.max(half + 8, rect.left + rect.width / 2)), bold: document.queryCommandState("bold"), underline: document.queryCommandState("underline"), italic: document.queryCommandState("italic"), strikeThrough: document.queryCommandState("strikeThrough") });
   };
   useEffect(() => {
     let start: { x: number; y: number; target: EventTarget | null } | null = null;
@@ -1739,7 +1741,13 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
     setPaletteOpen(!paletteOpen);
   };
   const labels = ["회색", "갈색", "주황색", "노란색", "초록색", "파란색", "보라색", "분홍색", "빨간색"];
-  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
+  const customColorName = colorTab === "text" ? "텍스트" : "배경";
+  const addCustomColor = () => {
+    const value = customColorInput.trim().toLowerCase();
+    if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+    setCustomColors(current => current.includes(value) ? current : [...current, value]);
+  };
+  const controls = <div ref={panelRef} className={`selectionFormatToolbar${mobile ? " mobileNoteDock" : ""}${mobile && paletteOpen ? " mobileNoteSheet" : ""}`} style={mobile ? undefined : { top: toolbar?.top, left: toolbar?.left, fontFamily: toolbar?.fontFamily }} onPointerDown={() => { interactingRef.current = true; }} onMouseDown={(event) => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setToolbar(null); setPaletteOpen(false); ref.current?.focus({ preventScroll: true }); } }}>
       <div className="noteFormatActions" role="toolbar" aria-label="선택한 글자 서식">
         {([{ command: "bold", label: "굵게", icon: Bold }, { command: "underline", label: "밑줄", icon: Underline }, { command: "italic", label: "기울임", icon: Italic }, { command: "strikeThrough", label: "취소선", icon: Strikethrough }] as const).map(({ command, label, icon: Icon }) => <button key={command} type="button" aria-label={label} title={label} disabled={!toolbar} aria-pressed={toolbar?.[command]} onClick={() => apply(command)}><Icon /></button>)}
         <button type="button" disabled={!toolbar} aria-label="서식 지우기" title="서식 지우기" onClick={() => apply("removeFormat")}><RemoveFormatting /></button>
@@ -1759,13 +1767,16 @@ function RichNoteTextarea({ value, onChange, placeholder, ariaLabel }: { value: 
             <span className={colorTab === "background" ? "colorSample backgroundSample" : "colorSample"} style={colorTab === "text" ? {color: i === 0 ? "#4d4d49" : noteColorHex[noteColors[i - 1]]} : {backgroundColor: i === 0 ? "transparent" : noteBackgroundHex[noteColors[i - 1]]}}>{colorTab === "text" ? "가" : ""}</span>
             {i === 0 ? "기본" : labels[i - 1]} {colorTab === "text" ? "텍스트" : "배경"}
           </button>)}
+          {customColors.map(color => <button type="button" key={color} aria-pressed={toolbar?.[colorTab === "text" ? "textColor" : "backgroundColor"] === color} onClick={() => apply(colorTab === "text" ? "foreColor" : "hiliteColor", color)}><span className="colorSample" style={colorTab === "text" ? { color } : { backgroundColor: color }}>{colorTab === "text" ? "가" : ""}</span>내 색상 {color}</button>)}
         </div>
+        <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
       </div>}
       {!mobile && paletteOpen && <fieldset className="noteColorPalette" disabled={!toolbar}>
         <div className="notePaletteLabel">글자색</div>
-        <div className="noteSwatches"><button type="button" aria-label="기본 글자색" onClick={() => apply("foreColor", "#4d4d49")}>A</button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 글자색`} style={{ color: noteColorHex[color] }} onClick={() => apply("foreColor", noteColorHex[color])}>A</button>)}</div>
+        <div className="noteSwatches"><button type="button" aria-label="기본 글자색" onClick={() => apply("foreColor", "#4d4d49")}>A</button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 글자색`} style={{ color: noteColorHex[color] }} onClick={() => apply("foreColor", noteColorHex[color])}>A</button>)}{customColors.map(color => <button type="button" key={color} aria-label={`내 색상 ${color}`} style={{ color }} aria-pressed={toolbar?.textColor === color} onClick={() => apply("foreColor", color)}>A</button>)}</div>
         <div className="notePaletteLabel">배경색</div>
-        <div className="noteSwatches"><button type="button" aria-label="하이라이트 없음" onClick={() => apply("hiliteColor", "transparent")}><CircleSlash /></button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 하이라이트`} style={{ backgroundColor: noteBackgroundHex[color] }} onClick={() => apply("hiliteColor", noteBackgroundHex[color])} />)}</div>
+        <div className="noteSwatches"><button type="button" aria-label="하이라이트 없음" onClick={() => apply("hiliteColor", "transparent")}><CircleSlash /></button>{noteColors.map((color, i) => <button type="button" key={color} aria-label={`${labels[i]} 하이라이트`} style={{ backgroundColor: noteBackgroundHex[color] }} onClick={() => apply("hiliteColor", noteBackgroundHex[color])} />)}{customColors.map(color => <button type="button" key={color} aria-label={`내 배경 ${color}`} style={{ backgroundColor: color }} aria-pressed={toolbar?.backgroundColor === color} onClick={() => apply("hiliteColor", color)} />)}</div>
+        <div className="customColorRow"><input aria-label={`내 ${customColorName} HEX`} value={customColorInput} onChange={event => setCustomColorInput(event.target.value)} placeholder="#RRGGBB" /><button type="button" onClick={addCustomColor}>+ 추가</button></div>
       </fieldset>}
     </div>;
   return <div className="richNoteField">

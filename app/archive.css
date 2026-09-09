@@ -3060,6 +3060,11 @@ html { scrollbar-gutter: stable; }
 .mobileNoteSheet .noteColorTabs { min-width: 0; }
 .mobileNoteSheet .noteColorTabs button { min-width: 0; border-bottom: 1px solid transparent; }
 .mobileNoteSheet .noteColorTabs button[aria-selected="true"] { border-bottom-color: #dce0d7; }
+.customColorRow { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+.customColorRow input { min-width: 0; flex: 1; height: 34px; padding: 0 9px; border: 1px solid #e6e7e2; border-radius: 8px; background: #fff; color: #5f645d; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.customColorRow button { height: 34px; padding: 0 11px; border: 0; border-radius: 8px; background: #eef1eb; color: #687060; font-size: 12px; font-weight: 700; }
+.noteSwatches button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #c9cec4; }
+.mobileColorOptions .customColorRow { grid-column: 1 / -1; }
 
 /* Keep selected pills inset from the dock ends and the close-button divider. */
 .mobileNoteDock .noteFormatActions button { position: relative; isolation: isolate; min-width: 0; border-radius: 999px; background: transparent; }
