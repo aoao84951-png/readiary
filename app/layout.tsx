@@ -3,10 +3,12 @@ import './globals.css';
 import './archive.css';
 import './rating.css';
 import './symbols.css';
+import PwaRegister from './pwa-register';
 
 export const metadata: Metadata = {
   title: '읽은 마음 — 나의 독서기록',
   description: '읽은 책과 마음에 남은 감상을 오래 보관하는 개인 독서 아카이브',
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: '/favicon.png?v=restored-20260909',
     apple: '/apple-touch-icon.png?v=restored-20260909',
@@ -23,6 +25,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
@@ -32,7 +35,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PwaRegister />
+      </body>
     </html>
   );
 }
