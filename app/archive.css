@@ -3113,12 +3113,16 @@ html { scrollbar-gutter: stable; }
     font-size: 14px;
   }
   .mobileCustomColors { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7e2; }
-  .customSectionToggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0 4px; border: 0; background: transparent; color: #96909a; font-size: 9px; font-weight: 700; text-align: left; }
-  .customSectionToggle svg { transition: transform .16s ease; }
-  .customSectionToggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .customSectionToggle { width: 100%; display: flex; align-items: center; gap: 5px; padding: 0 0 4px; border: 0; background: transparent; color: #96909a; font-size: 9px; font-weight: 700; text-align: left; }
+  .customSectionCaret { color: #96909a; font-size: 9px; line-height: 1; }
+  .customSectionToggle[aria-expanded="true"] .customSectionCaret { transform: rotate(180deg); }
   .mobileCustomColorsBody { padding-top: 4px; }
+  .mobileCustomColors .customColorTabs { display: flex; gap: 0; padding: 0; border-radius: 12px; background: #f7f6f3; overflow: hidden; }
+  .mobileCustomColors .customColorTabs button { height: 42px; border-radius: 12px; background: transparent; color: #99938f; }
+  .mobileCustomColors .customColorTabs button[aria-selected="true"] { background: #eee7fb; color: #8b6c86; border-bottom: 0; }
   .mobileCustomSwatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobileCustomColors .customColorRow { margin-top: 10px; }
+  .mobileCustomColors .customColorPreview { flex: 0 0 44px; width: 44px; height: 44px; padding: 5px; border: 1px solid #e6e0e5; border-radius: 10px; background-clip: content-box; }
 }
 
 /* Keep selected pills inset from the dock ends and the close-button divider. */
